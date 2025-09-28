@@ -39,4 +39,4 @@ const matchingSchema = new Schema({
   },
 });
 
-export default mongoose.model("matchingModel", matchingSchema,);
+export default mongoose.model("MatchingModel", matchingSchema,);
