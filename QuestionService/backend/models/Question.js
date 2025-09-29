@@ -12,7 +12,7 @@ const questionSchema = new mongoose.Schema(
         },
         difficulty: {
             type: String,
-            enum: ['Beginner','Intermediate','Advanced'],
+            enum: ['Beginner', 'Intermediate', 'Advanced'],
             required: true,
         },
         topics: {

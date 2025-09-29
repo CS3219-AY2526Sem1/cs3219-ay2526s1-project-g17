@@ -1,24 +1,22 @@
 import express from "express";
 import dotenv from "dotenv"
 
-import routes from "./routes/route.js"
 import { connectDB } from "../config/db.js";
 import rateLimiter from "../middleware/rateLimiter.js";
+import questionRouter from "./routes/questionsRoutes.js";
 
 const app = express();
 dotenv.config()
 const PORT = process.env.PORT || 5001;
-
-connectDB();
 
 // middleware
 app.use(express.json());
 
 app.use(rateLimiter);
 
+app.use("/api/questions", questionRouter);
 
-app.use("/api/notes", routes);
-connectDB(() => {
+connectDB().then(() => {
     app.listen(PORT, () => {
         console.log("server started on port: 5001");
     });
