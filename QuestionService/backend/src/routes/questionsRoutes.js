@@ -6,15 +6,17 @@ import {
     createQuestion,
     editQuestion,
     deleteQuestion,
-    getRandomQuestionByDificultyAndTopic,
-    getListOfQuestionsByDificultyAndTopic
+    getRandomQuestionByDifficultyAndTopic,
+    getListOfQuestionsByDifficultyAndTopic,
+    getListOfTopicsByDifficulty
 } from "../controllers/questionsController.js";
 
 const router = express.Router();
 
 router.get("/", getAllQuestions);
-router.get("/randomlist", getListOfQuestionsByDificultyAndTopic);
-router.get("/random", getRandomQuestionByDificultyAndTopic);
+router.get("/randomlist", getListOfQuestionsByDifficultyAndTopic);
+router.get("/random", getRandomQuestionByDifficultyAndTopic);
+router.get("/topics", getListOfTopicsByDifficulty);
 router.get("/:id", getQuestionById);
 router.post("/", createQuestion);
 router.put("/:id", editQuestion);

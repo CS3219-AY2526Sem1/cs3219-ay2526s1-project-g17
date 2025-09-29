@@ -63,7 +63,7 @@ export async function deleteQuestion(req, res) {
     }
 }
 
-export async function getRandomQuestionByDificultyAndTopic(req, res) {
+export async function getRandomQuestionByDifficultyAndTopic(req, res) {
     try {
         const { difficulty, topics } = req.body;
 
@@ -74,7 +74,7 @@ export async function getRandomQuestionByDificultyAndTopic(req, res) {
             })
             .sample(1); // picks at random from matched list
 
-        if (!data) return res.status(400).json({ message: "No question matches the defined criteria" });
+        if (data.length == 0) return res.status(404).json({ message: "No question matches the defined criteria" });
 
         // if multiple topics are specified (for eg. array, oop):
         // like q1 has [array, recursion]
@@ -86,12 +86,12 @@ export async function getRandomQuestionByDificultyAndTopic(req, res) {
 
         res.status(200).json(data);
     } catch (error) {
-        console.error("Error in getRandomQuestionByDificultyAndTopic controller", error);
+        console.error("Error in getRandomQuestionByDifficultyAndTopic controller", error);
         res.status(500).json({ message: "Internal server error" });
     }
 }
 
-export async function getListOfQuestionsByDificultyAndTopic(req, res) {
+export async function getListOfQuestionsByDifficultyAndTopic(req, res) {
     try {
         const { difficulty, topics } = req.body;
 
@@ -101,7 +101,7 @@ export async function getListOfQuestionsByDificultyAndTopic(req, res) {
                 topics: { $in: topics } // will return a list of matches as long as one of the topics in the request is present in the database
             });
 
-        if (!data) return res.status(400).json({ message: "No question matches the defined criteria" });
+        if (data.length == 0) return res.status(404).json({ message: "No question matches the defined criteria" });
 
         // if multiple topics are specified (for eg. array, oop):
         // like q1 has [array, recursion]
@@ -112,7 +112,27 @@ export async function getListOfQuestionsByDificultyAndTopic(req, res) {
 
         res.status(200).json(data);
     } catch (error) {
-        console.error("Error in getRandomQuestionByDificultyAndTopic controller", error);
+        console.error("Error in getListOfQuestionsByDifficultyAndTopic controller", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+}
+
+export async function getListOfTopicsByDifficulty(req, res) {
+    try {
+        const { difficulty } = req.body;
+
+        const data = await Question.aggregate()
+            .match({
+                difficulty: difficulty,
+            });
+
+        if (data.length == 0) return res.status(404).json({ message: "No question matches the defined criteria" });
+        
+        const allTopics = [...new Set(data.flatMap(q => q.topics))];
+
+        res.status(200).json(allTopics);
+    } catch (error) {
+        console.error("Error in getListOfTopicsByDifficulty controller", error);
         res.status(500).json({ message: "Internal server error" });
     }
 }
