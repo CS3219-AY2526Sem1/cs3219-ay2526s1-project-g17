@@ -24,8 +24,8 @@ export async function getQuestionById(req, res) {
 
 export async function createQuestion(req, res) {
     try {
-        const { title, question, difficulty, topics } = req.body;
-        const newQuestion = new Question({ title, question, difficulty, topics });
+        const { title, question, difficulty, topics, testCases, constraints, hints, solution } = req.body;
+        const newQuestion = new Question({ title, question, difficulty, topics, testCases, constraints, hints, solution });
         const savedQuestion = await newQuestion.save();
         res.status(201).json({ savedQuestion });
     } catch (error) {
@@ -36,10 +36,10 @@ export async function createQuestion(req, res) {
 
 export async function editQuestion(req, res) {
     try {
-        const { title, question, difficulty, topics } = req.body;
+        const { title, question, difficulty, topics, testCases, constraints, hints, solution } = req.body;
         const editedQuestion = await Question.findByIdAndUpdate(
             req.params.id,
-            { title, question, difficulty, topics },
+            { title, question, difficulty, topics, testCases, constraints, hints, solution },
             { new: true }
         );
         if (!editedQuestion) return res.status(404).json({ message: "Question not found" });
