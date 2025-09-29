@@ -1,10 +1,18 @@
 import express from "express";
 
-import { getAllQuestions, getQuestionById, createQuestion, editQuestion, deleteQuestion } from "../controllers/questionsController.js";
+import {
+    getAllQuestions,
+    getQuestionById,
+    createQuestion,
+    editQuestion,
+    deleteQuestion,
+    getRandomQuestionByDificultyAndTopic
+} from "../controllers/questionsController.js";
 
 const router = express.Router();
 
 router.get("/", getAllQuestions);
+router.get("/random", getRandomQuestionByDificultyAndTopic);
 router.get("/:id", getQuestionById);
 router.post("/", createQuestion);
 router.put("/:id", editQuestion);

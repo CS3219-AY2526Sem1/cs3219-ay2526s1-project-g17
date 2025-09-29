@@ -1,3 +1,5 @@
+import { Model } from "mongoose";
+
 import Question from "../../models/Question.js";
 
 export async function getAllQuestions(_, res) {
@@ -57,6 +59,32 @@ export async function deleteQuestion(req, res) {
         res.status(200).json({ message: "Question deleted successfully" })
     } catch (error) {
         console.error("Error in deleteQuestion controller", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+}
+
+export async function getRandomQuestionByDificultyAndTopic(req, res) {
+    try {
+        const { difficulty, topics } = req.body;
+
+        const data = await Question.aggregate()
+            .match({
+                difficulty: difficulty,
+                topics: { $in: topics } // will return a list of matches as long as one of the topics in the request is present in the database
+            })
+            .sample(1); // picks at random from matched list
+
+        // if multiple topics are specified (for eg. array, oop):
+        // like q1 has [array, recursion]
+        // and  q2 has [recursion, oop]
+        // match will return both q1 and q2 then size will pick one at random
+
+        // does not work if no topic selected
+        // does not work if no difficulty selected
+
+        res.status(200).json(data);
+    } catch (error) {
+        console.error("Error in getRandomQuestionByDificultyAndTopic controller", error);
         res.status(500).json({ message: "Internal server error" });
     }
 }
