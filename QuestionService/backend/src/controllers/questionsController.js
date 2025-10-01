@@ -134,3 +134,17 @@ export async function getListOfTopicsByDifficulty(req, res) {
         res.status(500).json({ message: "Internal server error" });
     }
 }
+
+export async function insertMany(req, res) {
+    try {
+        const questionsArray = req.body;
+        if (!Array.isArray(questionsArray) || questionsArray.length === 0) {
+            return res.status(400).json({ message: "Request body must be a non-empty array of questions" });
+        }
+        const result = await Question.insertMany(questionsArray);
+        res.status(201).json({ insertedCount: result.length, insertedQuestions: result });
+    } catch (error) {
+        console.error("Error in insertMany controller", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+}
