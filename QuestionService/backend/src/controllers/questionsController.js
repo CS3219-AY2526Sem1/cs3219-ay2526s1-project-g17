@@ -1,5 +1,3 @@
-import { Model } from "mongoose";
-
 import Question from "../../models/Question.js";
 
 export async function getAllQuestions(_, res) {
@@ -26,8 +24,8 @@ export async function getQuestionById(req, res) {
 
 export async function createQuestion(req, res) {
     try {
-        const { title, question, difficulty, topics, testCases, constraints, hints, solution } = req.body;
-        const newQuestion = new Question({ title, question, difficulty, topics, testCases, constraints, hints, solution });
+        const { title, question, difficulty, topics, link, testCases, constraints, hints, solution } = req.body;
+        const newQuestion = new Question({ title, question, difficulty, topics, link, testCases, constraints, hints, solution });
         const savedQuestion = await newQuestion.save();
         res.status(201).json({ savedQuestion });
     } catch (error) {
@@ -38,10 +36,10 @@ export async function createQuestion(req, res) {
 
 export async function editQuestion(req, res) {
     try {
-        const { title, question, difficulty, topics, testCases, constraints, hints, solution } = req.body;
+        const { title, question, difficulty, topics, link, testCases, constraints, hints, solution } = req.body;
         const editedQuestion = await Question.findByIdAndUpdate(
             req.params.id,
-            { title, question, difficulty, topics, testCases, constraints, hints, solution },
+            { title, question, difficulty, topics, link, testCases, constraints, hints, solution },
             { new: true }
         );
         if (!editedQuestion) return res.status(404).json({ message: "Question not found" });
@@ -127,7 +125,7 @@ export async function getListOfTopicsByDifficulty(req, res) {
             });
 
         if (data.length == 0) return res.status(404).json({ message: "No question matches the defined criteria" });
-        
+
         const allTopics = [...new Set(data.flatMap(q => q.topics))];
 
         res.status(200).json(allTopics);
