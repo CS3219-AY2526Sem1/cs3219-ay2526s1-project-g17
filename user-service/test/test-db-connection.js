@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 
 dotenv.config();
 
+// Test the connection to the MongoDB Cloud database
 const uri = process.env.DB_CLOUD_URI;
 mongoose.connect(uri)
   .then(() => {
