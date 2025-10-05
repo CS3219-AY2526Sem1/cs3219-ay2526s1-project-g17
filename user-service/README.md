@@ -4,13 +4,7 @@
 
 > :notebook: If you are familiar to MongoDB and wish to use a local instance, please feel free to do so. This guide utilizes MongoDB Cloud Services.
 
-mongodb+srv://<db_username>:<db_password>@cluster0.xfhuymk.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
 
-g17_user_service_test
-WZ4R28pYJMbFGAoQ
-
-test-user
-w2PlcaeSgYNmzq7h
 
 1. Set up a MongoDB Shared Cluster by following the steps in this [Guide](./MongoDBSetup.md).
 
