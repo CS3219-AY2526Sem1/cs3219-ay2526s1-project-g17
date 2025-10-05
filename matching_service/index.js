@@ -1,15 +1,14 @@
 import express from "express";
 import cors from "cors";
 
-import userRoutes from "./routes/user-routes.js";
-import authRoutes from "./routes/auth-routes.js";
+import matchingRoute from "./routes/matching_route.js";
 
 const app = express();
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors()); // config cors so that front-end can use
-app.options("*", cors());
+// app.options("*", cors());
 
 // To handle CORS Errors
 app.use((req, res, next) => {
@@ -30,15 +29,14 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use("/users", userRoutes);
-app.use("/auth", authRoutes);
+app.use("/api/matching", matchingRoute)
 
 app.get("/", (req, res, next) => {
   console.log("Sending Greetings!");
   res.json({
-    message: "Hello World from user-service",
-  });
-});
+    message: "Hello World from matching service",
+  });})
+
 
 // Handle When No Route Match Is Found
 app.use((req, res, next) => {

@@ -1,71 +1,104 @@
-import {MatchingModel} from "./matching-model.js";
+import MatchingModel from "./matching_model.js";
 import "dotenv/config";
 import { connect } from "mongoose";
+import { monitorListingUsingEventTransmitter } from "../service/change_stream.js";
+import { configDotenv } from "dotenv";
+
+configDotenv();
 
 export async function connectToDB() {
   let mongoDBUri =
     process.env.ENV === "PROD"
       ? process.env.DB_CLOUD_URI
       : process.env.DB_LOCAL_URI;
-
-  await connect(mongoDBUri);
+  try {
+    const c = await connect(mongoDBUri);
+    MatchingModel.wa;
+    console.log("Mongodb connected successfully");
+  } catch (error) {
+    console.error("Error: " + error);
+  }
 }
 
-export async function createUser(username, email, password) {
-  return new UserModel({ username, email, password }).save();
-}
+/** @typedef {import("../server.js").Criteria} Criteria */
 
-export async function findUserByEmail(email) {
-  return UserModel.findOne({ email });
-}
-
-export async function findUserById(userId) {
-  return UserModel.findById(userId);
-}
-
-export async function findUserByUsername(username) {
-  return UserModel.findOne({ username });
-}
-
-export async function findUserByUsernameOrEmail(username, email) {
-  return UserModel.findOne({
-    $or: [
-      { username },
-      { email },
-    ],
+/**
+ * @param {string} clientId
+ * @param {"searching" | "found" | "pending" | "matched"} status
+ * searching is searching for a match,
+ * found means a match is found and is waiting for the server to send request,
+ * pending is waiting for user to ack acceptance or rejection,
+ * matched is for system to clean up
+ * @param {Criteria} criterias
+ */
+export async function storeMatchRequest(clientId, status, criterias) {
+  const newMatch = new MatchingModel({
+    userId: clientId,
+    status: status,
+    criterias: criterias,
   });
+
+  const doc = await newMatch.save();
+  // monitorListingUsingEventTransmitter(
+  //   MatchingModel,
+  //   process.env.QUEUE_TIMEOUT,
+  //   [
+  //     {
+  //       $match: { "documentKey._id": doc._id },
+  //     },
+  //   ]
+  // );
 }
 
-export async function findAllUsers() {
-  return UserModel.find();
-}
+/**
+ * @param {MatchingModel} match
+ * @returns {Promise<Array>}
+ */
+export async function findCompatibleMatch(match) {
+  try {
+    const searchCriteria = match.criterias;
 
-export async function updateUserById(userId, username, email, password) {
-  return UserModel.findByIdAndUpdate(
-    userId,
-    {
-      $set: {
-        username,
-        email,
-        password,
+    const orConditions = searchCriteria.map((criteria) => ({
+      criterias: {
+        $elemMatch: {
+          difficulty: criteria.difficulty,
+          language: criteria.language,
+          topic: criteria.topic,
+        },
       },
-    },
-    { new: true },  // return the updated user
-  );
+    }));
+
+    const compatibleMatches = await MatchingModel.find({
+      $and: [
+        {
+          $or: orConditions,
+        },
+        {
+          userId: { $ne: match.userId },
+        },
+        {
+          status: "waiting",
+        },
+      ],
+    }).sort({ createdAt: asc });
+    compatibleMatches[0];
+    return compatibleMatches;
+  } catch (error) {
+    console.error("Error finding compatible matches:", error);
+    throw error;
+  }
 }
 
-export async function updateUserPrivilegeById(userId, isAdmin) {
-  return UserModel.findByIdAndUpdate(
-    userId,
-    {
-      $set: {
-        isAdmin,
-      },
-    },
-    { new: true },  // return the updated user
-  );
-}
-
-export async function deleteUserById(userId) {
-  return UserModel.findByIdAndDelete(userId);
+/**
+ * @param {string} clientId
+ */
+export async function cancelMatch(clientId) {
+  try {
+    await MatchingModel.deleteMany({
+      userId: clientId,
+    });
+    console.log("Client match request deleted");
+  } catch (error) {
+    console.error("Error while deleting client request", error);
+  }
 }
