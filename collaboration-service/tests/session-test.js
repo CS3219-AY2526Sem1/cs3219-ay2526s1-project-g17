@@ -10,14 +10,22 @@ const socket = io('http://localhost:3002', {
 const sessionId = 'session-123';
 const userId = 'user-456';
 
+
 socket.on('connect', () => {
   console.log('Connected to collaboration service');
+  socket.emit('clientMessage', 'Hello Server, this is the client!');
   socket.emit('joinSession', { sessionId, userId });
+  socket.emit('codeChange', { sessionId, code: '// A code change' });
 });
 
 // Listen for events
 socket.on('userJoined', (data) => {
   console.log('User joined:', data);
+});
+
+
+socket.onAny((event, ...args) => {
+  console.log(`Event: ${event}`, args);
 });
 
 socket.on('codeUpdate', (code) => {
@@ -29,12 +37,12 @@ socket.on('sessionTerminated', () => {
   socket.disconnect();
 });
 
-// Simulate code change after 2 seconds
-setTimeout(() => {
-  socket.emit('codeChange', { sessionId, code: 'console.log("Hello from test client!");' });
-}, 2000);
+// // Simulate code change after 2 seconds
+// setTimeout(() => {
+//   socket.emit('codeChange', { sessionId, code: 'console.log("Hello from test client!");' });
+// }, 2000);
 
-// Terminate after 5 seconds
-setTimeout(() => {
-  socket.emit('terminateSession', { sessionId });
-}, 5000);
+// // Terminate after 5 seconds
+// setTimeout(() => {
+//   socket.emit('terminateSession', { sessionId });
+// }, 5000);
