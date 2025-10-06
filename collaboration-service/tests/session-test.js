@@ -15,7 +15,6 @@ socket.on('connect', () => {
   console.log('Connected to collaboration service');
   socket.emit('clientMessage', 'Hello Server, this is the client!');
   socket.emit('joinSession', { sessionId, userId });
-  socket.emit('codeChange', { sessionId, code: '// A code change' });
 });
 
 // Listen for events
@@ -24,9 +23,9 @@ socket.on('userJoined', (data) => {
 });
 
 
-socket.onAny((event, ...args) => {
-  console.log(`Event: ${event}`, args);
-});
+// socket.onAny((event, ...args) => {
+//   console.log(`Event: ${event}`, args);
+// });
 
 socket.on('codeUpdate', (code) => {
   console.log('Received code update:', code);
@@ -37,12 +36,24 @@ socket.on('sessionTerminated', () => {
   socket.disconnect();
 });
 
-// // Simulate code change after 2 seconds
-// setTimeout(() => {
-//   socket.emit('codeChange', { sessionId, code: 'console.log("Hello from test client!");' });
-// }, 2000);
+// Simulate realistic editing flow
+setTimeout(() => {
+  console.log('✏️ Sending initial code...');
+  socket.emit('codeChange', { 
+    sessionId, 
+    code: `function greet() {\n  console.log("Hello, PeerPrep!");\n}` 
+  });
+}, 1000);
 
-// // Terminate after 5 seconds
-// setTimeout(() => {
-//   socket.emit('terminateSession', { sessionId });
-// }, 5000);
+setTimeout(() => {
+  console.log('✏️ Sending updated code...');
+  socket.emit('codeChange', { 
+    sessionId, 
+    code: `function greet(name = "PeerPrep") {\n  console.log("Hello, " + name + "!");\n}` 
+  });
+}, 3000);
+
+// Terminate after 5 seconds
+setTimeout(() => {
+  socket.emit('terminateSession', { sessionId });
+}, 5000);
