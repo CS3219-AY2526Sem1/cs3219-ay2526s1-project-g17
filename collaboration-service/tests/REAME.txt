@@ -1,0 +1,1 @@
+Project root dir: collaboration-service
