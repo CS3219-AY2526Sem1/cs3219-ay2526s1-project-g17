@@ -22,6 +22,18 @@ export async function getQuestionById(req, res) {
     }
 }
 
+export async function getAllTopics(_, res) {
+    try {
+        const data = await Question.find();
+        const allTopics = [...new Set(data.flatMap(q => q.topics))];
+
+        res.status(200).json(allTopics);
+    } catch (error) {
+        console.error("Error in getAllTopics controller", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+}
+
 export async function createQuestion(req, res) {
     try {
         const { title, question, difficulty, topics, link, testCases, constraints, hints, solution } = req.body;
