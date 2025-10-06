@@ -21,3 +21,5 @@ connectDB().then(() => {
         console.log("server started on port: 5001");
     });
 });
+
+// from backend folder, npm run dev to start the server (use non-sch wifi)
