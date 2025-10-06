@@ -25,13 +25,18 @@ io.on('connection', (socket) => {
     socket.join(sessionId);
     socket.to(sessionId).emit('userJoined', { userId });
     const session = await Session.findOne({ sessionId });
-    if (session) socket.emit('codeUpdate', session.code);
+	if (session) socket.emit('codeUpdate', session.code);
   });
 
   socket.on('codeChange', async ({ sessionId, code }) => {
-    await Session.findOneAndUpdate({ sessionId }, { code }, { new: true });
-    socket.to(sessionId).emit('codeUpdate', code);
-  });
+	console.log('Saved code:\n' + code);
+	await Session.findOneAndUpdate(
+	{ sessionId },
+	{ code, lastUpdated: new Date() },
+	{ upsert: true, new: true }
+	);
+	socket.to(sessionId).emit('codeUpdate', code);
+});
 
   socket.on('disconnecting', () => {
     for (const room of socket.rooms) {
@@ -56,3 +61,6 @@ mongoose.connect(DB_URI)
     server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
   })
   .catch(err => console.error('DB connection failed:', err.message));
+
+
+export { server };
