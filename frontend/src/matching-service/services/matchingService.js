@@ -48,7 +48,7 @@ export const submitMatchRequest = async (matchRequest) => {
       resolve({
         success: true,
         message: "Match request submitted successfully",
-        requestId: Math.random().toString(36).substr(2, 9),
+        requestId: Math.random().toString(36).substring(2, 9),
       });
     }, 1000);
   });
