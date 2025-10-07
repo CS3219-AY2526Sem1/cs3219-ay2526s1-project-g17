@@ -1,11 +1,14 @@
 import http from "http";
 import index from "./index.js";
 import { connectToDB } from "./model/repository.js";
-import { configDotenv } from "dotenv";
 import { WebSocketServer } from "ws";
 import { randomUUID } from "crypto";
-import { sendMessage } from "./utility/ws_util.js";
-configDotenv();
+import {
+  sendMatchNotification,
+  sendMessage,
+  sendSessionToUser,
+} from "./utility/ws_util.js";
+
 const port = process.env.PORT || 3001;
 
 const server = http.createServer(index);
@@ -23,9 +26,15 @@ const wss = new WebSocketServer({ server, clientTracking: true });
  */
 
 /**
+ * @typedef {Object} UserInstance
+ * @property {WebSocket} ws
+ * @property {UUID} id
+ */
+
+/**
  * @typedef {Object} MatchRequest
  * @property {"matchRequest"} typename
- * @property {Array<Criteria>} [criterias]
+ * @property {Array<Criteria>} criterias
  * @property {number} time
  */
 
@@ -42,7 +51,7 @@ const wss = new WebSocketServer({ server, clientTracking: true });
 /**
  * @typedef {Object} MatchPair
  * @property {UUID} partner
- * @property {bool} accepted
+ * @property {boolean} accepted
  */
 
 /**
@@ -52,19 +61,22 @@ const wss = new WebSocketServer({ server, clientTracking: true });
 
 /** @type {Map<UUID, MatchRequest>} */
 const userRequests = new Map();
+/** @type {Map<UUID, UserInstance>} */
 const userConnections = new Map();
 /** @type {Map<UUID, MatchPair>} */
 const matchedPairTable = new Map();
 
 wss.on("connection", (ws, request) => {
   console.log("New WebSocket connection");
-  ws.id = randomUUID();
+  /** @type {UserInstance} */
+  // @ts-ignore
+  const userInstance = { id: randomUUID(), ws: ws };
 
   ws.on("message", async (message) => {
     try {
       const data = JSON.parse(message);
       console.log("Received message", data);
-      await handleMessage(ws, data);
+      await handleMessage(userInstance, data);
     } catch (error) {
       console.error("Error while parsing or handling message", error);
       ws.send(
@@ -74,13 +86,13 @@ wss.on("connection", (ws, request) => {
   });
 
   ws.on("close", async () => {
-    await handleDisconnect(ws.id);
+    await handleDisconnect(userInstance);
   });
 });
 
 /**
  * @param {Message} message
- * @param {WebSocket} ws
+ * @param {UserInstance} ws
  */
 async function handleMessage(ws, message) {
   switch (message.typename) {
@@ -103,28 +115,34 @@ async function handleMessage(ws, message) {
       }
       break;
     default:
-      sendMessage(ws, { message: "Invalid request typename" });
+      sendMessage(ws.ws, { message: "Invalid request typename" });
   }
 }
 
 /**
- * @param {WebSocket} ws
+ * @param {UserInstance} ws
  */
 async function matchAcceptHandler(ws) {
   const p = matchedPairTable.get(ws.id);
+  if (!p) {
+    throw new Error("No match entry for " + ws.id);
+  }
   p.accepted = true;
   console.log(matchedPairTable.get(ws.id));
 
   console.log(`${ws.id} has accepted`);
 }
 
-async function handleDisconnect(id) {
-  userConnections.delete(id);
+/**
+ * @param {UserInstance} userInstance
+ */
+async function handleDisconnect(userInstance) {
+  userConnections.delete(userInstance.id);
   // await cancelMatch(id);
 }
 
 /**
- * @param {WebSocket} ws
+ * @param {UserInstance} ws
  * @param {MatchRequest} data
  */
 async function handleMatchRequest(ws, data) {
@@ -132,58 +150,67 @@ async function handleMatchRequest(ws, data) {
     userConnections.set(ws.id, ws);
     /** @type {Array<[UUID, Criteria[]]>} */
     const matchedRequest = [];
-    console.log("data", data);
     for (const [k, v] of userRequests.entries()) {
-      console.log("v", v);
       if (hasMatchingCriteria(data.criterias, v.criterias)) {
         matchedRequest.push([k, v.criterias]);
       }
     }
     if (matchedRequest.length !== 0) {
-      matchedRequest.sort((a, b) => a - b);
-      /** @type {[UUID, Criteria[]]} */
-      const [otherUUID, otherCriterias] = matchedRequest.at(0);
-      const criteria = findMatchingCriteria(data.criterias, otherCriterias);
-      updateMatchedPairTable(otherUUID, ws.id);
-      sendMatchNotification(ws, criteria);
-      /**@type {WebSocket} */
+      matchedRequest.sort();
+
+      /** @type {[UUID, Criteria[]] | undefined} */
+      const other = matchedRequest.at(0);
+      if (!other) {
+        throw new Error("No matching found");
+      }
+      const [otherUUID, otherCriterias] = other;
       const otherConnection = userConnections.get(otherUUID);
-      sendMatchNotification(otherConnection, criteria);
-      sendMessage(ws, { message: "match found notification sent" });
+      const criteria = findMatchingCriteria(data.criterias, otherCriterias);
 
-      // timeout will determine if both are accepted
-      setTimeout(async () => {
-        const userAccepts = matchedPairTable.get(ws.id).accepted;
-        const otherAccepts = matchedPairTable.get(otherUUID).accepted;
-        const shouldCreateSession = userAccepts && otherAccepts;
-        if (shouldCreateSession) {
-          const session = await getCollaborationSession();
-          sendMessage(ws, { type: "matchOutcome", session: session });
-          sendMessage(otherConnection, {
-            type: "matchOutcome",
-            session: session,
-          });
-        } else {
-          // Sends notification
-          sendAcceptanceTimeoutNotification(ws);
-          sendAcceptanceTimeoutNotification(otherConnection);
+      if (criteria && otherConnection) {
+        updateMatchedPairTable(otherUUID, ws.id);
+        sendMatchNotification(ws.ws, criteria);
+        /**@type {WebSocket} */
 
-          // clear match pair table
-          clearMatchedPairTable(ws.id, otherConnection);
+        sendMatchNotification(otherConnection.ws, criteria);
+        sendMessage(ws.ws, { message: "match found notification sent" });
 
-          // disconnect from matching for non-accepting user
-          if (!userAccepts) {
-            ws.close();
+        // timeout will determine if both are accepted
+        setTimeout(async () => {
+          const userEntry = matchedPairTable.get(ws.id);
+          const otherEntry = matchedPairTable.get(otherUUID);
+          if (!userEntry || !otherEntry) {
+            return;
           }
-          if (!otherAccepts) {
-            otherConnection.close();
+          const userAccepts = userEntry.accepted;
+          const otherAccepts = otherEntry.accepted;
+          const shouldCreateSession = userAccepts && otherAccepts;
+          if (shouldCreateSession) {
+            const session = await getCollaborationSession();
+            sendSessionToUser(ws, session);
+            sendSessionToUser(otherConnection, session);
+          } else {
+            // Sends notification
+            sendAcceptanceTimeoutNotification(ws);
+            sendAcceptanceTimeoutNotification(otherConnection);
+
+            // clear match pair table
+            clearMatchedPairTable(ws.id, otherConnection.id);
+
+            // disconnect from matching for non-accepting user
+            if (!userAccepts) {
+              ws.ws.close();
+            }
+            if (!otherAccepts) {
+              otherConnection.ws.close();
+            }
           }
-        }
-      }, process.env.ACCEPTANCE_TIMEOUT);
+        }, Number(process.env.ACCEPTANCE_TIMEOUT));
+      }
     } else {
       userRequests.set(ws.id, data);
       // await storeMatchRequest(ws.id, "waiting", data.criterias);
-      sendMessage(ws, { message: "client request processed" });
+      sendMessage(ws.ws, { message: "client request processed" });
     }
   } catch (error) {
     console.error("Error while handling match request", error);
@@ -191,14 +218,14 @@ async function handleMatchRequest(ws, data) {
 }
 
 /**
- * @param {WebSocket} ws
+ * @param {UserInstance} ws
  */
 function sendAcceptanceTimeoutNotification(ws) {
   /**@type {AcceptanceTimeoutNotification} */
   const notification = {
     reason: "one of the user never accepts within time limit",
   };
-  sendMessage(ws, notification);
+  sendMessage(ws.ws, notification);
   console.log(`${ws.id} did not accept`);
 }
 
@@ -251,17 +278,6 @@ function findMatchingCriteria(criterias, otherCriterias) {
     }
   }
   return undefined;
-}
-
-/**
- * @param {WebSocket} ws
- * @param {Criteria} criteria
- */
-function sendMatchNotification(ws, criteria) {
-  sendMessage(ws, {
-    type: "matchFound",
-    details: criteria,
-  });
 }
 
 /**

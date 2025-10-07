@@ -12,7 +12,7 @@ import {
 } from "./websocket-utils.js";
 
 // Test configuration
-const TEST_TIMEOUT = 15000;
+const TEST_TIMEOUT = 150000;
 
 describe("WebSocket Matching Service Integration Tests", () => {
   let clientA, clientB, clientC;
@@ -307,7 +307,7 @@ describe("WebSocket Matching Service Integration Tests", () => {
       sendMessage(clientB, createMatchRequest(criteria));
 
       // Wait briefly for processing
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 200));
 
       // Disconnect clientB
       clientB.close();

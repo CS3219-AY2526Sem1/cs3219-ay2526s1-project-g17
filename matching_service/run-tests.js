@@ -26,10 +26,14 @@ console.log(
 // Run tests
 console.log("🧪 Running WebSocket integration tests...\n");
 
-const testProcess = spawn("npm", ["run", "test", "--verbose"], {
-  stdio: "inherit",
-  shell: true,
-});
+const testProcess = spawn(
+  "npm",
+  ["run", "test", "--slient=false", "--verbose", "--trace-warnings"],
+  {
+    stdio: "inherit",
+    shell: true,
+  }
+);
 
 testProcess.on("close", (code) => {
   if (code === 0) {

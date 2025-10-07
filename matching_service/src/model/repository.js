@@ -1,7 +1,6 @@
 import MatchingModel from "./matching_model.js";
 import "dotenv/config";
 import { connect } from "mongoose";
-import { monitorListingUsingEventTransmitter } from "../service/change_stream.js";
 import { configDotenv } from "dotenv";
 
 configDotenv();

@@ -41,6 +41,7 @@ const config = {
   //   "lcov",
   //   "clover"
   // ],
+  silent: false,
 
   // An object that configures minimum threshold enforcement for coverage results
   // coverageThreshold: undefined,
