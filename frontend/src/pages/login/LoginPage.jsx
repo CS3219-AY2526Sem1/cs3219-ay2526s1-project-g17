@@ -1,10 +1,10 @@
-import { use, useState } from "react";
+import { useState } from "react";
 import axios from 'axios'
 import Header from "../../components/Header";
 import { useNavigate, Link } from "react-router";
 
 
-export function LoginPage({ setLogoutUser }) {
+export function LoginPage({ isLoggedIn, setIsLoggedIn }) {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -22,13 +22,16 @@ export function LoginPage({ setLogoutUser }) {
       console.log("response", response);
       localStorage.setItem("login", JSON.stringify({
         userLogin: true,
-        token: response.data.access_token
+        token: response.data.data.accessToken,
+        username: response.data.data.username,
+        email: response.data.data.email,
+        isAdmin: response.data.data.isAdmin,
       }))
 
       setError("");
       setEmail("");
       setPassword("");
-      setLogoutUser(false);
+      setIsLoggedIn(true);
       navigate("/");
       console.log("Login successful");
     } catch (error) {
@@ -41,7 +44,7 @@ export function LoginPage({ setLogoutUser }) {
 
   return (
     <div style={styles.container}>
-      <Header />
+      <Header isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn}/>
       <h2 style={styles.heading}>Login Page</h2>
       {error && <p style={styles.error}>{error}</p>}
       <form onSubmit={login} style={styles.form}>

@@ -9,14 +9,22 @@ import { RegisterPage } from './pages/register/RegisterPage'
 
 function App() {
 
-  const [logoutUser, setLogoutUser] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    try {
+      const raw = localStorage.getItem('login');
+      const parsed = raw ? JSON.parse(raw) : null;
+      return !!parsed?.userLogin; // => true if userLogin is truthy
+    } catch {
+      return false;
+    }
+  });
 
   return (
     <>
       <Routes>
-        <Route path="/" element={<HomePage logoutUser={logoutUser}/>}></Route>
-        <Route path="/login" element={<LoginPage setLogoutUser={setLogoutUser}/>}></Route>
-        <Route path="/register" element={<RegisterPage />}></Route>
+        <Route path="/" element={<HomePage isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />}></Route>
+        <Route path="/login" element={<LoginPage isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />}></Route>
+        <Route path="/register" element={<RegisterPage isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />}></Route>
       </Routes>
     </>
   )
