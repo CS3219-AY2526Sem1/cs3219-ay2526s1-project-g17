@@ -42,7 +42,7 @@ export function LoginPage({ isLoggedIn, setIsLoggedIn }) {
     }
   }
 
-  return (
+  return !(isLoggedIn) ? (
     <div style={styles.container}>
       <Header isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn}/>
       <h2 style={styles.heading}>Login Page</h2>
@@ -75,6 +75,11 @@ export function LoginPage({ isLoggedIn, setIsLoggedIn }) {
       <p>
         Don't have an account? <Link to="/register" style={styles.link}>Register</Link>.
       </p>
+    </div>
+  ) : (
+    <div>
+      <Header isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn}/>
+      <h2>You are already logged in</h2>
     </div>
   );
 }

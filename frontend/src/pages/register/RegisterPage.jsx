@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
+import Header from "../../components/Header";
 import axios from "axios";
 
-export function RegisterPage() {
+export function RegisterPage({ isLoggedIn, setIsLoggedIn }) {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -18,7 +19,7 @@ export function RegisterPage() {
         password
       })
       console.log("response", response);
-      
+
       // Now navigate to the login page
       navigate("/login");
     } catch (error) {
@@ -29,8 +30,9 @@ export function RegisterPage() {
     }
   }
 
-  return (
+  return !(isLoggedIn) ? (
     <div style={styles.container}>
+      <Header isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn}/>
       <h2 style={styles.heading}>User Registration</h2>
       {error && <p style={styles.error}>{error}</p>}
       <form onSubmit={register} style={styles.form}>
@@ -73,6 +75,11 @@ export function RegisterPage() {
           Login
         </button>
       </p>
+    </div>
+  ) : (
+    <div>
+      <Header isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn}/>
+      <h2>You are already logged in, please log out before registering again</h2>
     </div>
   );
 };

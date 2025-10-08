@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import axios from "axios";
 import Header from "../../components/Header";
 
 export function HomePage({ isLoggedIn, setIsLoggedIn }) {
@@ -21,7 +22,7 @@ export function HomePage({ isLoggedIn, setIsLoggedIn }) {
       setUsername(null)
     }
   }, [isLoggedIn])
-  
+
 
   const userNotLogin = () => {
     return (
@@ -37,7 +38,7 @@ export function HomePage({ isLoggedIn, setIsLoggedIn }) {
 
   return (
     <>
-      <Header isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn}/>
+      <Header isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
       {isLoggedIn ? userLoggedIn() : userNotLogin()}
     </>
   )
