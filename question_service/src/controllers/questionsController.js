@@ -131,7 +131,7 @@ export async function getListOfTopicsByDifficulty(_, res) {
     try {
         const data = await Question.find();
 
-        // initialise arrays for beginner, intermediate and advanced
+        // initialise arrays for beginner, intermediate and advanced difficulty
         const result = {};
         data.forEach(q => {
             if (!result[q.difficulty]) {
