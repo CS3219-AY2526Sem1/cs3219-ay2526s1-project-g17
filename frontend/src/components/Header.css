@@ -1,0 +1,23 @@
+.header {
+  background-color: blue;
+  color: white;
+  padding-left: 15px;
+  padding-right: 15px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+}
+
+.header-link {
+  color: white;
+  cursor: pointer;
+  margin-left: 10px;
+  margin-right: 20px;
+}
