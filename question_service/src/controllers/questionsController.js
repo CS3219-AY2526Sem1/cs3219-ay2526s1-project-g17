@@ -140,7 +140,7 @@ export async function getListOfTopicsByDifficulty(_, res) {
             result[q.difficulty].push(...q.topics);
         });
 
-        // Remove duplicates and sort topics for each difficulty
+        // remove duplicates and sort topics for each difficulty
         Object.keys(result).forEach(difficulty => {
             result[difficulty] = [...new Set(result[difficulty])].sort();
         });
