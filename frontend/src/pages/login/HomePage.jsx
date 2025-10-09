@@ -1,27 +1,13 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
 import Header from "../../components/Header";
+import useAuth from "../../hooks/useAuth";
 
-export function HomePage({ isLoggedIn, setIsLoggedIn }) {
+export function HomePage() {
 
-  const [username, setUsername] = useState(null);
+  const {isLoggedIn, user, setIsLoggedIn} = useAuth();
 
-
-  useEffect(() => {
-    const loginItem = localStorage.getItem("login");
-    if (loginItem) {
-      try {
-        const parsed = JSON.parse(loginItem);
-        if (parsed?.userLogin) {
-          setUsername(parsed.username);
-        }
-      } catch (error) {
-        console.error("Error parsing login data", error)
-      }
-    } else {
-      setUsername(null)
-    }
-  }, [isLoggedIn])
+  console.log("isLoggedIn: ", isLoggedIn);
+  
+  const username = user?.data?.data?.username ?? null;
 
 
   const userNotLogin = () => {

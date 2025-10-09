@@ -2,8 +2,13 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 import Header from "../../components/Header";
 import axios from "axios";
+import useAuth from "../../hooks/useAuth";
 
-export function RegisterPage({ isLoggedIn, setIsLoggedIn }) {
+export function RegisterPage() {
+
+
+  const { isLoggedIn, setIsLoggedIn } = useAuth();
+
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

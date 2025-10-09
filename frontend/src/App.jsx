@@ -13,16 +13,21 @@ function App() {
     try {
       const raw = localStorage.getItem('login');
       const parsed = raw ? JSON.parse(raw) : null;
-      return !!parsed?.userLogin; // => true if userLogin is truthy
+
+      if (parsed !== null) {
+        return !!parsed?.userLogin; 
+      }
     } catch {
       return false;
     }
   });
 
+
+
   return (
     <>
       <Routes>
-        <Route path="/" element={<HomePage isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />}></Route>
+        <Route path="/" element={<HomePage />}></Route>
         <Route path="/login" element={<LoginPage isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />}></Route>
         <Route path="/register" element={<RegisterPage isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />}></Route>
       </Routes>
