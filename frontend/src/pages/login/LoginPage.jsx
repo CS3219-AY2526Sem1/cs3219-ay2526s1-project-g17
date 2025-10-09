@@ -23,9 +23,6 @@ export function LoginPage({ isLoggedIn, setIsLoggedIn }) {
       localStorage.setItem("login", JSON.stringify({
         userLogin: true,
         token: response.data.data.accessToken,
-        username: response.data.data.username,
-        email: response.data.data.email,
-        isAdmin: response.data.data.isAdmin,
       }))
 
       setError("");

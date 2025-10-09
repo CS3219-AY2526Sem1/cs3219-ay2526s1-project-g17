@@ -5,9 +5,12 @@ export function HomePage() {
 
   const {isLoggedIn, user, setIsLoggedIn} = useAuth();
 
-  console.log("isLoggedIn: ", isLoggedIn);
   
   const username = user?.data?.data?.username ?? null;
+  const isAdmin = user?.data?.data?.isAdmin ?? null;
+
+  console.log("User object", user);
+
 
 
   const userNotLogin = () => {
