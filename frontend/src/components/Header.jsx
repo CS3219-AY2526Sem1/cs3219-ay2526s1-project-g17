@@ -6,7 +6,7 @@ import './Header.css';
 
 export default function Header() {
 
-  const { isAuthenticated, user, isLoading, logout } = useAuth0();
+  const { isAuthenticated, user } = useAuth0();
 
   const UserLoggedInHeader = () => {
     return (
