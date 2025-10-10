@@ -127,20 +127,25 @@ export async function getListOfQuestionsByDifficultyAndTopic(req, res) {
     }
 }
 
-export async function getListOfTopicsByDifficulty(req, res) {
+export async function getListOfTopicsByDifficulty(_, res) {
     try {
-        const { difficulty } = req.body;
+        const data = await Question.find();
 
-        const data = await Question.aggregate()
-            .match({
-                difficulty: difficulty,
-            });
+        // initialise arrays for beginner, intermediate and advanced difficulty
+        const result = {};
+        data.forEach(q => {
+            if (!result[q.difficulty]) {
+                result[q.difficulty] = [];
+            }
+            result[q.difficulty].push(...q.topics);
+        });
 
-        if (data.length == 0) return res.status(404).json({ message: "No question matches the defined criteria" });
+        // remove duplicates and sort topics for each difficulty
+        Object.keys(result).forEach(difficulty => {
+            result[difficulty] = [...new Set(result[difficulty])].sort();
+        });
 
-        const allTopics = [...new Set(data.flatMap(q => q.topics))];
-
-        res.status(200).json(allTopics);
+        res.status(200).json(result);
     } catch (error) {
         console.error("Error in getListOfTopicsByDifficulty controller", error);
         res.status(500).json({ message: "Internal server error" });
