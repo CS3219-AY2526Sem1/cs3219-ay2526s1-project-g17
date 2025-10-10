@@ -1,5 +1,6 @@
 import express from "express";
-import dotenv from "dotenv"
+import dotenv from "dotenv";
+import cors from "cors";
 
 import { connectDB } from "../config/db.js";
 import rateLimiter from "../middleware/rateLimiter.js";
@@ -13,6 +14,7 @@ const PORT = process.env.PORT || 5001;
 app.use(express.json());
 
 app.use(rateLimiter);
+app.use(cors());
 
 app.use("/api/questions", questionRouter);
 

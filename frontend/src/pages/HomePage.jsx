@@ -9,22 +9,22 @@ import { useEffect, useState } from "react";
 export default function HomePage() {
   const { isLoading } = useAuth0();
 
-  // const [questions, setQuestions] = useState([]);
+  const [questions, setQuestions] = useState([]);
 
-  // useEffect(() => {
-  //   const getQuestions = async () => {
-  //     try {
-  //       const response = await axios.get("http://localhost:5001/api/questions")
-  //       setQuestions(response.data);
-  //     } catch (error) {
-  //       console.error("Error fetching questions: ", error);
-  //     }
-  //   }
+  useEffect(() => {
+    const getQuestions = async () => {
+      try {
+        const response = await axios.get("http://localhost:5001/api/questions")
+        setQuestions(response.data);
+      } catch (error) {
+        console.error("Error fetching questions: ", error);
+      }
+    }
 
-  //   getQuestions()
-  // }, [])
+    getQuestions()
+  }, [])
 
-  //console.log(questions);
+  console.log(questions);
 
   if (isLoading) {
     return <p>Loading...</p>
