@@ -1,3 +1,5 @@
+/** @typedef {import("ws").WebSocket} WebSocket*/
+
 /**
  * @param {WebSocket} ws
  * @param {Object} jsonObject

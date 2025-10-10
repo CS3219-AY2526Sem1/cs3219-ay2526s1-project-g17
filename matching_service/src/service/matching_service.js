@@ -3,11 +3,10 @@ import {
   hasMatchingCriteria,
   matchRequestToEntity,
 } from "../utility/utility.js";
-import {
-  redisRepository,
-} from "../model/redis_integration.js";
+import { redisRepository } from "../model/redis_integration.js";
 import { sendMessage } from "../utility/ws_util.js";
 
+/** @typedef {import("ws").WebSocket} WebSocket*/
 /** @typedef {import("../types").UserInstance} UserInstance */
 /** @typedef {import("../types").MatchRequest} MatchRequest */
 /** @typedef {import("../types").MatchRequestEntity} MatchRequestEntity */
@@ -44,7 +43,7 @@ class UserService {
   }
 }
 
-class MatchingService {
+export class MatchingService {
   #userService = new UserService();
   #redisRepository = redisRepository;
 
@@ -57,9 +56,31 @@ class MatchingService {
     this.#userService.addUser(userInstance);
     const matchRequestEntity = matchRequestToEntity(userInstance, request);
 
-    await this.#redisRepository.storeUserRequest(userInstance.id, matchRequestEntity);
+    await this.#redisRepository.storeUserRequest(
+      userInstance.id,
+      matchRequestEntity
+    );
     this.listenToRequestChange(userInstance.id);
     await this.#redisRepository.updateUserRequest(userInstance.id, "waiting");
+  }
+
+  /**
+   * @param {UserInstance} userInstance
+   */
+  async handleUserAccept(userInstance) {
+    const matchedDetails = await this.#redisRepository.getMatchedDetails(
+      userInstance.id
+    );
+    if (matchedDetails) {
+      matchedDetails.accepts = true;
+      await this.#redisRepository.updateMatchedDetails(
+        userInstance.id,
+        matchedDetails
+      );
+    } else {
+      console.error("Missing Matched Details");
+      throw new Error(`Missing Matched Details for ${userInstance.id}`);
+    }
   }
 
   /**
@@ -244,6 +265,3 @@ class MatchingService {
    */
   async #onRequestDelete(requestKey) {}
 }
-
-const matchingService = new MatchingService();
-export default matchingService;

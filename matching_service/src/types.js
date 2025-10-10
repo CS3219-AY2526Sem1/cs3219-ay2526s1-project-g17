@@ -1,3 +1,4 @@
+/** @typedef {import("ws").WebSocket} WebSocket*/
 /**
  * @typedef {Object} Criteria
  * @property {"easy" | "medium" | "hard"} difficulty
