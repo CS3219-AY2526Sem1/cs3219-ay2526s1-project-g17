@@ -7,7 +7,6 @@ export function HomePage() {
 
   
   const username = user?.data?.data?.username ?? null;
-  const isAdmin = user?.data?.data?.isAdmin ?? null;
 
   console.log("User object", user);
 

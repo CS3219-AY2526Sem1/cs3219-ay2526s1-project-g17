@@ -5,6 +5,7 @@ import { LoginPage } from './pages/login/LoginPage'
 import { HomePage } from './pages/login/HomePage'
 import { useState } from 'react'
 import { RegisterPage } from './pages/register/RegisterPage'
+import { ForgotPassword } from './pages/ForgotPasswordPage'
 
 
 function App() {
@@ -30,6 +31,7 @@ function App() {
         <Route path="/" element={<HomePage />}></Route>
         <Route path="/login" element={<LoginPage isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />}></Route>
         <Route path="/register" element={<RegisterPage isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />}></Route>
+        <Route path="/forgot-password" element={<ForgotPassword />}></Route>
       </Routes>
     </>
   )
