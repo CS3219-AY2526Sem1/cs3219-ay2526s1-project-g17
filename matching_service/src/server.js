@@ -1,6 +1,6 @@
 import http from "http";
 import index from "./index.js";
-import { connectToDB } from "./model/repository.js";
+// import { connectToDB } from "./model/repository.js";
 import { WebSocketServer } from "ws";
 import { randomUUID } from "crypto";
 import {
@@ -8,68 +8,48 @@ import {
   sendMessage,
   sendSessionToUser,
 } from "./utility/ws_util.js";
+import {
+  initializeRedis,
+  listenToRequestChanges,
+  redisRepository,
+} from "./model/redis_integration.js";
+import {} from "./types.js";
+
+/** @typedef {import("./types.js").MatchRequest} MatchRequest */
+/** @typedef {import("./types.js").MatchPair} MatchPair */
+/** @typedef {import("./types.js").UserInstance} UserInstance */
+/** @typedef {import("./types.js").MatchAck} MatchAck */
+/** @typedef {import("./types.js").Message} Message */
+/** @typedef {import("./types.js").Criteria} Criteria */
+/** @typedef {import("./types.js").AcceptanceTimeoutNotification} AcceptanceTimeoutNotification */
 
 const port = process.env.PORT || 3001;
 
 const server = http.createServer(index);
 const wss = new WebSocketServer({ server, clientTracking: true });
+await initializeRedis()
+  .then(() => {
+    server.listen(port);
+    console.log(
+      "Matching service server listening on http://localhost:" + port
+    );
+  })
+  .catch((err) => {
+    console.error("Failed to connect to DB");
+    console.error(err);
+    process.exit(1);
+  });
 
-/**
- * @typedef {Object} Criteria
- * @property {"easy" | "medium" | "hard"} difficulty
- * @property {string} language
- * @property {string} topic
- */
-
-/**
- * @typedef {MatchRequest | MatchAck} Message
- */
-
-/**
- * @typedef {Object} UserInstance
- * @property {WebSocket} ws
- * @property {UUID} id
- */
-
-/**
- * @typedef {Object} MatchRequest
- * @property {"matchRequest"} typename
- * @property {Array<Criteria>} criterias
- * @property {number} time
- */
-
-/**
- * @typedef {Object} MatchAck
- * @property {"matchAck"} typename
- * @property {"accept" | "reject"} response
- */
-
-/**
- * @typedef {import("crypto").UUID} UUID;
- */
-
-/**
- * @typedef {Object} MatchPair
- * @property {UUID} partner
- * @property {boolean} accepted
- */
-
-/**
- * @typedef {Object} AcceptanceTimeoutNotification
- * @property {String} reason
- */
-
-/** @type {Map<UUID, MatchRequest>} */
-const userRequests = new Map();
-/** @type {Map<UUID, UserInstance>} */
+/** @type {Map<string, UserInstance>} */
 const userConnections = new Map();
-/** @type {Map<UUID, MatchPair>} */
+/** @type {Map<string, MatchPair>} */
 const matchedPairTable = new Map();
+/** @type {Map<string, Function>} */
+const unsubscriptions = new Map();
 
 wss.on("connection", (ws, request) => {
   console.log("New WebSocket connection");
   /** @type {UserInstance} */
-  // @ts-ignore
   const userInstance = { id: randomUUID(), ws: ws };
 
   ws.on("message", async (message) => {
@@ -148,8 +128,11 @@ async function handleDisconnect(userInstance) {
 async function handleMatchRequest(ws, data) {
   try {
     userConnections.set(ws.id, ws);
-    /** @type {Array<[UUID, Criteria[]]>} */
+
+    /** @type {Array<[string, Criteria[]]>} */
     const matchedRequest = [];
+
+    const userRequests = await redisRepository.getAllUserRequests();
     for (const [k, v] of userRequests.entries()) {
       if (hasMatchingCriteria(data.criterias, v.criterias)) {
         matchedRequest.push([k, v.criterias]);
@@ -158,7 +141,7 @@ async function handleMatchRequest(ws, data) {
     if (matchedRequest.length !== 0) {
       matchedRequest.sort();
 
-      /** @type {[UUID, Criteria[]] | undefined} */
+      /** @type {[string, Criteria[]] | undefined} */
       const other = matchedRequest.at(0);
       if (!other) {
         throw new Error("No matching found");
@@ -168,7 +151,7 @@ async function handleMatchRequest(ws, data) {
       const criteria = findMatchingCriteria(data.criterias, otherCriterias);
 
       if (criteria && otherConnection) {
-        updateMatchedPairTable(otherUUID, ws.id);
+        await redisRepository.storeMatchedPair(otherUUID, ws.id);
         sendMatchNotification(ws.ws, criteria);
         /**@type {WebSocket} */
 
@@ -208,8 +191,36 @@ async function handleMatchRequest(ws, data) {
         }, Number(process.env.ACCEPTANCE_TIMEOUT));
       }
     } else {
-      userRequests.set(ws.id, data);
-      // await storeMatchRequest(ws.id, "waiting", data.criterias);
+      await redisRepository.storeUserRequest(ws.id, data);
+      const unSub = listenToRequestChanges(
+        ws.id,
+        ({ key, operation, timestamp }) => {
+          if (operation === "set") {
+            // get the request
+            // check the current status
+            // if waiting then search for matching criteria
+            // if pending, get from the matched key and send match found noti
+            // pending then?
+            // matched
+            // should get the session and send to user
+            // del the request
+          } else if (operation === "del" || operation === "expired") {
+            // should close websocket
+            const userInstance = userConnections.get(key);
+            if (userInstance) {
+              userInstance.ws.close();
+            }
+
+            const unSub = unsubscriptions.get(ws.id);
+            if (unSub) {
+              unSub();
+            }
+          } else {
+            console.log("Unknown/unaccounted opeation", operation);
+          }
+        }
+      );
+      unsubscriptions.set(ws.id, unSub);
       sendMessage(ws.ws, { message: "client request processed" });
     }
   } catch (error) {
@@ -230,8 +241,8 @@ function sendAcceptanceTimeoutNotification(ws) {
 }
 
 /**
- * @param {UUID} uuid1
- * @param {UUID} uuid2
+ * @param {string} uuid1
+ * @param {string} uuid2
  */
 function clearMatchedPairTable(uuid1, uuid2) {
   matchedPairTable.delete(uuid1);
@@ -247,10 +258,10 @@ async function getCollaborationSession() {
 }
 
 /**
- * @param {UUID} uuid1
- * @param {UUID} uuid2
+ * @param {string} uuid1
+ * @param {string} uuid2
  */
-function updateMatchedPairTable(uuid1, uuid2) {
+async function updateMatchedPairTable(uuid1, uuid2) {
   matchedPairTable.set(uuid1, {
     partner: uuid2,
     accepted: false,
@@ -295,16 +306,3 @@ function hasMatchingCriteria(criterias, otherCriterias) {
   const set = new Set(appendCriteria);
   return set.size !== totalLength;
 }
-
-await connectToDB()
-  .then(() => {
-    server.listen(port);
-    console.log(
-      "Matching service server listening on http://localhost:" + port
-    );
-  })
-  .catch((err) => {
-    console.error("Failed to connect to DB");
-    console.error(err);
-    process.exit(1);
-  });
