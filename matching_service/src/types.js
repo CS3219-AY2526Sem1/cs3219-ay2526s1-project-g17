@@ -6,6 +6,26 @@
  */
 
 /**
+ * @typedef {Object} MatchRequest
+ * @property {"matchRequest"} typename
+ * @property {Array<Criteria>} criterias
+ * @property {number} time
+ */
+
+/**
+ * @typedef {Object} MatchFound
+ * @property {Criteria} criteria
+ */
+
+/**
+ * @typedef {Object} MatchRequestEntity
+ * @property {string} userId
+ * @property {"waiting" | "pending" | "matched"} status
+ * @property {Array<Criteria>} criterias
+ * @property {number} time
+ */
+
+/**
  * @typedef {MatchRequest | MatchAck} Message
  */
 
@@ -13,13 +33,6 @@
  * @typedef {Object} UserInstance
  * @property {WebSocket} ws
  * @property {UUID} id
- */
-
-/**
- * @typedef {Object} MatchRequest
- * @property {"matchRequest"} typename
- * @property {Array<Criteria>} criterias
- * @property {number} time
  */
 
 /**
@@ -33,14 +46,23 @@
  */
 
 /**
- * @typedef {Object} MatchPair
- * @property {UUID} partner
- * @property {boolean} accepted
- */
+ * @typedef {Record<string, boolean>} MatchedPair
+  */
 
 /**
  * @typedef {Object} AcceptanceTimeoutNotification
  * @property {String} reason
  */
 
+/**
+ * @typedef {Object} MatchedDetails
+ * @property {boolean} accepts
+ * @property {string} partner
+ * @property {Criteria} criteria
+ */
+
+/**
+ * @typedef {Object} CollaborationSession
+ * @property {string} session
+ */
 export {};

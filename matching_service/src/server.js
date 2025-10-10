@@ -1,6 +1,5 @@
 import http from "http";
 import index from "./index.js";
-// import { connectToDB } from "./model/repository.js";
 import { WebSocketServer } from "ws";
 import { randomUUID } from "crypto";
 import {
@@ -16,7 +15,6 @@ import {
 import {} from "./types.js";
 
 /** @typedef {import("./types.js").MatchRequest} MatchRequest */
-/** @typedef {import("./types.js").MatchPair} MatchPair */
 /** @typedef {import("./types.js").UserInstance} UserInstance */
 /** @typedef {import("./types.js").MatchAck} MatchAck */
 /** @typedef {import("./types.js").Message} Message */
@@ -122,6 +120,22 @@ async function handleDisconnect(userInstance) {
 }
 
 /**
+ * @returns {Promise<Array<[string, Criteria[]]>>}
+ */
+async function findExistingMatch() {
+  /** @type {Array<[string, Criteria[]]>} */
+  const matchedRequest = [];
+
+  const userRequests = await redisRepository.getAllUserRequests();
+  for (const [k, v] of userRequests.entries()) {
+    if (hasMatchingCriteria(data.criterias, v.criterias)) {
+      matchedRequest.push([k, v.criterias]);
+    }
+  }
+  return matchedRequest;
+}
+
+/**
  * @param {UserInstance} ws
  * @param {MatchRequest} data
  */
@@ -130,16 +144,10 @@ async function handleMatchRequest(ws, data) {
     userConnections.set(ws.id, ws);
 
     /** @type {Array<[string, Criteria[]]>} */
-    const matchedRequest = [];
+    const matchedRequest = await findExistingMatch();
 
-    const userRequests = await redisRepository.getAllUserRequests();
-    for (const [k, v] of userRequests.entries()) {
-      if (hasMatchingCriteria(data.criterias, v.criterias)) {
-        matchedRequest.push([k, v.criterias]);
-      }
-    }
     if (matchedRequest.length !== 0) {
-      matchedRequest.sort();
+      matchedRequest.sort((a, b) => a.time - b.time);
 
       /** @type {[string, Criteria[]] | undefined} */
       const other = matchedRequest.at(0);
@@ -147,9 +155,9 @@ async function handleMatchRequest(ws, data) {
         throw new Error("No matching found");
       }
       const [otherUUID, otherCriterias] = other;
-      const otherConnection = userConnections.get(otherUUID);
       const criteria = findMatchingCriteria(data.criterias, otherCriterias);
 
+      const otherConnection = userConnections.get(otherUUID);
       if (criteria && otherConnection) {
         await redisRepository.storeMatchedPair(otherUUID, ws.id);
         sendMatchNotification(ws.ws, criteria);

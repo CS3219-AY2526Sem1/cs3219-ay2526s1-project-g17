@@ -1,6 +1,10 @@
 import { EventEmitter } from "events";
 import { createClient } from "redis";
 
+/** @typedef {Promise<import("../types.js").CollaborationSession>} CollaborationSession */
+/** @typedef {import("../types.js").MatchRequestEntity} MatchRequestEntity */
+/** @typedef {import("../types.js").MatchedPair}  MatchedPair*/
+
 class RedisRepository extends EventEmitter {
   constructor() {
     super();
@@ -125,7 +129,7 @@ class RedisRepository extends EventEmitter {
   /**
    * Listen for changes to a specific Redis key
    * @param {string} key - Redis key to watch
-   * @param {Function} callback - Callback function to call on change
+   * @param {(change: {key: string, operation: string, timestamp: number}) => void} callback - Callback function to call on change
    * @returns {Function} Unsubscribe function
    */
   listenToKeyChanges(key, callback) {
@@ -153,11 +157,11 @@ class RedisRepository extends EventEmitter {
   /**
    * Store a match request
    * @param {string} userId - User ID
-   * @param {import("../server.js").MatchRequest} request - Match request object
+   * @param {MatchRequestEntity} request - Match request object
    * @param {number} ttl - TTL in seconds
    */
   async storeUserRequest(userId, request, ttl = 300) {
-    const key = `user_request:${userId}`;
+    const key = `${userRequestKeyPrefix}${userId}`;
     const value = JSON.stringify({
       ...request,
       storedAt: Date.now(),
@@ -168,16 +172,55 @@ class RedisRepository extends EventEmitter {
   }
 
   /**
+   * Store a match request
+   * @param {string} userId - User ID
+   * @param {"waiting" | "pending" | "matched"} status
+   */
+  async updateUserRequest(userId, status) {
+    const retries = 5;
+    var tries = 0;
+
+    const key = `${userRequestKeyPrefix}${userId}`;
+    const request = await this.getUserRequest(userId);
+    request.status = status;
+    const value = JSON.stringify(request);
+
+    while (tries < retries) {
+      await this.client.watch([key]);
+
+      try {
+        const result = await this.client
+          .multi()
+          .set(key, value, { KEEPTTL: true })
+          .exec();
+        if (result) {
+          await this.client.unwatch();
+          console.log("User updated");
+          return;
+        } else {
+          tries += 1;
+          await this.client.unwatch();
+        }
+      } catch (e) {
+        tries += 1;
+        await this.client.unwatch();
+        console.error(e);
+      }
+    }
+  }
+
+  /**
    * Get a user's match request
    * @param {string} userId - User ID
-   * @returns {Promise<import("../server").MatchRequest|null>}
+   * @returns {Promise<MatchRequestEntity | null>}
    */
   async getUserRequest(userId) {
-    const key = `user_request:${userId}`;
+    const key = `${userRequestKeyPrefix}${userId}`;
     const value = await this.client.get(key);
 
     if (!value) return null;
 
+    // @ts-ignore
     return JSON.parse(value);
   }
 
@@ -186,23 +229,24 @@ class RedisRepository extends EventEmitter {
    * @param {string} userId - User ID
    */
   async removeUserRequest(userId) {
-    const key = `user_request:${userId}`;
+    const key = `${userRequestKeyPrefix}${userId}`;
     await this.client.del(key);
     console.log(`🗑️ Removed user request for ${userId}`);
   }
 
   /**
    * Get all active user requests
-   * @returns {Promise<Map<string, import("../server.js").MatchRequest>>}
+   * @returns {Promise<Map<string, MatchRequestEntity>>}
    */
   async getAllUserRequests() {
-    const pattern = "user_request:*";
-    const keys = await this.client.keys(pattern);
+    const pattern = `${userRequestKeyPrefix}*`;
+    /** @type {string[]} */
+    const keys = await this.client.keys(pattern).then((k) => k.map(toString));
     const requests = new Map();
 
     for (const key of keys) {
-      const userId = key.replace("user_request:", "");
-      const value = await this.client.get(key);
+      const userId = key.replace(userRequestKeyPrefix, "");
+      const value = await this.client.get(key).then((e) => e.toString());
       if (value) {
         requests.set(userId, JSON.parse(value));
       }
@@ -211,86 +255,47 @@ class RedisRepository extends EventEmitter {
     return requests;
   }
 
-  // ==================== USER CONNECTIONS OPERATIONS ====================
-
-  /**
-   * Store user connection info
-   * @param {string} userId - User ID
-   * @param {object} connectionInfo - Connection information
-   */
-  async storeUserConnection(userId, connectionInfo) {
-    const key = `user_connection:${userId}`;
-    const value = JSON.stringify({
-      ...connectionInfo,
-      connectedAt: Date.now(),
-    });
-
-    await this.client.setEx(key, 7200, value); // 2 hours TTL
-    console.log(`🔌 Stored connection info for ${userId}`);
-  }
-
-  /**
-   * Get user connection info
-   * @param {string} userId - User ID
-   * @returns {Promise<object|null>}
-   */
-  async getUserConnection(userId) {
-    const key = `user_connection:${userId}`;
-    const value = await this.client.get(key);
-
-    if (!value) return null;
-
-    return JSON.parse(value);
-  }
-
-  /**
-   * Remove user connection
-   * @param {string} userId - User ID
-   */
-  async removeUserConnection(userId) {
-    const key = `user_connection:${userId}`;
-    await this.client.del(key);
-    console.log(`🔌❌ Removed connection info for ${userId}`);
-  }
-
   // ==================== MATCHED PAIR OPERATIONS ====================
+  /**
+   * @param {string} userId1
+   * @param {string} userId2
+   */
+  #getMatchedPairKey(userId1, userId2) {
+    const ids = [userId1, userId2];
+    ids.sort();
+    const key = `${matchedPairKeyPrefix}${ids[0]}:${ids[1]}`;
+    return key;
+  }
 
   /**
    * Store matched pair information
    * @param {string} userId1
    * @param {string} userId2
-   * @param {number} [ttl=360] 360 seconds default
    */
-  async storeMatchedPair(userId1, userId2, ttl = 360) {
-    const createData = (partnerId) => ({
-      partner: partnerId,
-      accepted: false,
-    });
+  async storeMatchedPair(userId1, userId2) {
+    const ttl = 10;
+    const key = this.#getMatchedPairKey(userId1, userId2);
 
-    const pairKey = `matched_pair:${userId1}`;
-    const reversePairKey = `matched_pair:${userId2}:${userId1}`;
+    const obj = {};
+    obj[userId1] = false;
+    obj[userId2] = false;
+    const value = JSON.stringify(obj);
 
-    const value1 = JSON.stringify(createData(userId2));
-    const value2 = JSON.stringify(createData(userId1));
-
-    await Promise.all([
-      this.client.setEx(pairKey, ttl, value1),
-      this.client.setEx(reversePairKey, ttl, value2),
-    ]);
-
+    this.client.setEx(key, ttl, value);
     console.log(`👥 Stored matched pair: ${userId1} <-> ${userId2}`);
   }
 
   /**
-   * Get matched pair information
-   * @param {string} userId - User ID to find their match
-   * @returns {Promise<object|null>}
+   * @param {string} userId1
+   * @param {string} userId2
+   * @returns {Promise<MatchedPair>}
    */
-  async getMatchedPair(userId) {
-    const key = `matched_pair:${userId}`;
+  async getMatchedPair(userId1, userId2) {
+    const key = this.#getMatchedPairKey(userId1, userId2);
 
     const value = await this.client.get(key);
 
+    // @ts-ignore
     return value ? JSON.parse(value) : null;
   }
 
@@ -299,34 +304,149 @@ class RedisRepository extends EventEmitter {
    * @param {string} userId1 - First user ID
    */
   async updateMatchAcceptance(userId1) {
-    const pairKey = `matched_pair:${userId1}`;
+    const retries = 5;
+    var tries = 0;
+    const matchedDetails = await this.getMatchedDetails(userId1);
+    const matchedPairKey = this.#getMatchedPairKey(
+      userId1,
+      matchedDetails.partner
+    );
 
-    const existingData = await this.client.get(pairKey);
-    if (!existingData) {
-      throw new Error("Match pair not found");
+    while (tries < retries) {
+      await this.client.watch([matchedPairKey]);
+
+      const existingData = await this.client.get(matchedPairKey);
+      if (!existingData) {
+        throw new Error("Match pair not found");
+      }
+
+      /** @type {MatchedPair} */
+      // @ts-ignore
+      const pairData = JSON.parse(existingData);
+      pairData[userId1] = true;
+      const value = JSON.stringify(pairData);
+
+      try {
+        const result = await this.client
+          .multi()
+          .set(matchedPairKey, value, { KEEPTTL: true })
+          .exec();
+        if (result !== null) {
+          console.log(`✅ Updated acceptance for ${userId1}`);
+          await this.client.unwatch();
+          return pairData;
+        } else {
+          await this.client.unwatch();
+          tries += 1;
+        }
+      } catch (e) {
+        await this.client.unwatch();
+        console.error(e);
+        tries += 1;
+      }
     }
+  }
 
-    const pairData = JSON.parse(existingData);
+  /**
+   * @param {string} userId1
+   * @param {string} userId2
+   */
+  async removeMatchedPair(userId1, userId2) {
+    const key = this.#getMatchedPairKey(userId1, userId2);
+    await this.client.del(key),
+      console.log(`🗑️👥 Removed matched pair: ${userId1} <-> ${userId2}`);
+  }
 
-    pairData.accepted = true;
-    pairData.lastUpdated = Date.now();
+  // ==================== MATCHED DETAILS OPERATIONS ====================
 
-    const value = JSON.stringify(pairData);
+  /**
+   * Store matched pair information
+   * @param {string} userId
+   * @param {import("../types.js").MatchedDetails} matchedDetails
+   */
+  async storeMatchedDetails(userId, matchedDetails) {
+    const ttl = 172800; // 2 days
 
-    await Promise.all([this.client.set(pairKey, value, { KEEPTTL: true })]);
+    const key = `${matchedDetailsPrefix}${userId}`;
+    const value = JSON.stringify(matchedDetails);
+    await this.client.setEx(key, ttl, value);
 
-    console.log(`✅ Updated acceptance for ${userId1}`);
+    console.log(`👥 Stored matched details: ${userId}`);
+  }
 
-    return pairData;
+  /**
+   * Get matched pair information
+   * @param {string} userId
+   * @returns {Promise<import("../types.js").MatchedDetails>}
+   */
+  async getMatchedDetails(userId) {
+    const key = `${matchedDetailsPrefix}${userId}`;
+
+    const value = await this.client.get(key);
+
+    // @ts-ignore
+    return value ? JSON.parse(value) : null;
   }
 
   /**
    * @param {string} userId
    */
-  async removeMatchedPair(userId) {
-    const pairKey = `matched_pair:${userId}`;
-    await this.client.del(pairKey),
-      console.log(`🗑️👥 Removed matched pair: ${userId}`);
+  async removeMatchedDetails(userId) {
+    const key = `${matchedDetailsPrefix}${userId}`;
+    await this.client.del(key),
+      console.log(`🗑️👥 Removed matched details: ${userId}`);
+  }
+
+  // ==================== COLLABORATION METHODS ====================
+  /**
+   * @param {string} userId1
+   * @param {string} userId2
+   */
+  #getCollaborationKey(userId1, userId2) {
+    const ids = [userId1, userId2];
+    ids.sort();
+    const key = `${collaborationSessionPrefix}${ids[0]}:${ids[1]}`;
+    return key;
+  }
+
+  /**
+   * Store matched pair information
+   * @param {string} session
+   * @param {string} userId1
+   * @param {string} userId2
+   */
+  async storeCollaborationSession(session, userId1, userId2) {
+    const ttl = 172800; // 2 days
+    const value = JSON.stringify({
+      session: session,
+    });
+    const key = this.#getCollaborationKey(userId1, userId2);
+    await this.client.setEx(key, ttl, value),
+      console.log(`👥 Stored collaboration session: ${userId1} <-> ${userId2}`);
+  }
+
+  /**
+   * @param {string} userId1
+   * @param {string} userId2
+   * @returns {Promise<import("../types.js").CollaborationSession>}
+   */
+  async getCollaborationSession(userId1, userId2) {
+    const key = this.#getCollaborationKey(userId1, userId2);
+    const value = await this.client.get(key);
+    // @ts-ignore
+    return value ? JSON.parse(value) : null;
+  }
+
+  /**
+   * @param {string} userId1
+   * @param {string} userId2
+   */
+  async removeCollaborationSession(userId1, userId2) {
+    const key = this.#getCollaborationKey(userId1, userId2);
+    await this.client.del(key),
+      console.log(
+        `🗑️👥 Removed Collaboration session: \n${userId1}\n${userId2} `
+      );
   }
 
   // ==================== UTILITY METHODS ====================
