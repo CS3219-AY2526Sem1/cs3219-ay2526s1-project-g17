@@ -4,8 +4,6 @@ import {
   matchRequestToEntity,
 } from "../utility/utility.js";
 import {
-  initializeRedis,
-  listenToRequestChanges,
   redisRepository,
 } from "../model/redis_integration.js";
 import { sendMessage } from "../utility/ws_util.js";
@@ -28,10 +26,10 @@ class UserService {
   }
 
   /**
-   * @param {UserInstance} userInstance
+   * @param {string} id
    */
-  deleteUser(userInstance) {
-    this.#userConnection.delete(userInstance.id);
+  deleteUser(id) {
+    this.#userConnection.delete(id);
   }
 
   /**
@@ -59,16 +57,9 @@ class MatchingService {
     this.#userService.addUser(userInstance);
     const matchRequestEntity = matchRequestToEntity(userInstance, request);
 
-    const existingMatch = await this.#findExistingMatch(
-      matchRequestEntity.criterias
-    );
-    const hasExisting = existingMatch.length !== 0;
-
-    if (hasExisting) {
-      await this.#handleHasExistingMatchCase(matchRequestEntity, existingMatch);
-    } else {
-      await this.#handleNoExistingMatchCase();
-    }
+    await this.#redisRepository.storeUserRequest(userInstance.id, matchRequestEntity);
+    this.listenToRequestChange(userInstance.id);
+    await this.#redisRepository.updateUserRequest(userInstance.id, "waiting");
   }
 
   /**
@@ -90,20 +81,6 @@ class MatchingService {
     return matchedRequest;
   }
 
-  /**
-   * @param {MatchRequestEntity} request
-   * @param {Array<[string, MatchRequestEntity]>} existingMatches
-   */
-  async #handleHasExistingMatchCase(request, existingMatches) {
-    request.status = "pending";
-    await this.#redisRepository.storeUserRequest(request.userId, request);
-    // listen to the key change
-
-    // when matched
-  }
-
-  async #handleNoExistingMatchCase() {}
-
   async #getSession() {
     return "some session";
   }
@@ -118,9 +95,27 @@ class MatchingService {
         case "set":
           await this.#onRequestSet(requestKey);
         case "del":
-          await this.#onRequestDelete(requestKey);
+          {
+            await this.#onRequestDelete(requestKey);
+            const userInstance = this.#userService.getUser(userId);
+            if (userInstance) {
+              this.#userService.deleteUser(userId);
+              userInstance.ws.close();
+            }
+          }
           break;
         case "expire":
+          {
+            const userInstance = this.#userService.getUser(userId);
+            if (userInstance) {
+              this.#userService.deleteUser(userId);
+              sendMessage(userInstance.ws, {
+                type: "timeout",
+                message: "Queue timeout",
+              });
+              userInstance.ws.close();
+            }
+          }
           break;
         default:
           console.log("Unaccounted operation:", change.operation);
@@ -152,23 +147,26 @@ class MatchingService {
             requestData.criterias,
             partnerMatchRequest.criterias
           );
-          await this.#redisRepository.storeMatchedPair(userId, partnerId);
           await this.#redisRepository.storeMatchedDetails(userId, {
             criteria: matchingCriteria,
             partner: partnerId,
-            accepts: false
+            accepts: false,
           });
-          await this.#redisRepository.storeMatchedDetails(userId, {
+          await this.#redisRepository.storeMatchedDetails(partnerId, {
             criteria: matchingCriteria,
             partner: userId,
-            accepts: false
+            accepts: false,
           });
+          await this.#redisRepository.updateUserRequest(userId, "pending");
+          await this.#redisRepository.updateUserRequest(partnerId, "pending");
           setTimeout(async () => {
-            const matchedPairResult =
-              await this.#redisRepository.getMatchedPair(userId, partnerId);
-            const userResult = matchedPairResult[userId];
-            const partnerResult = matchedPairResult[partnerId];
-
+            const [userMatchDetails, partnerMatchDetails] =
+              await this.#redisRepository.getPairMatchDetails(
+                userId,
+                partnerId
+              );
+            const userResult = userMatchDetails.accepts ?? false;
+            const partnerResult = partnerMatchDetails.accepts ?? false;
             if (userResult && partnerResult) {
               // creates collaboration
               const session = await this.#getSession();
@@ -186,17 +184,6 @@ class MatchingService {
               );
             }
           }, Number(process.env.ACCEPTANCE_TIMEOUT));
-          // if found then  create a matched entry for both then change to pending
-          // The initiator will create the following
-          // matched_pair:user1Id:user2Id (ids are arranged by in order)
-          //  - user1Accept: false
-          //  - user2Accept: false
-          // matched_details:user1Id
-          //  - user2's id
-          // matched_details:user2
-          //  - user1's id
-          // Only the initiator will listen to the match_pair key
-          // if not found do nothing
         }
         break;
       case "pending": {
@@ -213,22 +200,22 @@ class MatchingService {
           const matchedDetails = await this.#redisRepository.getMatchedDetails(
             userId
           );
-          const matchedPairResult = await this.#redisRepository.getMatchedPair(
-            userId,
-            matchedDetails.partner
-          );
-          const userResult = matchedPairResult[userId];
-          // remove matched pair
+          const userResult = matchedDetails.accepts;
+
           // remove matched details
+          await this.#redisRepository.removeMatchedDetails(userId);
           if (!userResult) {
             // disconnect
+            await this.#redisRepository.removeUserRequest(userId);
+            this.#userService.deleteUser(userId);
+            userInstance.ws.close();
           } else {
             // resume queue
+            await this.#redisRepository.updateUserRequest(userId, "waiting");
           }
         }, Number(process.env.ACCEPTANCE_TIMEOUT));
         break;
       }
-
       case "matched":
         {
           const userInstance = this.#userService.getUser(userId);
@@ -244,6 +231,11 @@ class MatchingService {
           sendMessage(userInstance.ws, collaborationSession);
         }
         break;
+      case "initial":
+        console.log("Initial state, do nothing");
+        break;
+      default:
+        throw new Error("Unrecognized state");
     }
   }
 

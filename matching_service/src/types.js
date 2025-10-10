@@ -20,7 +20,7 @@
 /**
  * @typedef {Object} MatchRequestEntity
  * @property {string} userId
- * @property {"waiting" | "pending" | "matched"} status
+ * @property {"waiting" | "pending" | "matched" | "initial"} status
  * @property {Array<Criteria>} criterias
  * @property {number} time
  */
@@ -44,10 +44,6 @@
 /**
  * @typedef {import("crypto").UUID} UUID;
  */
-
-/**
- * @typedef {Record<string, boolean>} MatchedPair
-  */
 
 /**
  * @typedef {Object} AcceptanceTimeoutNotification

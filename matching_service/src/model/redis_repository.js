@@ -3,7 +3,7 @@ import { createClient } from "redis";
 
 /** @typedef {Promise<import("../types.js").CollaborationSession>} CollaborationSession */
 /** @typedef {import("../types.js").MatchRequestEntity} MatchRequestEntity */
-/** @typedef {import("../types.js").MatchedPair}  MatchedPair*/
+/** @typedef {import("../types.js").MatchedDetails} MatchedDetails*/
 
 class RedisRepository extends EventEmitter {
   constructor() {
@@ -255,114 +255,12 @@ class RedisRepository extends EventEmitter {
     return requests;
   }
 
-  // ==================== MATCHED PAIR OPERATIONS ====================
-  /**
-   * @param {string} userId1
-   * @param {string} userId2
-   */
-  #getMatchedPairKey(userId1, userId2) {
-    const ids = [userId1, userId2];
-    ids.sort();
-    const key = `${matchedPairKeyPrefix}${ids[0]}:${ids[1]}`;
-    return key;
-  }
-
-  /**
-   * Store matched pair information
-   * @param {string} userId1
-   * @param {string} userId2
-   */
-  async storeMatchedPair(userId1, userId2) {
-    const ttl = 10;
-    const key = this.#getMatchedPairKey(userId1, userId2);
-
-    const obj = {};
-    obj[userId1] = false;
-    obj[userId2] = false;
-    const value = JSON.stringify(obj);
-
-    this.client.setEx(key, ttl, value);
-    console.log(`👥 Stored matched pair: ${userId1} <-> ${userId2}`);
-  }
-
-  /**
-   * @param {string} userId1
-   * @param {string} userId2
-   * @returns {Promise<MatchedPair>}
-   */
-  async getMatchedPair(userId1, userId2) {
-    const key = this.#getMatchedPairKey(userId1, userId2);
-
-    const value = await this.client.get(key);
-
-    // @ts-ignore
-    return value ? JSON.parse(value) : null;
-  }
-
-  /**
-   * Update match acceptance status
-   * @param {string} userId1 - First user ID
-   */
-  async updateMatchAcceptance(userId1) {
-    const retries = 5;
-    var tries = 0;
-    const matchedDetails = await this.getMatchedDetails(userId1);
-    const matchedPairKey = this.#getMatchedPairKey(
-      userId1,
-      matchedDetails.partner
-    );
-
-    while (tries < retries) {
-      await this.client.watch([matchedPairKey]);
-
-      const existingData = await this.client.get(matchedPairKey);
-      if (!existingData) {
-        throw new Error("Match pair not found");
-      }
-
-      /** @type {MatchedPair} */
-      // @ts-ignore
-      const pairData = JSON.parse(existingData);
-      pairData[userId1] = true;
-      const value = JSON.stringify(pairData);
-
-      try {
-        const result = await this.client
-          .multi()
-          .set(matchedPairKey, value, { KEEPTTL: true })
-          .exec();
-        if (result !== null) {
-          console.log(`✅ Updated acceptance for ${userId1}`);
-          await this.client.unwatch();
-          return pairData;
-        } else {
-          await this.client.unwatch();
-          tries += 1;
-        }
-      } catch (e) {
-        await this.client.unwatch();
-        console.error(e);
-        tries += 1;
-      }
-    }
-  }
-
-  /**
-   * @param {string} userId1
-   * @param {string} userId2
-   */
-  async removeMatchedPair(userId1, userId2) {
-    const key = this.#getMatchedPairKey(userId1, userId2);
-    await this.client.del(key),
-      console.log(`🗑️👥 Removed matched pair: ${userId1} <-> ${userId2}`);
-  }
-
   // ==================== MATCHED DETAILS OPERATIONS ====================
 
   /**
    * Store matched pair information
    * @param {string} userId
-   * @param {import("../types.js").MatchedDetails} matchedDetails
+   * @param {MatchedDetails} matchedDetails
    */
   async storeMatchedDetails(userId, matchedDetails) {
     const ttl = 172800; // 2 days
@@ -377,7 +275,7 @@ class RedisRepository extends EventEmitter {
   /**
    * Get matched pair information
    * @param {string} userId
-   * @returns {Promise<import("../types.js").MatchedDetails>}
+   * @returns {Promise<MatchedDetails>}
    */
   async getMatchedDetails(userId) {
     const key = `${matchedDetailsPrefix}${userId}`;
@@ -386,6 +284,32 @@ class RedisRepository extends EventEmitter {
 
     // @ts-ignore
     return value ? JSON.parse(value) : null;
+  }
+
+  /**
+   * @param {string} userId1
+   * @param {string} userId2
+   * @returns {Promise<[MatchedDetails|null, MatchedDetails |null]>}
+   */
+  async getPairMatchDetails(userId1, userId2) {
+    const key1 = `${matchedDetailsPrefix}${userId1}`;
+    const key2 = `${matchedDetailsPrefix}${userId2}`;
+    const [value1, value2] = await this.client.mGet([key1, key2]);
+    // @ts-ignore
+    const ret1 = value1 ? JSON.parse(value1) : null;
+    // @ts-ignore
+    const ret2 = value2 ? JSON.parse(value2) : null;
+    return [ret1, ret2];
+  }
+
+  /**
+   * @param {string} userId
+   * @param {MatchedDetails} matchDetails
+   */
+  async updateMatchedDetails(userId, matchDetails) {
+    const key = `${matchedDetailsPrefix}${userId}`;
+    const value = JSON.stringify(matchDetails);
+    await this.client.set(key, value, { KEEPTTL: true });
   }
 
   /**
