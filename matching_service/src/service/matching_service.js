@@ -1,9 +1,10 @@
+import redisRepository from "../model/redis_repository.js";
 import {
   findMatchingCriteria,
   hasMatchingCriteria,
   matchRequestToEntity,
 } from "../utility/utility.js";
-import { redisRepository } from "../model/redis_integration.js";
+
 import { sendMessage } from "../utility/ws_util.js";
 
 /** @typedef {import("ws").WebSocket} WebSocket*/
@@ -46,6 +47,17 @@ class UserService {
 export class MatchingService {
   #userService = new UserService();
   #redisRepository = redisRepository;
+
+  /**
+   * @param {string} userId
+   */
+  async disposeUser(userId) {
+    const userInstance = this.#userService.getUser(userId);
+    if (userInstance) {
+      this.#userService.deleteUser(userId);
+      userInstance.ws.close();
+    }
+  }
 
   /**
    * @param {MatchRequest} request

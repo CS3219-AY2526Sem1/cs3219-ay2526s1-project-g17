@@ -1,4 +1,5 @@
 /** @typedef {import("ws").WebSocket} WebSocket*/
+
 /**
  * @typedef {Object} Criteria
  * @property {"easy" | "medium" | "hard"} difficulty
@@ -33,7 +34,7 @@
 /**
  * @typedef {Object} UserInstance
  * @property {WebSocket} ws
- * @property {UUID} id
+ * @property {string} id
  */
 
 /**

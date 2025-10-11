@@ -1,15 +1,11 @@
 import http from "http";
 import index from "./index.js";
 import { WebSocketServer } from "ws";
-import { randomUUID } from "crypto";
-import {
-  sendMessage,
-} from "./utility/ws_util.js";
-import {
-  initializeRedis,
-} from "./model/redis_integration.js";
+import { sendMessage } from "./utility/ws_util.js";
 import {} from "./types.js";
 import { MatchingService } from "./service/matching_service.js";
+import { initializeRedis } from "./model/redis_integration.js";
+import redisRepository from "./model/redis_repository.js";
 
 /** @typedef {import("./types.js").MatchRequest} MatchRequest */
 /** @typedef {import("./types.js").UserInstance} UserInstance */
@@ -23,6 +19,11 @@ const port = process.env.PORT || 3001;
 const server = http.createServer(index);
 const wss = new WebSocketServer({ server, clientTracking: true });
 const matchingService = new MatchingService();
+process.on("SIGINT", () => {
+  server.close(async () => {
+    await redisRepository.disconnect();
+  });
+});
 await initializeRedis()
   .then(() => {
     server.listen(port);
@@ -37,9 +38,11 @@ await initializeRedis()
   });
 
 wss.on("connection", (ws, request) => {
+  const url = new URL(request.url, `http://${request.headers.host}`);
+  const userId = url.searchParams.get("userId");
   console.log("New WebSocket connection");
   /** @type {UserInstance} */
-  const userInstance = { id: randomUUID(), ws: ws };
+  const userInstance = { id: userId, ws: ws };
 
   ws.on("message", async (message) => {
     try {
@@ -55,7 +58,9 @@ wss.on("connection", (ws, request) => {
     }
   });
 
-  ws.on("close", async () => {});
+  ws.on("close", async () => {
+    await matchingService.disposeUser(userInstance.id);
+  });
 });
 
 /**
