@@ -1,9 +1,13 @@
 FROM node:22-alpine
 LABEL maintainer=ywllowsensor
 
-WORKDIR /app
-COPY . .
+WORKDIR /
+
+COPY package.json ./
+COPY package-lock.json ./
 RUN npm install
+COPY . .
+
 EXPOSE 5001
 
 CMD ["npm","start"]
