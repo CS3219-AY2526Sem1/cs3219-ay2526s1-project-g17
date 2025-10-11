@@ -9,13 +9,14 @@
 
 /**
  * @typedef {Object} MatchRequest
- * @property {"matchRequest"} typename
+ * @property {"matchRequest"} type
  * @property {Array<Criteria>} criterias
  * @property {number} time
  */
 
 /**
- * @typedef {Object} MatchFound
+ * @typedef {Object} MatchFoundNotification
+ * @property {"matchFound"} type
  * @property {Criteria} criteria
  */
 
@@ -39,7 +40,7 @@
 
 /**
  * @typedef {Object} MatchAck
- * @property {"matchAck"} typename
+ * @property {"matchAck"} type
  * @property {"accept" | "reject"} response
  */
 

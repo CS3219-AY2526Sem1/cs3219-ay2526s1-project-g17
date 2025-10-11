@@ -1,5 +1,10 @@
 import { EventEmitter } from "events";
 import { createClient } from "redis";
+import {
+  userRequestKeyPrefix,
+  collaborationSessionPrefix,
+  matchedDetailsPrefix,
+} from "../constants.js";
 
 /** @typedef {Promise<import("../types.js").CollaborationSession>} CollaborationSession */
 /** @typedef {import("../types.js").MatchRequestEntity} MatchRequestEntity */
@@ -240,14 +245,14 @@ class RedisRepository extends EventEmitter {
    */
   async getAllUserRequests() {
     const pattern = `${userRequestKeyPrefix}*`;
-    /** @type {string[]} */
-    const keys = await this.client.keys(pattern).then((k) => k.map(toString));
+    const keys = await this.client.keys(pattern);
     const requests = new Map();
 
     for (const key of keys) {
-      const userId = key.replace(userRequestKeyPrefix, "");
-      const value = await this.client.get(key).then((e) => e.toString());
+      const userId = key.toString().replace(userRequestKeyPrefix, "");
+      const value = await this.client.get(key);
       if (value) {
+        // @ts-ignore
         requests.set(userId, JSON.parse(value));
       }
     }

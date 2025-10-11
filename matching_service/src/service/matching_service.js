@@ -1,3 +1,4 @@
+import { userRequestKeyPrefix } from "../constants.js";
 import redisRepository from "../model/redis_repository.js";
 import {
   findMatchingCriteria,
@@ -13,6 +14,7 @@ import { sendMessage } from "../utility/ws_util.js";
 /** @typedef {import("../types").MatchRequestEntity} MatchRequestEntity */
 /** @typedef {import("../types").Criteria} Criteria */
 /** @typedef {import("../types").CollaborationSession} CollaborationSession */
+/** @typedef {import("../types").MatchFoundNotification} MatchFoundNotification */
 
 class UserService {
   /** @type {Map<string, UserInstance>} */
@@ -126,7 +128,11 @@ export class MatchingService {
     redisRepository.listenToKeyChanges(requestKey, async (change) => {
       switch (change.operation) {
         case "set":
-          await this.#onRequestSet(requestKey);
+          try {
+            await this.#onRequestSet(requestKey);
+          } catch (error) {
+            console.error(error);
+          }
         case "del":
           {
             await this.#onRequestDelete(requestKey);
@@ -198,8 +204,12 @@ export class MatchingService {
                 userId,
                 partnerId
               );
-            const userResult = userMatchDetails.accepts ?? false;
-            const partnerResult = partnerMatchDetails.accepts ?? false;
+            const userResult = userMatchDetails
+              ? userMatchDetails.accepts
+              : false;
+            const partnerResult = userMatchDetails
+              ? userMatchDetails.accepts
+              : false;
             if (userResult && partnerResult) {
               // creates collaboration
               const session = await this.#getSession();
@@ -222,12 +232,18 @@ export class MatchingService {
       case "pending": {
         // Send match found to user
         const userInstance = this.#userService.getUser(userId);
+        if (!userInstance) {
+          throw new Error("Invalid system state: Not user Id: " + userId);
+        }
         const matchedDetails = await this.#redisRepository.getMatchedDetails(
           userId
         );
 
-        /** @type {import("../types").MatchFound} */
-        const message = { criteria: matchedDetails.criteria };
+        /** @type {MatchFoundNotification} */
+        const message = {
+          type: "matchFound",
+          criteria: matchedDetails.criteria,
+        };
         sendMessage(userInstance.ws, message);
         setTimeout(async () => {
           const matchedDetails = await this.#redisRepository.getMatchedDetails(

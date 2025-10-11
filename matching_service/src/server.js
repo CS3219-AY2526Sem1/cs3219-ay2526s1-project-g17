@@ -6,6 +6,7 @@ import {} from "./types.js";
 import { MatchingService } from "./service/matching_service.js";
 import { initializeRedis } from "./model/redis_integration.js";
 import redisRepository from "./model/redis_repository.js";
+import { randomUUID } from "crypto";
 
 /** @typedef {import("./types.js").MatchRequest} MatchRequest */
 /** @typedef {import("./types.js").UserInstance} UserInstance */
@@ -25,7 +26,8 @@ process.on("SIGINT", () => {
   });
 });
 await initializeRedis()
-  .then(() => {
+  .then(async () => {
+    await redisRepository.flushAll();
     server.listen(port);
     console.log(
       "Matching service server listening on http://localhost:" + port
@@ -38,11 +40,15 @@ await initializeRedis()
   });
 
 wss.on("connection", (ws, request) => {
-  const url = new URL(request.url, `http://${request.headers.host}`);
-  const userId = url.searchParams.get("userId");
-  console.log("New WebSocket connection");
+  // const url = new URL(request.url, `http://${request.headers.host}`);
+  // const userId = url.searchParams.get("userId");
+  // console.log("New WebSocket connection");
+  // /** @type {UserInstance} */
+  // const userInstance = { id: userId, ws: ws };
+
   /** @type {UserInstance} */
-  const userInstance = { id: userId, ws: ws };
+  const userInstance = { id: randomUUID(), ws: ws };
+  console.log("New WebSocket connection");
 
   ws.on("message", async (message) => {
     try {
@@ -51,7 +57,7 @@ wss.on("connection", (ws, request) => {
       console.log("Received message", data);
       await handleMessage(userInstance, data);
     } catch (error) {
-      console.error("Error while parsing or handling message", error);
+      console.error("Error while parsing or handling message", message, error);
       ws.send(
         JSON.stringify({ type: "error", message: "Invalid JSON", e: error })
       );
@@ -61,6 +67,10 @@ wss.on("connection", (ws, request) => {
   ws.on("close", async () => {
     await matchingService.disposeUser(userInstance.id);
   });
+
+  ws.on("error", (e) => {
+    console.error(e);
+  });
 });
 
 /**
@@ -68,11 +78,11 @@ wss.on("connection", (ws, request) => {
  * @param {UserInstance} userInstance
  */
 async function handleMessage(userInstance, message) {
-  switch (message.typename) {
+  switch (message.type) {
     case "matchRequest":
       /** @type {MatchRequest} */
       message;
-      message["time"] = Date.now();
+      message.time = Date.now();
       await matchingService.addRequest(userInstance, message);
       break;
     case "matchAck":

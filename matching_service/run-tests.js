@@ -28,7 +28,7 @@ console.log("🧪 Running WebSocket integration tests...\n");
 
 const testProcess = spawn(
   "npm",
-  ["run", "test", "--slient=false", "--verbose", "--trace-warnings"],
+  ["run", "test", "--", "--silent=false", "--verbose"],
   {
     stdio: "inherit",
     shell: true,

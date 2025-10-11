@@ -1,5 +1,13 @@
 import WebSocket from "ws";
-import { afterEach, beforeAll, describe, expect, jest, test } from "@jest/globals";
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  describe,
+  expect,
+  jest,
+  test,
+} from "@jest/globals";
 import {
   createWebSocketClient,
   waitForMessage,
@@ -10,9 +18,21 @@ import {
   WS_URL,
   MESSAGE_TIMEOUT,
 } from "./websocket-utils.js";
+import redisRepository from "../src/model/redis_repository.js";
+
+/** @typedef {import("../src/types.js").MatchFoundNotification} MatchFoundNotification*/
+/** @typedef {import("../src/types.js").MatchRequest} MatchRequest */
+/** @typedef {import("../src/types.js").UserInstance} UserInstance */
+/** @typedef {import("../src/types.js").MatchAck} MatchAck */
+/** @typedef {import("../src/types.js").Message} Message */
+/** @typedef {import("../src/types.js").Criteria} Criteria */
+/** @typedef {import("../src/types.js").AcceptanceTimeoutNotification} AcceptanceTimeoutNotification */
 
 // Test configuration
 const TEST_TIMEOUT = 150000;
+function delay(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 describe("WebSocket Matching Service Integration Tests", () => {
   let clientA, clientB, clientC;
@@ -22,15 +42,17 @@ describe("WebSocket Matching Service Integration Tests", () => {
     jest.setTimeout(TEST_TIMEOUT);
   });
 
-  afterEach(() => {
+  afterEach(async () => {
     // Clean up WebSocket connections after each test
     closeClients(clientA, clientB, clientC);
     clientA = clientB = clientC = null;
+    await redisRepository.flushAll();
   });
 
   describe("Matching Logic Tests", () => {
     test("should match two clients with identical criteria", async () => {
       // Test Case 1: Two clients with identical matching criteria should be matched
+      /** @type {Criteria} */
       const criteria = {
         difficulty: "easy",
         language: "JavaScript",
@@ -43,32 +65,39 @@ describe("WebSocket Matching Service Integration Tests", () => {
 
       // Send match requests simultaneously
       const matchRequestA = createMatchRequest(criteria);
+      await delay(1000);
       const matchRequestB = createMatchRequest(criteria);
 
       sendMessage(clientA, matchRequestA);
       sendMessage(clientB, matchRequestB);
 
       // Wait for both clients to receive match notifications
+      /** @type {[MatchFoundNotification, MatchFoundNotification]} */
       const [matchNotificationA, matchNotificationB] = await Promise.all([
         waitForMessage(clientA, "matchFound"),
         waitForMessage(clientB, "matchFound"),
       ]);
 
+      console.log(matchNotificationA);
+      console.log(matchNotificationB);
+
       // Verify both clients received match notifications
       expect(matchNotificationA.type).toBe("matchFound");
-      expect(matchNotificationA.details).toEqual(criteria);
+      expect(matchNotificationA.criteria).toEqual(criteria);
       expect(matchNotificationB.type).toBe("matchFound");
-      expect(matchNotificationB.details).toEqual(criteria);
+      expect(matchNotificationB.criteria).toEqual(criteria);
     });
 
     test("should not match clients with different criteria", async () => {
       // Test Case: Clients with different criteria should not be matched
+      /** @type {Criteria} */
       const criteriaA = {
         difficulty: "easy",
         language: "JavaScript",
         topic: "Array",
       };
 
+      /** @type {Criteria} */
       const criteriaB = {
         difficulty: "hard",
         language: "Python",
@@ -111,6 +140,7 @@ describe("WebSocket Matching Service Integration Tests", () => {
   describe("Match Acceptance Tests", () => {
     test("should create session when both clients accept match", async () => {
       // Test Case: When both clients accept, a session should be created
+      /** @type {Criteria} */
       const criteria = {
         difficulty: "medium",
         language: "Python",
@@ -177,6 +207,7 @@ describe("WebSocket Matching Service Integration Tests", () => {
 
     test("should handle rejection gracefully and resume matchmaking", async () => {
       // Test Case: When one client rejects, the other should resume matchmaking
+      /** @type {Criteria} */
       const criteria = {
         difficulty: "hard",
         language: "Java",
@@ -241,6 +272,7 @@ describe("WebSocket Matching Service Integration Tests", () => {
 
     test("should disconnect non-accepting client after timeout", async () => {
       // Test Case: Client that doesn't respond should be disconnected
+      /** @type {Criteria} */
       const criteria = {
         difficulty: "easy",
         language: "C++",
@@ -291,6 +323,7 @@ describe("WebSocket Matching Service Integration Tests", () => {
 
   describe("Edge Cases and Error Handling", () => {
     test("should handle client disconnection during matching", async () => {
+      /** @type {Criteria} */
       const criteria = {
         difficulty: "medium",
         language: "TypeScript",
@@ -349,6 +382,7 @@ describe("WebSocket Matching Service Integration Tests", () => {
 
   describe("Multiple Client Scenarios", () => {
     test("should handle multiple clients with same criteria (first-come-first-served)", async () => {
+      /** @type {Criteria} */
       const criteria = {
         difficulty: "hard",
         language: "Python",

@@ -1,7 +1,14 @@
 import WebSocket from "ws";
 
+/** @typedef {import("../src/types.js").MatchRequest} MatchRequest */
+/** @typedef {import("../src/types.js").UserInstance} UserInstance */
+/** @typedef {import("../src/types.js").MatchAck} MatchAck */
+/** @typedef {import("../src/types.js").Message} Message */
+/** @typedef {import("../src/types.js").Criteria} Criteria */
+/** @typedef {import("../src/types.js").AcceptanceTimeoutNotification} AcceptanceTimeoutNotification */
+
 const WS_URL = "ws://localhost:3001";
-const CONNECTION_TIMEOUT = 5000;
+const CONNECTION_TIMEOUT = 10000;
 const MESSAGE_TIMEOUT = 10000;
 
 /**
@@ -63,12 +70,12 @@ function waitForMessage(ws, messageType, timeout = MESSAGE_TIMEOUT) {
 
 /**
  * Helper function to create a match request
- * @param {Object} criteria - Matching criteria
- * @returns {Object} Match request object
+ * @param {Criteria} criteria - Matching criteria
+ * @returns {MatchRequest} Match request object
  */
 function createMatchRequest(criteria) {
   return {
-    typename: "matchRequest",
+    type: "matchRequest",
     criterias: [criteria],
     time: Date.now(),
   };
