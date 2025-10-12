@@ -1,1 +1,1 @@
-Project root dir: collaboration-service
+test case root dir: collaboration-service
