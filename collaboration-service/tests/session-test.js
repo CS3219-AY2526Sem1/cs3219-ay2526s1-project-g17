@@ -1,98 +1,107 @@
-// test-client.js
-import WebSocket from 'ws';
+// tests/session-test.js
+import { io } from 'socket.io-client';
+import { WebsocketProvider } from 'y-websocket';
 import * as Y from 'yjs';
-import Session from '../model/session-model.js';
 
-// Define constants for the test
-const TEST_PORT = 4000; // Port for the test WebSocket server
-const TEST_SESSION_ID = 'test-session'; // Session ID for testing
+const PORT = 3002;
+const SESSION_ID = 'test-session-' + Date.now();
+const USER_1 = 'user-1';
+const USER_2 = 'user-2';
 
-const sessionId = 'session-123';
-const userId = 'user-456';
+console.log(`[END] Starting integration test for session: ${SESSION_ID}\n`);
 
-// Create a WebSocket connection to the test server
-const ws = new WebSocket(`ws://localhost:${TEST_PORT}/?sessionId=${TEST_SESSION_ID}`);
+// --- Helper: delay ---
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-// Create a Yjs document for testing
-const ydoc = new Y.Doc();
-const yText = ydoc.getText('sharedText');
+// --- 1. Client 1: Join via Socket.IO + Connect Yjs ---
+const socket1 = io(`http://localhost:${PORT}`, { reconnection: false });
+const ydoc1 = new Y.Doc();
+const ytext1 = ydoc1.getText('notebook');
 
-// Event listener for when the WebSocket connection is opened
-ws.on('open', () => {
-  console.log('WebSocket connection established');
+const provider1 = new WebsocketProvider(
+  `ws://localhost:${PORT}`,
+  SESSION_ID,
+  ydoc1,
+  { WebSocket: (await import('ws')).default }
+);
 
-  // Test the joinSession event
-  ws.send(JSON.stringify({ type: 'joinSession' }));
+// Join session
+socket1.emit('joinSession', { sessionId: SESSION_ID, userId: USER_1 });
 
-  // Request the Yjs document from the server
-  ws.send(JSON.stringify({ type: 'loadDocument' }));
+socket1.on('connect', () => console.log('[CONNECTION] Client 1: Socket.IO connected'));
+socket1.on('userJoined', (data) => console.log(`[USER JOINED] Client 1: User joined: ${data.userId}`));
+socket1.on('sessionTerminated', () => console.log('[SESSION TERMINATED] Client 1: Session terminated'));
+
+ytext1.observe(() => {
+  console.log('[DOCUMENT] Client 1 sees:', `"${ytext1.toString()}"`);
 });
 
-// Event listener for receiving messages from the server
-ws.on('message', (message) => {
-  const parsedMessage = JSON.parse(message);
+// --- 2. Client 2: Same ---
+const socket2 = io(`http://localhost:${PORT}`, { reconnection: false });
+const ydoc2 = new Y.Doc();
+const ytext2 = ydoc2.getText('notebook');
 
-  if (parsedMessage.type === 'document') {
-    // Apply the received Yjs document to the local Yjs document
-    const binaryData = new Uint8Array(parsedMessage.data);
-    Y.applyUpdate(ydoc, binaryData);
-    console.log('Yjs document loaded for Client 1:', yText.toString());
+const provider2 = new WebsocketProvider(
+  `ws://localhost:${PORT}`,
+  SESSION_ID,
+  ydoc2,
+  { WebSocket: (await import('ws')).default }
+);
 
-    // Modify the Yjs document and save changes
-    yText.insert(0, 'Hello, Client 1!');
-    ws.send(JSON.stringify({ type: 'saveDocument' }));
-  }
+socket2.emit('joinSession', { sessionId: SESSION_ID, userId: USER_2 });
+
+socket2.on('connect', () => console.log('[CONNECTION] Client 2: Socket.IO connected'));
+socket2.on('userJoined', (data) => console.log(`[USER JOINED] Client 2: User joined: ${data.userId}`));
+socket2.on('sessionTerminated', () => console.log('[SESSION TERMINATED] Client 2: Session terminated'));
+
+ytext2.observe(() => {
+  console.log('[DOCUMENT] Client 2 sees:', `"${ytext2.toString()}"`);
 });
 
-// Event listener for when the WebSocket connection is closed
-ws.on('close', () => {
-  console.log('WebSocket connection closed');
-});
+// --- 3. Simulate collaboration ---
+// Client 1 types initial code
+setTimeout(() => {
+  ytext1.insert(0, 'A');
+  ytext2.insert(0, 'B');
+}, 1000);
 
-// Event listener for WebSocket errors
-ws.on('error', (error) => {
-  console.error('WebSocket error:', error);
-});
+setTimeout(() => {
+  console.log('\n[WRITE] Client 1 types initial code...');
+  ytext1.insert(0, '// Client 1 code ');
+}, 2000);
 
-// Create a second WebSocket connection to simulate another client
-const ws2 = new WebSocket(`ws://localhost:${TEST_PORT}/?sessionId=${TEST_SESSION_ID}`);
+// Client 1 later types "hello" at start
+setTimeout(() => {
+  console.log('\n[WRITE] Client 1 types "hello" at start...');
+  ytext1.insert(0, 'hello ');
+}, 3000); // ← Later!
 
-// Event listener for when the second WebSocket connection is opened
-ws2.on('open', () => {
-  console.log('Second WebSocket connection established');
+// Client 2 appends
+setTimeout(() => {
+  console.log('\n[WRITE] Client 2 appends...');
+  ytext2.insert(ytext2.length, '// Client 2 code');
+}, 4000);
 
-  // Test the joinSession event for the second client
-  ws2.send(JSON.stringify({ type: 'joinSession' }));
+// Client 2 adds "world"
+setTimeout(() => {
+  console.log('\n[WRITE] Client 2 types "world" at end...');
+  ytext2.insert(5, ' world');
+}, 5000);
 
-  // Request the Yjs document from the server
-  ws2.send(JSON.stringify({ type: 'loadDocument' }));
-});
 
-// Event listener for receiving messages from the server for the second client
-ws2.on('message', (message) => {
-  const parsedMessage = JSON.parse(message);
+// --- 4. Test auto-close: disconnect both after 6s ---
+setTimeout(async () => {
+  console.log('\n[DISCONNECT] Disconnecting both clients...');
+  socket1.disconnect();
+  socket2.disconnect();
+  provider1.destroy();
+  provider2.destroy();
 
-  if (parsedMessage.type === 'document') {
-    // Apply the received Yjs document to the local Yjs document
-    const binaryData = new Uint8Array(parsedMessage.data);
-    Y.applyUpdate(ydoc, binaryData);
-    console.log('Yjs document loaded for Client 2:', yText.toString());
+  console.log('[WAIT] Waiting 1s to test auto-termination...');
+  await sleep(1_000);
 
-    // Modify the Yjs document from the second client and save changes
-    yText.insert(yText.length, ' Hello from Client 2!');
-    ws2.send(JSON.stringify({ type: 'saveDocument' }));
-
-    // Log the final state of the Yjs document
-    console.log('Final Yjs document state after Client 2:', yText.toString());
-  }
-});
-
-// Event listener for when the second WebSocket connection is closed
-ws2.on('close', () => {
-  console.log('Second WebSocket connection closed');
-});
-
-// Event listener for WebSocket errors for the second client
-ws2.on('error', (error) => {
-  console.error('WebSocket error (Client 2):', error);
-});
+  // Try to reconnect — should still work if session not terminated,
+  // but your server will have emitted 'sessionTerminated'
+  console.log('[END] Test completed.');
+  process.exit(0);
+}, 6000);
