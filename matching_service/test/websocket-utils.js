@@ -2,7 +2,7 @@ import WebSocket from "ws";
 
 /** @typedef {import("../src/types.js").MatchRequest} MatchRequest */
 /** @typedef {import("../src/types.js").UserInstance} UserInstance */
-/** @typedef {import("../src/types.js").MatchAck} MatchAck */
+/** @typedef {import("../src/types.js").MatchFoundResponse} MatchFoundResponse */
 /** @typedef {import("../src/types.js").Message} Message */
 /** @typedef {import("../src/types.js").Criteria} Criteria */
 /** @typedef {import("../src/types.js").AcceptanceTimeoutNotification} AcceptanceTimeoutNotification */
@@ -83,13 +83,13 @@ function createMatchRequest(criteria) {
 
 /**
  * Helper function to create a match acknowledgment
- * @param {string} response - "accept" or "reject"
- * @returns {Object} Match acknowledgment object
+ * @param {"accept" | "reject"} response - "accept" or "reject"
+ * @returns {MatchFoundResponse} Match acknowledgment object
  */
 function createMatchAck(response) {
   return {
-    typename: "matchAck",
-    response,
+    type: "matchFoundResponse",
+    response: response,
   };
 }
 

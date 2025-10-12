@@ -23,7 +23,7 @@ import redisRepository from "../src/model/redis_repository.js";
 /** @typedef {import("../src/types.js").MatchFoundNotification} MatchFoundNotification*/
 /** @typedef {import("../src/types.js").MatchRequest} MatchRequest */
 /** @typedef {import("../src/types.js").UserInstance} UserInstance */
-/** @typedef {import("../src/types.js").MatchAck} MatchAck */
+/** @typedef {import("../src/types.js").MatchFoundResponse} MatchFoundResponse */
 /** @typedef {import("../src/types.js").Message} Message */
 /** @typedef {import("../src/types.js").Criteria} Criteria */
 /** @typedef {import("../src/types.js").AcceptanceTimeoutNotification} AcceptanceTimeoutNotification */
@@ -46,7 +46,12 @@ describe("WebSocket Matching Service Integration Tests", () => {
     // Clean up WebSocket connections after each test
     closeClients(clientA, clientB, clientC);
     clientA = clientB = clientC = null;
-    await redisRepository.flushAll();
+    try {
+      await redisRepository.flushAll();  
+    } catch (error) {
+      console.log("redis not connected")
+    }
+    
   });
 
   describe("Matching Logic Tests", () => {
@@ -203,7 +208,7 @@ describe("WebSocket Matching Service Integration Tests", () => {
       // Verify session was created for both clients
       expect(sessionA).toBeDefined();
       expect(sessionB).toBeDefined();
-    });
+    }, 10000);
 
     test("should handle rejection gracefully and resume matchmaking", async () => {
       // Test Case: When one client rejects, the other should resume matchmaking

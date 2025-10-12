@@ -51,3 +51,11 @@ export function findMatchingCriteria(criterias, otherCriterias) {
   }
   return undefined;
 }
+
+/**
+ * @param {number} milliseconds
+ */
+export async function delay(milliseconds) {
+  return new Promise((resolve) => setTimeout(resolve, milliseconds));
+}
+

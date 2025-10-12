@@ -10,7 +10,7 @@ import { randomUUID } from "crypto";
 
 /** @typedef {import("./types.js").MatchRequest} MatchRequest */
 /** @typedef {import("./types.js").UserInstance} UserInstance */
-/** @typedef {import("./types.js").MatchAck} MatchAck */
+/** @typedef {import("./types.js").MatchFoundResponse} MatchFoundResponse */
 /** @typedef {import("./types.js").Message} Message */
 /** @typedef {import("./types.js").Criteria} Criteria */
 /** @typedef {import("./types.js").AcceptanceTimeoutNotification} AcceptanceTimeoutNotification */
@@ -85,17 +85,13 @@ async function handleMessage(userInstance, message) {
       message.time = Date.now();
       await matchingService.addRequest(userInstance, message);
       break;
-    case "matchAck":
-      /** @type {MatchAck} */
+    case "matchFoundResponse":
+      /** @type {MatchFoundResponse} */
       message;
-      switch (message.response) {
-        case "accept":
-          await matchingService.handleUserAccept(userInstance);
-          break;
-        case "reject":
-          // TODO: user reject should short circuit the wait
-          break;
-      }
+      await matchingService.handleUserMatchFoundResponse(
+        userInstance.id,
+        message
+      );
       break;
     default:
       sendMessage(userInstance.ws, { message: "Invalid request typename" });

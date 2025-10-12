@@ -5,10 +5,12 @@ import {
   collaborationSessionPrefix,
   matchedDetailsPrefix,
 } from "../constants.js";
+import { delay } from "../utility/utility.js";
 
 /** @typedef {Promise<import("../types.js").CollaborationSession>} CollaborationSession */
 /** @typedef {import("../types.js").MatchRequestEntity} MatchRequestEntity */
 /** @typedef {import("../types.js").MatchedDetails} MatchedDetails*/
+/** @typedef {import("../types").MatchRequestStatus} MatchRequestStatus*/
 
 class RedisRepository extends EventEmitter {
   constructor() {
@@ -182,11 +184,16 @@ class RedisRepository extends EventEmitter {
    * @param {"waiting" | "pending" | "matched"} status
    */
   async updateUserRequest(userId, status) {
+    console.log("Updating user to ", status);
     const retries = 5;
     var tries = 0;
 
     const key = `${userRequestKeyPrefix}${userId}`;
     const request = await this.getUserRequest(userId);
+    if (!request) {
+      console.log("User Request no longer exists: " + userId);
+      return;
+    }
     request.status = status;
     const value = JSON.stringify(request);
 
@@ -258,6 +265,101 @@ class RedisRepository extends EventEmitter {
     }
 
     return requests;
+  }
+
+  /**
+   * @param {string} userId1
+   * @param {string} userId2
+   * @param {MatchRequestStatus} initialStatus
+   * @param {MatchRequestStatus} newStatus
+   */
+  async atomicTransitionUsersState(userId1, userId2, initialStatus, newStatus) {
+    console.log(`Atomic transition from ${initialStatus} -> ${newStatus}`);
+    const retries = 5;
+    let tries = 0;
+
+    const key1 = `${userRequestKeyPrefix}${userId1}`;
+    const key2 = `${userRequestKeyPrefix}${userId2}`;
+
+    while (tries < retries) {
+      try {
+        await this.client.watch([key1, key2]);
+        const [value1, value2] = await this.client.mGet([key1, key2]);
+
+        if (!value1 || !value2) {
+          await this.client.unwatch();
+          console.log(
+            `❌ Transition failed: User ${userId1} or ${userId2} not found`
+          );
+          return false;
+        }
+
+        /** @type {MatchRequestEntity} */
+        // @ts-ignore
+        const request1 = JSON.parse(value1);
+        /** @type {MatchRequestEntity} */
+        // @ts-ignore
+        const request2 = JSON.parse(value2);
+
+        if (
+          request1.status !== initialStatus ||
+          request2.status !== initialStatus
+        ) {
+          await this.client.unwatch();
+          console.log(
+            `❌ Transition failed: Expected both users to be '${initialStatus}', but found '${request1.status}' and '${request2.status}'`
+          );
+          return false;
+        }
+
+        request1.status = newStatus;
+        request2.status = newStatus;
+
+        const result = await this.client
+          .multi()
+          .set(key1, JSON.stringify(request1))
+          .set(key2, JSON.stringify(request2))
+          .exec();
+
+        if (result !== null) {
+          console.log(
+            `✅ Successfully transitioned users ${userId1}, ${userId2} from '${initialStatus}' to '${newStatus}'`
+          );
+          return true;
+        } else {
+          tries += 1;
+          console.log(
+            `🔄 Transition failed due to concurrent modification (attempt ${tries}/${retries})`
+          );
+          await this.client.unwatch();
+
+          if (tries >= retries) {
+            console.log(
+              `❌ Failed to transition users after ${retries} attempts`
+            );
+            return false;
+          }
+
+          await delay(Math.random() * 10);
+        }
+      } catch (error) {
+        tries += 1;
+        await this.client.unwatch();
+        console.error(
+          `❌ Error in atomic transition (attempt ${tries}/${retries}):`,
+          error
+        );
+
+        if (tries >= retries) {
+          throw error;
+        }
+
+        // Small delay before retry
+        await delay(Math.random() * 10);
+      }
+    }
+
+    return false;
   }
 
   // ==================== MATCHED DETAILS OPERATIONS ====================

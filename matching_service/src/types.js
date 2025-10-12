@@ -1,8 +1,12 @@
 /** @typedef {import("ws").WebSocket} WebSocket*/
 
 /**
+ * @typedef {"easy" | "medium" | "hard"} Difficulty
+ */
+
+/**
  * @typedef {Object} Criteria
- * @property {"easy" | "medium" | "hard"} difficulty
+ * @property {Difficulty} difficulty
  * @property {string} language
  * @property {string} topic
  */
@@ -21,15 +25,19 @@
  */
 
 /**
+ * @typedef {"waiting" | "pending" | "matched" | "initial"} MatchRequestStatus
+ */
+
+/**
  * @typedef {Object} MatchRequestEntity
  * @property {string} userId
- * @property {"waiting" | "pending" | "matched" | "initial"} status
+ * @property {MatchRequestStatus} status
  * @property {Array<Criteria>} criterias
  * @property {number} time
  */
 
 /**
- * @typedef {MatchRequest | MatchAck} Message
+ * @typedef {MatchRequest | MatchFoundResponse} Message
  */
 
 /**
@@ -39,8 +47,8 @@
  */
 
 /**
- * @typedef {Object} MatchAck
- * @property {"matchAck"} type
+ * @typedef {Object} MatchFoundResponse
+ * @property {"matchFoundResponse"} type
  * @property {"accept" | "reject"} response
  */
 
