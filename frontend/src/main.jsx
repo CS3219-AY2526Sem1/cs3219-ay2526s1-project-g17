@@ -1,28 +1,26 @@
-import React from "react";
-import ReactDOM from "react-dom/client";
-import {
-  BrowserRouter,
-  createBrowserRouter,
-  RouterProvider,
-} from "react-router";
-import "./index.css";
-import App from "./app";
-import MatchingPage from "./matching-service/pages/matching_page";
-import { TestPage } from "./test_page";
+import { StrictMode } from 'react'
+import { BrowserRouter } from 'react-router'
+import { createRoot } from 'react-dom/client'
+import { Auth0Provider } from '@auth0/auth0-react';
+import './index.css'
+import App from './App.jsx'
 
-const root = document.getElementById("root");
+const domain = import.meta.env.VITE_AUTH0_DOMAIN;
+const clientId = import.meta.env.VITE_AUTH0_CLIENT_ID;
 
-const router = createBrowserRouter([
-  { path: "/", element: <App /> },
-  { path: "/match", element: <MatchingPage /> },
-  { path: "/test/:testId", element: <TestPage /> },
-]);
 
-ReactDOM.createRoot(root).render(
-  <React.StrictMode>
-    <RouterProvider router={router} />
-    {/* <BrowserRouter>
-      <App />
-    </BrowserRouter> */}
-  </React.StrictMode>
-);
+createRoot(document.getElementById('root')).render(
+  <StrictMode>
+    <BrowserRouter>
+      <Auth0Provider
+        domain={domain}
+        clientId={clientId}
+        authorizationParams={{
+          redirect_uri: window.location.origin
+        }}
+      >
+        <App />
+      </Auth0Provider>
+    </BrowserRouter>
+  </StrictMode>,
+)
