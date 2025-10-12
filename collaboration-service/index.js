@@ -1,66 +1,93 @@
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import http from 'http';
-import { Server as SocketIOServer } from 'socket.io';
-import app from './server.js';
+import WebSocket from 'ws';
+import { WebsocketProvider } from 'y-websocket';
+import * as Y from 'yjs';
+import { setupWSConnection } from 'y-websocket/bin/utils.js';
 import Session from './model/session-model.js';
 
 dotenv.config();
 const PORT = process.env.PORT || 3002;
 const DB_URI = process.env.DB_CLOUD_URI;
 
-const server = http.createServer(app);
-const io = new SocketIOServer(server, {
-  cors: { origin: '*', methods: ['GET', 'POST'] }
-});
+const server = http.createServer();
 
-io.on('connection', (socket) => {
-  console.log('A user connected:', socket.id);
+// Map to store Yjs documents by sessionId
+const docs = new Map();
 
-  socket.onAny((event, ...args) => {
-    console.log(`Received event: ${event}`, ...args);
-  });
+// Set up the y-websocket server
+const wss = new WebSocket.Server({ server });
+wss.on('connection', (ws, req) => {
+  const urlParams = new URLSearchParams(req.url.slice(1));
+  const sessionId = urlParams.get('sessionId');
 
-  socket.on('joinSession', async ({ sessionId, userId }) => {
-    socket.join(sessionId);
-    socket.to(sessionId).emit('userJoined', { userId });
-    const session = await Session.findOne({ sessionId });
-	if (session) socket.emit('codeUpdate', session.code);
-  });
+  if (!sessionId) {
+    ws.close(1008, 'Missing sessionId');
+    return;
+  }
 
-  socket.on('codeChange', async ({ sessionId, code }) => {
-	console.log('Saved code:\n' + code);
-	await Session.findOneAndUpdate(
-	{ sessionId },
-	{ code, lastUpdated: new Date() },
-	{ upsert: true, new: true }
-	);
-	socket.to(sessionId).emit('codeUpdate', code);
-});
+  // Get or create the Yjs document for the session
+  let doc = docs.get(sessionId);
+  if (!doc) {
+    doc = new Y.Doc();
+    docs.set(sessionId, doc);
+  }
 
-  socket.on('disconnecting', () => {
-    for (const room of socket.rooms) {
-      if (room !== socket.id)
-        socket.to(room).emit('userDisconnected', { socketId: socket.id });
+  // Set up the WebSocket connection for the Yjs document
+  setupWSConnection(ws, req, { doc });
+
+  // Handle custom events
+  ws.on('message', async (message) => {
+    const parsedMessage = JSON.parse(message);
+
+    switch (parsedMessage.type) {
+      case 'joinSession':
+        console.log(`User joined session: ${sessionId}`);
+        break;
+
+      case 'terminateSession':
+        console.log(`Terminating session: ${sessionId}`);
+        docs.delete(sessionId);
+        ws.close(1000, 'Session terminated');
+        break;
+
+      case 'saveDocument':
+        try {
+          const binaryData = Y.encodeStateAsUpdate(doc);
+          await Session.findOneAndUpdate(
+            { sessionId },
+            { yDoc: Buffer.from(binaryData) },
+            { new: true, upsert: true }
+          );
+          console.log(`Document saved for session: ${sessionId}`);
+        } catch (error) {
+          console.error(`Failed to save document for session: ${sessionId}`, error);
+        }
+        break;
+
+      case 'loadDocument':
+        try {
+          const session = await Session.findOne({ sessionId });
+          if (session && session.yDoc) {
+            Y.applyUpdate(doc, new Uint8Array(session.yDoc));
+            console.log(`Document loaded for session: ${sessionId}`);
+          } else {
+            console.log(`No document found for session: ${sessionId}`);
+          }
+        } catch (error) {
+          console.error(`Failed to load document for session: ${sessionId}`, error);
+        }
+        break;
+
+      default:
+        console.log(`Unknown event type: ${parsedMessage.type}`);
     }
-  });
-
-  socket.on('terminateSession', async ({ sessionId }) => {
-    await Session.findOneAndUpdate(
-      { sessionId },
-      { isActive: false, endedAt: new Date() },
-      { new: true }
-    );
-    io.to(sessionId).emit('sessionTerminated');
-    io.in(sessionId).socketsLeave(sessionId);
   });
 });
 
 mongoose.connect(DB_URI)
   .then(() => {
-    server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+    server.listen(PORT, () => console.log(`Collaboration service using y-websocket running on port ${PORT}`));
   })
   .catch(err => console.error('DB connection failed:', err.message));
-
-
-export { server };
