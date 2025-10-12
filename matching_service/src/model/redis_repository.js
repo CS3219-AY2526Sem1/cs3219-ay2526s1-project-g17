@@ -165,16 +165,15 @@ class RedisRepository extends EventEmitter {
    * Store a match request
    * @param {string} userId - User ID
    * @param {MatchRequestEntity} request - Match request object
-   * @param {number} ttl - TTL in seconds
    */
-  async storeUserRequest(userId, request, ttl = 300) {
+  async storeUserRequest(userId, request) {
     const key = `${userRequestKeyPrefix}${userId}`;
     const value = JSON.stringify({
       ...request,
       storedAt: Date.now(),
     });
 
-    await this.client.setEx(key, ttl, value);
+    await this.client.set(key, value);
     console.log(`Stored user request for ${userId}`);
   }
 
@@ -184,7 +183,6 @@ class RedisRepository extends EventEmitter {
    * @param {"waiting" | "pending" | "matched"} status
    */
   async updateUserRequest(userId, status) {
-    console.log("Updating user to ", status);
     const retries = 5;
     var tries = 0;
 
@@ -194,6 +192,8 @@ class RedisRepository extends EventEmitter {
       console.log("User Request no longer exists: " + userId);
       return;
     }
+
+    console.log(`Updating user from ${request.status} to ${status}`);
     request.status = status;
     const value = JSON.stringify(request);
 
@@ -201,15 +201,14 @@ class RedisRepository extends EventEmitter {
       await this.client.watch([key]);
 
       try {
-        const result = await this.client
-          .multi()
-          .set(key, value, { KEEPTTL: true })
-          .exec();
+        const result = await this.client.multi().set(key, value).exec();
+        console.log("Update result", result);
         if (result) {
           await this.client.unwatch();
-          console.log("User updated");
+          console.log(`User Updated on ${tries}th tries`);
           return;
         } else {
+          console.log(`Updating ${userId} failed, retrying...`);
           tries += 1;
           await this.client.unwatch();
         }
@@ -370,11 +369,9 @@ class RedisRepository extends EventEmitter {
    * @param {MatchedDetails} matchedDetails
    */
   async storeMatchedDetails(userId, matchedDetails) {
-    const ttl = 172800; // 2 days
-
     const key = `${matchedDetailsPrefix}${userId}`;
     const value = JSON.stringify(matchedDetails);
-    await this.client.setEx(key, ttl, value);
+    await this.client.set(key, value);
 
     console.log(`👥 Stored matched details: ${userId}`);
   }
@@ -416,7 +413,7 @@ class RedisRepository extends EventEmitter {
   async updateMatchedDetails(userId, matchDetails) {
     const key = `${matchedDetailsPrefix}${userId}`;
     const value = JSON.stringify(matchDetails);
-    await this.client.set(key, value, { KEEPTTL: true });
+    await this.client.set(key, value);
   }
 
   /**
@@ -447,12 +444,11 @@ class RedisRepository extends EventEmitter {
    * @param {string} userId2
    */
   async storeCollaborationSession(session, userId1, userId2) {
-    const ttl = 172800; // 2 days
     const value = JSON.stringify({
       session: session,
     });
     const key = this.#getCollaborationKey(userId1, userId2);
-    await this.client.setEx(key, ttl, value),
+    await this.client.set(key, value),
       console.log(`👥 Stored collaboration session: ${userId1} <-> ${userId2}`);
   }
 
@@ -525,10 +521,28 @@ class RedisRepository extends EventEmitter {
   async disconnect() {
     try {
       if (this.client) {
-        await this.client.quit();
+        try {
+          await this.client.quit();
+          console.log("✅ Main Redis client closed");
+        } catch (error) {
+          console.error("❌ Error closing main client:", error);
+          this.client.destroy();
+        }
       }
       if (this.subscriber) {
-        await this.subscriber.quit();
+        try {
+          await this.subscriber.pUnsubscribe("__keyspace@0__:*");
+          console.log("✅ Unsubscribed from keyspace notifications");
+
+          await this.subscriber.unsubscribe();
+          console.log("✅ Unsubscribed from all channels");
+
+          await this.subscriber.quit();
+          console.log("✅ Subscriber connection closed");
+        } catch (error) {
+          console.error("❌ Error closing subscriber:", error);
+          this.subscriber.destroy();
+        }
       }
 
       this.isConnected = false;

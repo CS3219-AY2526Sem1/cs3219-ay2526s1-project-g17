@@ -2,6 +2,7 @@ import { userRequestKeyPrefix } from "../constants.js";
 import redisRepository from "../model/redis_repository.js";
 import { ACCEPTANCE_TIMEOUT } from "../server_config.js";
 import {
+  delay,
   findMatchingCriteria,
   hasMatchingCriteria,
   matchRequestToEntity,
@@ -82,6 +83,8 @@ export class MatchingService {
   redisRepository = redisRepository;
   /** @private */
   acceptanceTimeout = new TimeoutService();
+  /** @private */
+  activeListeners = new Map();
 
   /**
    * @param {string} userId
@@ -92,6 +95,11 @@ export class MatchingService {
       userInstance.ws.close();
       this.userService.deleteUser(userId);
     }
+    const listener = this.activeListeners.get(userId);
+    if (listener) {
+      listener();
+      this.activeListeners.delete(userId);
+    }
 
     await this.redisRepository.removeUserRequest(userId);
   }
@@ -101,6 +109,7 @@ export class MatchingService {
    * @param {UserInstance} userInstance
    */
   async addRequest(userInstance, request) {
+    console.log(`Requst added: ${userInstance.id}`);
     request.time = Date.now();
     this.userService.addUser(userInstance);
     const matchRequestEntity = matchRequestToEntity(userInstance, request);
@@ -179,16 +188,17 @@ export class MatchingService {
   }
 
   /**
+   * @param {string} userId
    * @param {Criteria[]} criterias
    * @private
    */
-  async findExistingMatch(criterias) {
+  async findExistingMatch(userId, criterias) {
     /** @type {Array<[string, MatchRequestEntity]>} */
     const matchedRequest = [];
 
     const userRequests = await redisRepository.getAllUserRequests();
     for (const [k, v] of userRequests.entries()) {
-      if (v.status !== "waiting") {
+      if (v.status !== "waiting" || k === userId) {
         continue;
       }
       if (hasMatchingCriteria(criterias, v.criterias)) {
@@ -207,23 +217,29 @@ export class MatchingService {
    */
   async listenToRequestChange(userId) {
     const requestKey = `${userRequestKeyPrefix}${userId}`;
-    redisRepository.listenToKeyChanges(requestKey, async (change) => {
-      switch (change.operation) {
-        case "set":
-          try {
-            await this.#onRequestSet(requestKey);
-          } catch (error) {
-            console.error(error);
-          }
-        case "del":
-          {
-            await this.onRequestDelete(requestKey);
-          }
-          break;
-        default:
-          console.log("Unaccounted operation:", change.operation);
+    const listener = redisRepository.listenToKeyChanges(
+      requestKey,
+      async (change) => {
+        switch (change.operation) {
+          case "set":
+            try {
+              await this.#onRequestSet(requestKey);
+            } catch (error) {
+              console.error(error);
+            }
+            break;
+          case "del":
+            {
+              await this.onRequestDelete(requestKey);
+            }
+            break;
+          default:
+            console.log("Unaccounted operation:", change.operation);
+            break;
+        }
       }
-    });
+    );
+    this.activeListeners.set(userId, listener);
   }
 
   /**
@@ -269,6 +285,8 @@ export class MatchingService {
    * @private
    */
   async handlePending(userId) {
+    // Necessary!
+    await delay(1000);
     // Send match found to user
     const userInstance = this.userService.getUser(userId);
     if (!userInstance) {
@@ -313,6 +331,7 @@ export class MatchingService {
    */
   async handleWaiting(userId, matchRequestEntity) {
     const existingMatches = await this.findExistingMatch(
+      userId,
       matchRequestEntity.criterias
     );
 
@@ -343,6 +362,7 @@ export class MatchingService {
 
     try {
       await this.createMatchDetails(userId, partnerId, matchingCriteria);
+      console.log(`Match details created for ${userId} and ${partnerId}`);
     } catch (error) {
       console.error("Error while creating match details", error);
     }
@@ -366,7 +386,7 @@ export class MatchingService {
       } else {
         this.redisRepository.updateUserRequest(partnerId, "waiting");
       }
-    }, ACCEPTANCE_TIMEOUT);
+    }, ACCEPTANCE_TIMEOUT + 100000);
     const key = [userId, partnerId].sort().join();
     this.acceptanceTimeout.addTimeout(key, timeout);
   }

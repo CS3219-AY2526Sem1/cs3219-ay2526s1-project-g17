@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from "react";
 import {
   fetchTopics,
-  submitMatchRequest,
+  submitMatchRequestViaWebSocket,
 } from "../services/matchingService";
 import "./MatchingCriteriaDialog.css";
+
+/**
+ * @typedef {import("../types").MatchRequest} MatchRequest
+ */
 
 /**
  * Dialog component for selecting matching criteria
@@ -101,18 +105,18 @@ const MatchingCriteriaDialog = ({ isOpen, onClose, onSubmit }) => {
     setError("");
 
     try {
+      /** @type {MatchRequest} */
       const matchRequest = {
-        typename: "matchRequest",
+        type: "matchRequest",
         criterias: selectedTopics.map((topic) => ({
           difficulty,
           language,
           topic,
         })),
-        time: Date.now(),
       };
 
-      const response = await submitMatchRequest(matchRequest);
-
+      const response = await submitMatchRequestViaWebSocket(matchRequest);
+      console.log(`Response: `, response);
       if (response.success) {
         onSubmit && onSubmit(matchRequest, response);
         handleClose();
