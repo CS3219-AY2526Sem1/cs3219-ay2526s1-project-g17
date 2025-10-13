@@ -1,0 +1,37 @@
+
+services:
+  frontend:
+    build: ./frontend
+    ports:
+      - 5173:5173
+    env_file:
+      - ./frontend/.env
+    depends_on:
+      - user_service
+      - matching_service
+      - question_service
+      - collaboration_service
+  user_service:
+    build: ./user-service
+    ports:
+      - 3003:3003
+    env_file:
+      - ./user-service/.env
+  matching_service:
+    build: ./matching_service
+    ports:
+      - 3001:3001
+    env_file:
+      - ./matching_service/.env
+  question_service:
+    build: ./question_service
+    ports:
+      - 5001:5001
+    env_file:
+      - ./question_service/.env
+  collaboration_service:
+    build: ./collaboration-service
+    ports:
+      - 3002:3002
+    env_file:
+      - ./collaboration-service/.env
