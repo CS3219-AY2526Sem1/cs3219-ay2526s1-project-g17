@@ -1,20 +1,22 @@
 import { configDotenv } from "dotenv";
-import redisRepository from "./redis_repository.js";
+import { createRedisClient, RedisRepository } from "./redis_repository";
+import { REDIS_URL } from "../server_config";
 
 export async function initializeRedis() {
   configDotenv();
-  const redisUrl = process.env.REDIS_URL;
+
+  const redisUrl = REDIS_URL;
 
   if (!redisUrl) {
     throw new Error("REDIS_URL environment variable is required");
   }
 
+  const redisRepository = new RedisRepository(
+    createRedisClient(redisUrl),
+    createRedisClient(redisUrl)
+  );
+
   await redisRepository.connect(redisUrl);
   console.log("🔌 Redis integration initialized");
-}
-
-
-export async function cleanup() {
-  await redisRepository.disconnect();
-  console.log("🧹 Redis cleanup completed");
+  return redisRepository;
 }

@@ -1,5 +1,5 @@
 import { userRequestKeyPrefix } from "../constants.js";
-import redisRepository from "../model/redis_repository.js";
+import { RedisRepository } from "../model/redis_repository.js";
 import { ACCEPTANCE_TIMEOUT } from "../server_config.js";
 import {
   delay,
@@ -9,6 +9,8 @@ import {
 } from "../utility/utility.js";
 
 import { sendMessage } from "../utility/ws_util.js";
+import { TimeoutService } from "./timeout_service.js";
+import { UserService } from "./user_service.js";
 
 /** @typedef {import("ws").WebSocket} WebSocket*/
 /** @typedef {import("../types").UserInstance} UserInstance */
@@ -20,71 +22,19 @@ import { sendMessage } from "../utility/ws_util.js";
 /** @typedef {import("../types").MatchRequestStatus} MatchRequestStatus*/
 /** @typedef {import("../types.js").MatchFoundResponse} MatchFoundResponse */
 
-class TimeoutService {
-  /**
-   * @type {Map<string, NodeJS.Timeout>}
-   * @private
-   */
-  timeoutMap = new Map();
-
-  /**
-   * @param {string} id
-   * @param {NodeJS.Timeout} timeout
-   */
-  addTimeout(id, timeout) {
-    this.timeoutMap.set(id, timeout);
-  }
-
-  /**
-   * @param {string} id
-   */
-  removeTimeout(id) {
-    const timeout = this.timeoutMap.get(id);
-    if (timeout) {
-      clearTimeout(timeout);
-      this.timeoutMap.delete(id);
-    }
-  }
-}
-class UserService {
-  /** @type {Map<string, UserInstance>} */
-  #userConnection = new Map();
-
-  /**
-   * @param {UserInstance} userInstance
-   */
-  addUser(userInstance) {
-    this.#userConnection.set(userInstance.id, userInstance);
-  }
-
-  /**
-   * @param {string} id
-   */
-  deleteUser(id) {
-    this.#userConnection.delete(id);
-  }
-
-  /**
-   * @param {string} userId
-   */
-  getUser(userId) {
-    const userInstance = this.#userConnection.get(userId);
-    if (!userInstance) {
-      return null;
-    }
-    return userInstance;
-  }
-}
-
 export class MatchingService {
-  /** @private */
-  userService = new UserService();
-  /** @private */
-  redisRepository = redisRepository;
-  /** @private */
-  acceptanceTimeout = new TimeoutService();
-  /** @private */
-  activeListeners = new Map();
+  constructor(/** @type {RedisRepository} */ redisRepository) {
+    /** @private */
+    this.redisRepository = redisRepository;
+    /** @private */
+    this.userService = new UserService();
+    /** @private */
+    this.redisRepository;
+    /** @private */
+    this.acceptanceTimeout = new TimeoutService();
+    /** @private */
+    this.activeListeners = new Map();
+  }
 
   /**
    * @param {string} userId
@@ -196,7 +146,7 @@ export class MatchingService {
     /** @type {Array<[string, MatchRequestEntity]>} */
     const matchedRequest = [];
 
-    const userRequests = await redisRepository.getAllUserRequests();
+    const userRequests = await this.redisRepository.getAllUserRequests();
     for (const [k, v] of userRequests.entries()) {
       if (v.status !== "waiting" || k === userId) {
         continue;
@@ -217,7 +167,7 @@ export class MatchingService {
    */
   async listenToRequestChange(userId) {
     const requestKey = `${userRequestKeyPrefix}${userId}`;
-    const listener = redisRepository.listenToKeyChanges(
+    const listener = this.redisRepository.listenToKeyChanges(
       requestKey,
       async (change) => {
         switch (change.operation) {
