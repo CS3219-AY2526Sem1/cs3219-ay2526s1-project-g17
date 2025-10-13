@@ -1,0 +1,58 @@
+
+services:
+  frontend:
+    build: ./frontend
+    ports:
+      - 5173:5173
+    environment:
+      - VITE_AUTH0_DOMAIN=dev-6hlsv11p2kn5hiej.us.auth0.com
+      - VITE_AUTH0_CLIENT_ID=SGQIr3yGRMXT0F19nQujSFmPQAXLv4QC
+      - VITE_AUTH0_CALLBACK_URL=http://localhost:5173
+    depends_on:
+      - user_service
+      - matching_service
+      - question_service
+      - collaboration_service
+  user_service:
+    build: ./user-service
+    ports:
+      - 3003:3003
+    environment:
+      - DB_CLOUD_URI=mongodb+srv://test-user:w2PlcaeSgYNmzq7h@cluster0.xfhuymk.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+      - DB_LOCAL_URI=mongodb://127.0.0.1:27017/peerprepUserServiceDB
+      - PORT=3003
+      - ENV=PROD
+      - JWT_SECRET=you-can-replace-this-with-your-own-secret
+  matching_service:
+    build: ./matching_service
+    ports:
+      - 3001:3001
+    environment:
+      - DB_CLOUD_URI=mongodb+srv://khantkyaw8:Sf2465<>100600@cluster0.ql3olox.mongodb.net/MatchingService?retryWrites=true&w=majority&appName=Cluster0
+      - DB_LOCAL_URI=mongodb://127.0.0.1:27017/peerprepUserServiceDB
+      - PORT=3001
+      - REDIS_URL=redis://paing:zxcv123Z>@redis-17121.c1.ap-southeast-1-1.ec2.redns.redis-cloud.com:17121
+      - ENV=PROD
+      - JWT_SECRET=you-can-replace-this-with-your-own-secret
+      - QUEUE_TIMEOUT=300000
+      - ACCEPTANCE_TIMEOUT=3000
+      - DEBUG_TESTS=true
+  question_service:
+    build: ./question_service
+    ports:
+      - 5001:5001
+    environment:
+      - MONGO_URI=mongodb+srv://zatsyaza:zatsyaza@cluster0.o3epobg.mongodb.net/question_service_db?retryWrites=true&w=majority&appName=Cluster0
+      - PORT=5001 
+      - UPSTASH_REDIS_REST_URL=https://solid-buck-14555.upstash.io
+      - UPSTASH_REDIS_REST_TOKEN=ATjbAAIncDIwZTdkOWY2NDdmNTg0NWU3YjEwOTZjYTRkZmU1MzQ2OHAyMTQ1NTU
+  collaboration_service:
+    build: ./collaboration-service
+    ports:
+      - 3002:3002
+    environment:
+      - DB_CLOUD_URI=mongodb+srv://test-user:w2PlcaeSgYNmzq7h@cluster0.xfhuymk.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+      - DB_LOCAL_URI=mongodb://127.0.0.1:27017/peerprepUserServiceDB
+      - PORT=3002
+      - ENV=PROD
+      - JWT_SECRET=you-can-replace-this-with-your-own-secret
