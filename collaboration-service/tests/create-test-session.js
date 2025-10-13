@@ -2,6 +2,7 @@
 import mongoose from 'mongoose';
 import Session from '../model/session-model.js';
 import dotenv from 'dotenv';
+import * as Y from 'yjs';
 
 dotenv.config({ path: './.env' });
 
@@ -17,11 +18,19 @@ async function createTestSession() {
     // Delete existing test session
     await Session.deleteOne({ sessionId });
 
+    // Create a dummy Yjs document
+    const ydoc = new Y.Doc();
+    const yText = ydoc.getText('sharedText');
+    yText.insert(0, 'Dummy content for testing'); // Add dummy content
+    const serializedYDoc = Y.encodeStateAsUpdate(ydoc); // Serialize the Yjs document
+
+
     const session = new Session({
       sessionId,
       users: [userId],
       questionId,
       code: '// Happy coding!',
+      yDoc: Buffer.from(serializedYDoc), // Store the serialized Yjs document
       isActive: true
     });
 

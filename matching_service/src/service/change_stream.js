@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 /**
  * @param {mongoose.Model} model
- * @param {Array} [pipeline=[]]
+ * @param {Array<Record<String, unknown>>} [pipeline=[]]
  * @param {number} [timeInMs=6000]
  */
 export async function monitorListingUsingEventTransmitter(
@@ -20,12 +20,15 @@ export async function monitorListingUsingEventTransmitter(
   await closeChangeStream(timeInMs, changeStream);
 }
 
+/**
+ * @param {mongoose.mongo.ChangeStream<any, any>} changeStream
+ */
 function closeChangeStream(timeInMs = 6000, changeStream) {
-  return new Promise(() =>
+  return new Promise((resolve, reject) =>
     setTimeout(() => {
       console.log("Close change stream");
       changeStream.close();
-      resolve();
+      resolve(null);
     }, timeInMs)
   );
 }
