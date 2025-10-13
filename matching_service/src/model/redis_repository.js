@@ -5,6 +5,7 @@ import {
   collaborationSessionPrefix,
   matchedDetailsPrefix,
   MATCH_REQUEST_PREFIX,
+  MATCH_IDX,
 } from "../constants.js";
 import { delay } from "../utility/utility.js";
 import { REDIS_URL } from "../server_config.js";
@@ -48,10 +49,9 @@ export class RedisRepository extends EventEmitter {
   }
 
   /**
-   * @param {string} redisUrl
    * @returns {Promise<void>}
    */
-  async connect(redisUrl) {
+  async connect() {
     try {
       this.client.on("error", (/** @type {Error}*/ err) => {
         console.error("Redis Client Error:", err);
@@ -103,33 +103,35 @@ export class RedisRepository extends EventEmitter {
   $.time AS time NUMERIC
        */
     const schema = {
-      "$.criteria[*].difficulty": {
+      "$.criterias[*].difficulty": {
         type: SCHEMA_FIELD_TYPE.TAG,
         AS: "difficulty",
       },
-      "$.criteria[*].language": {
+      "$.criterias[*].language": {
         type: SCHEMA_FIELD_TYPE.TAG,
         AS: "language",
       },
-      "$.criteria[*].topic": {
+      "$.criterias[*].topic": {
         type: SCHEMA_FIELD_TYPE.TAG,
         AS: "topic",
-      },
-      "$.time": {
-        type: SCHEMA_FIELD_TYPE.NUMERIC,
-        AS: "time",
       },
       "$.status": {
         type: SCHEMA_FIELD_TYPE.TAG,
         AS: "status",
       },
+      "$.time": {
+        type: SCHEMA_FIELD_TYPE.NUMERIC,
+        AS: "time",
+        SORTABLE: true,
+      },
       "$.userId": {
-        type: SCHEMA_FIELD_TYPE.TEXT,
+        type: SCHEMA_FIELD_TYPE.TAG,
         AS: "userId",
       },
     };
+
     try {
-      await this.client.ft.create("matchIdx", schema, {
+      await this.client.ft.create(MATCH_IDX, schema, {
         ON: "JSON",
         PREFIX: MATCH_REQUEST_PREFIX,
       });

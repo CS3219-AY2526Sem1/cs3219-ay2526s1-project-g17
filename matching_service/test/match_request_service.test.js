@@ -11,6 +11,11 @@ import { createClient } from "redis";
 import { MatchRequestService } from "../src/service/match_request_service.js";
 import { MATCH_REQUEST_PREFIX } from "../src/constants.js";
 import dotenv from "dotenv";
+import {
+  createRedisClient,
+  RedisRepository,
+} from "../src/model/redis_repository.js";
+import { REDIS_URL } from "../src/server_config.js";
 
 // Load environment variables
 dotenv.config();
@@ -22,35 +27,32 @@ describe("MatchRequestService", () => {
   let redisSubscriber;
   /** @type {MatchRequestService} */
   let matchRequestService;
+  /** @type {RedisRepository} */
+  let redisRepository;
 
   const TEST_REDIS_URL = process.env.REDIS_URL || "redis://localhost:6379";
   const TEST_INDEX_NAME = "matchIdx";
 
   beforeAll(async () => {
     // Create Redis clients for testing
-    redisClient = createClient({
-      url: TEST_REDIS_URL,
-      socket: {
-        reconnectStrategy: (retries) => Math.min(retries * 50, 500),
-      },
-    });
+    redisClient = createRedisClient(TEST_REDIS_URL);
 
-    redisSubscriber = createClient({
-      url: TEST_REDIS_URL,
-      socket: {
-        reconnectStrategy: (retries) => Math.min(retries * 50, 500),
-      },
-    });
+    redisSubscriber = createRedisClient(TEST_REDIS_URL);
 
+    redisRepository = new RedisRepository(redisClient, redisSubscriber);
+    await redisRepository.connect();
     // Connect to Redis
-    await redisClient.connect();
-    await redisSubscriber.connect();
+    // await redisClient.connect();
+    // await redisSubscriber.connect();
 
     // Create the service instance
-    matchRequestService = new MatchRequestService(redisClient, redisSubscriber);
+    matchRequestService = new MatchRequestService(
+      redisRepository.client,
+      redisRepository.subscriber
+    );
 
     // Setup search index for testing
-    await setupTestSearchIndex();
+    // await setupTestSearchIndex();
   });
 
   afterAll(async () => {
@@ -63,8 +65,9 @@ describe("MatchRequestService", () => {
     }
 
     // Close Redis connections
-    await redisClient.quit();
-    await redisSubscriber.quit();
+    // await redisClient.quit();
+    // await redisSubscriber.quit();
+    await redisRepository.disconnect();
   });
 
   beforeEach(async () => {
