@@ -94,14 +94,7 @@ export class RedisRepository extends EventEmitter {
   }
 
   async setupMatchRequestSchema() {
-    /**
-       * FT.CREATE matchIdx ON JSON PREFIX 1 matchrequest: SCHEMA
-  $.criterias[*].difficulty AS difficulty TAG
-  $.criterias[*].language AS language TAG
-  $.criterias[*].topic AS topic TAG
-  $.type AS type TAG
-  $.time AS time NUMERIC
-       */
+
     const schema = {
       "$.criterias[*].difficulty": {
         type: SCHEMA_FIELD_TYPE.TAG,

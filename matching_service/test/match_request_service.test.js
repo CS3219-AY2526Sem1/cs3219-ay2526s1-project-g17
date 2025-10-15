@@ -7,7 +7,6 @@ import {
   it,
   expect,
 } from "@jest/globals";
-import { createClient } from "redis";
 import { MatchRequestService } from "../src/service/match_request_service.js";
 import { MATCH_REQUEST_PREFIX } from "../src/constants.js";
 import dotenv from "dotenv";
@@ -15,7 +14,6 @@ import {
   createRedisClient,
   RedisRepository,
 } from "../src/model/redis_repository.js";
-import { REDIS_URL } from "../src/server_config.js";
 
 // Load environment variables
 dotenv.config();
@@ -31,7 +29,7 @@ describe("MatchRequestService", () => {
   let redisRepository;
 
   const TEST_REDIS_URL = process.env.REDIS_URL || "redis://localhost:6379";
-  const TEST_INDEX_NAME = "matchIdx";
+  const TEST_INDEX_NAME = MATCH_REQUEST_PREFIX;
 
   beforeAll(async () => {
     // Create Redis clients for testing
@@ -41,9 +39,7 @@ describe("MatchRequestService", () => {
 
     redisRepository = new RedisRepository(redisClient, redisSubscriber);
     await redisRepository.connect();
-    // Connect to Redis
-    // await redisClient.connect();
-    // await redisSubscriber.connect();
+
 
     // Create the service instance
     matchRequestService = new MatchRequestService(
@@ -51,8 +47,6 @@ describe("MatchRequestService", () => {
       redisRepository.subscriber
     );
 
-    // Setup search index for testing
-    // await setupTestSearchIndex();
   });
 
   afterAll(async () => {
@@ -64,9 +58,6 @@ describe("MatchRequestService", () => {
       console.log("Test index cleanup: Index might not exist");
     }
 
-    // Close Redis connections
-    // await redisClient.quit();
-    // await redisSubscriber.quit();
     await redisRepository.disconnect();
   });
 
@@ -85,56 +76,6 @@ describe("MatchRequestService", () => {
       await redisClient.del(keys);
     }
   });
-
-  /**
-   * Setup search index for testing
-   */
-  async function setupTestSearchIndex() {
-    try {
-      await redisClient.ft.create(
-        TEST_INDEX_NAME,
-        {
-          "$.criterias[*].difficulty": {
-            type: "TAG",
-            AS: "difficulty",
-          },
-          "$.criterias[*].language": {
-            type: "TAG",
-            AS: "language",
-          },
-          "$.criterias[*].topic": {
-            type: "TAG",
-            AS: "topic",
-          },
-          "$.status": {
-            type: "TAG",
-            AS: "status",
-          },
-          "$.time": {
-            type: "NUMERIC",
-            AS: "time",
-            SORTABLE: true,
-          },
-          "$.userId": {
-            type: "TAG",
-            AS: "userId",
-          },
-        },
-        {
-          ON: "JSON",
-          PREFIX: MATCH_REQUEST_PREFIX,
-        }
-      );
-      console.log("✅ Test search index created");
-    } catch (error) {
-      if (error.message.includes("Index already exists")) {
-        console.log("ℹ️ Test index already exists");
-      } else {
-        console.error("❌ Error creating test search index:", error);
-        throw error;
-      }
-    }
-  }
 
   /**
    * Create a test match request entity

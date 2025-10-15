@@ -72,4 +72,38 @@
  * @typedef {Object} CollaborationSession
  * @property {string} session
  */
+
+/**
+ * @typedef {Object} PartnerRequest
+ * @property {"PARTNER-REQUEST"} type
+ * @property {string} userId
+ */
+
+/**
+ * @typedef {Object} PartnerRequestResponse
+ * @property {"PARTNER-RESPONSE"} type
+ * @property {boolean} isAccept
+ */
+
+/**
+ * @typedef {Object} PartnerRequestAck
+ * @property {"PARTNER-ACK"} type
+ * @property {string} userId
+ */
+
+/**
+ * @typedef {Object} CreateMatchDetailsCommand
+ * @property {"CREATE-MATCH-DETAILS"} type
+ * @property {string} partnerId
+ */
+
+
+/**
+ * @typedef {Object} CreateCollaborationCommand
+ * @property {"CREATE-COLLABORATION"} type
+ * @property {string} partnerId
+ */
+
+
+
 export {};

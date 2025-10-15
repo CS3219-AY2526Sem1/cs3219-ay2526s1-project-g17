@@ -37,7 +37,7 @@ export class MatchRequestService {
 
     // 3. Execute the search command
     // Use Redis OM's ft.search API
-    const result = await this.client.ft.search("matchIdx", query, {
+    const result = await this.client.ft.search(MATCH_REQUEST_PREFIX, query, {
       SORTBY: { BY: "time", DIRECTION: "ASC" },
       LIMIT: { from: 0, size: 1 },
     });
