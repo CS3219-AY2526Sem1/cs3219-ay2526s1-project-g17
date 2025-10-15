@@ -13,6 +13,10 @@ export const joinSession = async (sessionId, userId) => {
   );
 };
 
+export const deleteSession = async (sessionId) => {
+  return await Session.findOneAndDelete({ sessionId });
+};
+
 export const terminateSession = async (sessionId) => {
   return await Session.findOneAndUpdate(
     { sessionId },
