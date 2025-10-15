@@ -13,10 +13,12 @@ This microservice provides real-time collaborative coding sessions for matched u
 3. Start the service with `npm start`.
 
 ## API Endpoints
-- `POST /api/collaboration/session` - Create a new session
-- `POST /api/collaboration/session/join` - Join an existing session
-- `POST /api/collaboration/session/terminate` - Terminate a session
-
+| Method | Endpoint | Description |
+|--------|---------|-------------|
+| POST   | `/api/collaboration/sessions` | Create a new session |
+| POST   | `/api/collaboration/sessions/:sessionId/join` | Join an existing session |
+| DELETE | `/api/collaboration/sessions/:sessionId` | Terminate a session |
+| GET    | `/api/collaboration/sessions/:sessionId` | Get session details |
 ## Real-time Collaboration
 Connect to the Socket.io server at `/` to send/receive code changes in real time.
 
