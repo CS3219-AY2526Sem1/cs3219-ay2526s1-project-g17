@@ -17,7 +17,7 @@ This microservice provides real-time collaborative coding sessions for matched u
 |--------|---------|-------------|
 | POST   | `/api/collaboration/sessions` | Create a new session |
 | POST   | `/api/collaboration/sessions/:sessionId/join` | Join an existing session |
-| DELETE | `/api/collaboration/sessions/:sessionId` | Terminate a session |
+| DELETE | `/api/collaboration/session/:sessionId/terminate` | Terminate a session |
 | GET    | `/api/collaboration/sessions/:sessionId` | Get session details |
 ## Real-time Collaboration
 Connect to the Socket.io server at `/` to send/receive code changes in real time.
