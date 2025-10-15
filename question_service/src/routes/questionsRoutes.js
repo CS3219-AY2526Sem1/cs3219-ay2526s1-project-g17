@@ -12,7 +12,12 @@ import {
     getAllTopics
 } from "../controllers/questionsController.js";
 
+import { auth, requiredScopes, claimCheck, InsufficientScopeError } from "express-oauth2-jwt-bearer";
+import { checkRequiredPermissions, verifyAccessToken } from "../../middleware/authentication.middleware.js";
+
+
 const router = express.Router();
+
 
 router.get("/", getAllQuestions);
 router.get("/randomList", getListOfQuestionsByDifficultyAndTopic);
@@ -20,8 +25,8 @@ router.get("/randomQuestion", getRandomQuestionByDifficultyAndTopic);
 router.get("/topics", getAllTopics);
 router.get("/topicsByDifficulty", getListOfTopicsByDifficulty);
 router.get("/:id", getQuestionById);
-router.post("/", createQuestion);
-router.put("/:id", editQuestion);
-router.delete("/:id", deleteQuestion);
+router.post("/", verifyAccessToken, checkRequiredPermissions(['admin:all']), createQuestion);
+router.put("/:id", verifyAccessToken, checkRequiredPermissions(["admin:all"]), editQuestion);
+router.delete("/:id", verifyAccessToken, checkRequiredPermissions(["admin:all"]), deleteQuestion);
 
 export default router;
