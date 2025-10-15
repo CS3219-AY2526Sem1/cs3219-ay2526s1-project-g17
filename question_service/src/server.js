@@ -5,6 +5,7 @@ import cors from "cors";
 import { connectDB } from "../config/db.js";
 import rateLimiter from "../middleware/rateLimiter.js";
 import questionRouter from "./routes/questionsRoutes.js";
+import { errorHandler } from "../middleware/error.middleware.js";
 
 const app = express();
 dotenv.config()
@@ -17,6 +18,8 @@ app.use(rateLimiter);
 app.use(cors());
 
 app.use("/api/questions", questionRouter);
+
+app.use(errorHandler);
 
 connectDB().then(() => {
     app.listen(PORT, () => {
