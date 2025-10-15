@@ -3,8 +3,25 @@ const BASE_URL = 'http://localhost:3002/api/collaboration';
 
 async function testCollaboration() {
   try {
+    const sessionId = 'session123';
+
+    // Check if session exists
+    const checkRes = await fetch(`${BASE_URL}/sessions/${sessionId}`);
+    if (checkRes.ok) {
+      const existingSession = await checkRes.json();
+      if (existingSession) {
+        // Delete the session if it exists
+        const deleteRes = await fetch(`${BASE_URL}/sessions/${sessionId}`, {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        const deleteData = await deleteRes.json();
+        console.log('Deleted existing session:', deleteData);
+      }
+    }
+
     // Create a new session (provide sessionId manually)
-    const createRes = await fetch(`${BASE_URL}/session`, {
+    const createRes = await fetch(`${BASE_URL}/sessions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -14,11 +31,10 @@ async function testCollaboration() {
       })
     });
     const createData = await createRes.json();
-    const sessionId = createData.sessionId;
     console.log('Created session:', createData);
 
     // Join the session with a new user
-    const joinRes = await fetch(`${BASE_URL}/session/${sessionId}/join`, {
+    const joinRes = await fetch(`${BASE_URL}/sessions/${sessionId}/join`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId: 'charlie' })
@@ -27,12 +43,12 @@ async function testCollaboration() {
     console.log('After join:', joinData);
 
     // Retrieve session details
-    const getRes = await fetch(`${BASE_URL}/session/${sessionId}`);
+    const getRes = await fetch(`${BASE_URL}/sessions/${sessionId}`);
     const getData = await getRes.json();
     console.log('Session details:', getData);
 
     // Terminate the session
-    const terminateRes = await fetch(`${BASE_URL}/session/${sessionId}/terminate`, {
+    const terminateRes = await fetch(`${BASE_URL}/sessions/${sessionId}/terminate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' }
     });
