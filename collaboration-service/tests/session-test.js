@@ -61,14 +61,16 @@ ytext2.observe(() => {
 // --- 3. Simulate collaboration ---
 // Client 1 types initial code
 setTimeout(() => {
+  console.log('\n[WRITE] Client 1 types initial code...');
+  ytext1.insert(0, '// Client 1 code ');
+}, 2000);
+
+// Both clients type simultaneously
+setTimeout(() => {
   ytext1.insert(0, 'A');
   ytext2.insert(0, 'B');
 }, 1000);
 
-setTimeout(() => {
-  console.log('\n[WRITE] Client 1 types initial code...');
-  ytext1.insert(0, '// Client 1 code ');
-}, 2000);
 
 // Client 1 later types "hello" at start
 setTimeout(() => {

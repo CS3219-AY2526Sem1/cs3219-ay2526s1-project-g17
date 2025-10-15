@@ -15,10 +15,10 @@ const router = express.Router();
 router.post('/session', createSessionHandler);
 
 // Define a POST route for joining an existing session
-router.post('/session/join', joinSessionHandler);
+router.post('/session/:sessionId/join', joinSessionHandler);
 
 // Define a POST route for terminating a session
-router.post('/session/terminate', terminateSessionHandler);
+router.post('/session/:sessionId/terminate', terminateSessionHandler);
 
 // Define a GET route for retrieving session details by sessionId
 router.get('/session/:sessionId', getSessionHandler);

@@ -11,7 +11,8 @@ export const createSessionHandler = async (req, res) => {
 };
 
 export const joinSessionHandler = async (req, res) => {
-  const { sessionId, userId } = req.body;
+  const { sessionId } = req.params;
+  const { userId } = req.body;
   try {
     const session = await joinSession(sessionId, userId);
     res.status(200).json(session);
@@ -21,7 +22,7 @@ export const joinSessionHandler = async (req, res) => {
 };
 
 export const terminateSessionHandler = async (req, res) => {
-  const { sessionId } = req.body;
+  const { sessionId } = req.params;
   try {
     const session = await terminateSession(sessionId);
     res.status(200).json(session);
