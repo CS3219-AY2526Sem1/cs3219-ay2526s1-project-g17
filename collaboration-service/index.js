@@ -84,7 +84,8 @@ io.on('connection', (socket) => {
 
 // ====== 2. Yjs WebSocket for collaborative editing (/collab) ======
 const { WebSocketServer } = await import('ws');
-const { setupWSConnection } = await import('y-websocket');
+import { setupWSConnection } from '@y/websocket-server/utils';
+
 
 const yjsWSS = new WebSocketServer({ server, path: '/collab' });
 
