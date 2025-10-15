@@ -21,6 +21,16 @@ export const joinSessionHandler = async (req, res) => {
   }
 };
 
+export const deleteSessionHandler = async (req, res) => {
+  const { sessionId } = req.params;
+  try {
+    const session = await deleteSession(sessionId);
+    res.status(200).json(session);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 export const terminateSessionHandler = async (req, res) => {
   const { sessionId } = req.params;
   try {
