@@ -1,52 +1,58 @@
 import { EventEmitter } from "events";
-import { createClient } from "redis";
+import { createClient, SCHEMA_FIELD_TYPE } from "redis";
 import {
   userRequestKeyPrefix,
   collaborationSessionPrefix,
   matchedDetailsPrefix,
+  MATCH_REQUEST_PREFIX,
+  MATCH_IDX,
 } from "../constants.js";
 import { delay } from "../utility/utility.js";
+import { REDIS_URL } from "../server_config.js";
 
+/** @typedef {import("redis").RedisClientType} RedisClientType */
 /** @typedef {Promise<import("../types.js").CollaborationSession>} CollaborationSession */
 /** @typedef {import("../types.js").MatchRequestEntity} MatchRequestEntity */
 /** @typedef {import("../types.js").MatchedDetails} MatchedDetails*/
 /** @typedef {import("../types").MatchRequestStatus} MatchRequestStatus*/
 
-class RedisRepository extends EventEmitter {
-  constructor() {
+/**
+ * @param {string} redisUrl
+ * @returns {RedisClientType}
+ */
+export function createRedisClient(redisUrl) {
+  return createClient({
+    url: redisUrl,
+    socket: {
+      reconnectStrategy: (/** @type {number}*/ retries) => {
+        console.log(`Redis reconnection attempt ${retries}`);
+        return Math.min(retries * 50, 500);
+      },
+    },
+  });
+}
+
+/**
+ * @property {RedisClientType} client
+ * @property {RedisClientType} subscriber
+ */
+export class RedisRepository extends EventEmitter {
+  constructor(
+    /** @type {RedisClientType} */ client,
+    /** @type {RedisClientType} */ subscriber
+  ) {
     super();
-    this.client = null;
-    this.subscriber = null;
+    this.client = client;
+    this.subscriber = subscriber;
     this.isConnected = false;
     this.changeListeners = new Map();
   }
 
   /**
-   * @param {string} redisUrl
    * @returns {Promise<void>}
    */
-  async connect(redisUrl) {
+  async connect() {
     try {
-      this.client = createClient({
-        url: redisUrl,
-        socket: {
-          reconnectStrategy: (/** @type {number}*/ retries) => {
-            console.log(`Redis reconnection attempt ${retries}`);
-            return Math.min(retries * 50, 500);
-          },
-        },
-      });
-
-      this.subscriber = createClient({
-        url: redisUrl,
-        socket: {
-          reconnectStrategy: (/** @type {number}*/ retries) => {
-            console.log(`Redis subscriber reconnection attempt ${retries}`);
-            return Math.min(retries * 50, 500);
-          },
-        },
-      });
-
       this.client.on("error", (/** @type {Error}*/ err) => {
         console.error("Redis Client Error:", err);
         this.emit("error", err);
@@ -78,10 +84,59 @@ class RedisRepository extends EventEmitter {
       // Setup keyspace notification listener
       await this.setupKeyspaceNotifications();
 
+      await this.setupMatchRequestSchema();
+
       console.log("🚀 Redis Repository initialized successfully");
     } catch (error) {
       console.error("Failed to connect to Redis:", error);
       throw error;
+    }
+  }
+
+  async setupMatchRequestSchema() {
+
+    const schema = {
+      "$.criterias[*].difficulty": {
+        type: SCHEMA_FIELD_TYPE.TAG,
+        AS: "difficulty",
+      },
+      "$.criterias[*].language": {
+        type: SCHEMA_FIELD_TYPE.TAG,
+        AS: "language",
+      },
+      "$.criterias[*].topic": {
+        type: SCHEMA_FIELD_TYPE.TAG,
+        AS: "topic",
+      },
+      "$.status": {
+        type: SCHEMA_FIELD_TYPE.TAG,
+        AS: "status",
+      },
+      "$.time": {
+        type: SCHEMA_FIELD_TYPE.NUMERIC,
+        AS: "time",
+        SORTABLE: true,
+      },
+      "$.userId": {
+        type: SCHEMA_FIELD_TYPE.TAG,
+        AS: "userId",
+      },
+    };
+
+    try {
+      await this.client.ft.create(MATCH_IDX, schema, {
+        ON: "JSON",
+        PREFIX: MATCH_REQUEST_PREFIX,
+      });
+      console.log("MatchRequest schema setup complete");
+    } catch (e) {
+      if (e.message === "Index already exists") {
+        console.log("Index exists already, skipped creation.");
+      } else {
+        // Something went wrong, perhaps RediSearch isn't installed...
+        console.error(e);
+        process.exit(1);
+      }
     }
   }
 
@@ -552,7 +607,3 @@ class RedisRepository extends EventEmitter {
     }
   }
 }
-
-// Create and export singleton instance
-const redisRepository = new RedisRepository();
-export default redisRepository;

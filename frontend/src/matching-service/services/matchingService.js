@@ -198,7 +198,7 @@ export const cancelMatchRequest = async (requestId) => {
     }
 
     wsService.sendMessage({
-      typename: "cancelMatchRequest",
+      type: "match-cancel",
       requestId: requestId,
       time: Date.now(),
     });

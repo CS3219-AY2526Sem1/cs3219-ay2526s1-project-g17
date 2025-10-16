@@ -1,6 +1,7 @@
 import { configDotenv } from "dotenv";
-import { createRedisClient, RedisRepository } from "./redis_repository";
-import { REDIS_URL } from "../server_config";
+
+import { REDIS_URL } from "../server_config.js";
+import { createRedisClient, RedisRepository } from "./redis_repository.js";
 
 export async function initializeRedis() {
   configDotenv();
@@ -16,7 +17,7 @@ export async function initializeRedis() {
     createRedisClient(redisUrl)
   );
 
-  await redisRepository.connect(redisUrl);
+  await redisRepository.connect();
   console.log("🔌 Redis integration initialized");
   return redisRepository;
 }

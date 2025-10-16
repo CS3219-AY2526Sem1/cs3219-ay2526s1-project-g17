@@ -11,8 +11,13 @@
 
 /**
  * @typedef {Object} MatchRequest
- * @property {"matchRequest"} type
+ * @property {"match-request"} type
  * @property {Array<Criteria>} criterias
+ */
+
+/**
+ * @typedef {Object} MatchCancelRequest
+ * @property {"match-cancel"} type
  */
 
 /**
@@ -68,6 +73,5 @@
 /**
  * @typedef {MatchFoundNotification | MatchAcceptedNotification | MatchRejectedNotification | MatchTimeoutNotification | MatchCancelledNotification | CollaborationSessionNotification} Notification
  */
-
 
 export {};
