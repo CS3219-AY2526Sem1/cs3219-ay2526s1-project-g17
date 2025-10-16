@@ -4,7 +4,6 @@ import { ACCEPTANCE_TIMEOUT } from "../server_config.js";
 import {
   delay,
   findMatchingCriteria,
-  hasMatchingCriteria,
   matchRequestToEntity,
 } from "../utility/utility.js";
 
@@ -202,26 +201,20 @@ export class MatchingService {
         );
 
       if (isSuccess) {
-        const userCriterias = matchRequestEntity.criterias.map((c) =>
-          JSON.stringify(c)
+        const criteria = findMatchingCriteria(
+          matchRequestEntity.criterias,
+          existingMatch.criterias
         );
-        const existingMatchCriteria = existingMatch.criterias.map((c) =>
-          JSON.stringify(c)
-        );
-
-        const criteria = userCriterias.filter((c) =>
-          existingMatchCriteria.includes(c)
-        )[0];
         console.log("Similar criteria", criteria);
         this.matchedDetailsService.storeMatchedDetails(
           userId,
           existingMatch.userId,
-          JSON.parse(criteria)
+          criteria
         );
         this.matchedDetailsService.storeMatchedDetails(
           existingMatch.userId,
           userId,
-          JSON.parse(criteria)
+          criteria
         );
         break;
       } else {

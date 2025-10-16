@@ -1,5 +1,5 @@
 import express from "express";
-import redisRepository from "../model/redis_repository";
+import { collaborationService, matchedDetailsService } from "../server";
 
 const router = express.Router();
 
@@ -10,7 +10,10 @@ router.get("/", (req, res) => {
 router.delete("/endSession", async (req, res) => {
   const { userId1, userId2 } = req.body;
   try {
-    await redisRepository.removeCollaborationSession(userId1, userId2);
+    if (!userId1 || !userId2) {
+      throw new Error("bad request body");
+    }
+    await collaborationService.deleteCollaborationSession(userId1, userId2);
     console.log("Session close successful");
     res.status(200).send({ message: "Session closed" });
   } catch (error) {
@@ -22,10 +25,12 @@ router.delete("/endSession", async (req, res) => {
 router.get("/initiateMatch", async (req, res) => {
   const { userId } = req.body;
   try {
-    const matchedDetails = await redisRepository.getMatchedDetails(userId);
+    const matchedDetails = await matchedDetailsService.getMatchedDetails(
+      userId
+    );
     if (matchedDetails) {
       const collaborationSession =
-        await redisRepository.getCollaborationSession(
+        await collaborationService.getCollaborationSession(
           userId,
           matchedDetails.partner
         );

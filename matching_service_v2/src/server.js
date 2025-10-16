@@ -21,7 +21,7 @@ const port = process.env.PORT || 3001;
 const server = http.createServer(index);
 const wss = new WebSocketServer({ server, clientTracking: true });
 
-const redisRepository = await initializeRedis();
+export const redisRepository = await initializeRedis();
 
 try {
   // await redisRepository.flushAll();
@@ -33,13 +33,17 @@ try {
   process.exit(1);
 }
 
-const matchRequestService = new MatchRequestService(
+export const matchRequestService = new MatchRequestService(
   redisRepository.client,
   redisRepository.subscriber
 );
-const matchedDetailsService = new MatchedDetailsService(redisRepository.client);
-const collaborationService = new CollaborationService(redisRepository.client);
-const matchingService = new MatchingService(
+export const matchedDetailsService = new MatchedDetailsService(
+  redisRepository.client
+);
+export const collaborationService = new CollaborationService(
+  redisRepository.client
+);
+export const matchingService = new MatchingService(
   redisRepository,
   matchRequestService,
   matchedDetailsService,

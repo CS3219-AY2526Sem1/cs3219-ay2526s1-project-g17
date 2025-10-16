@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 
-// import matchingRoute from "./routes/matching_route.js";
+import matchingRoute from "./routes/matching_route.js";
 
 const app = express();
 
@@ -29,7 +29,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// app.use("/api/matching", matchingRoute);
+app.use("/api/matching", matchingRoute);
 
 app.get("/", (req, res, next) => {
   console.log("Sending Greetings!");
