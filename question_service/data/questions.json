@@ -59,7 +59,7 @@
   },
   {
     "title": "Combine Two Tables",
-    "question": "Given table Person and table Address, write a solution to report the first name, last name, city, and state of each person in the Person table. If the address of a persosent in the Address table, report null instead.",
+    "question": "Given table Person and table Address, write a solution to report the first name, last name, city, and state of each person in the Person table. If the address of a person is not present in the Address table, report null instead.",
     "difficulty": "Beginner",
     "topics": [
       "Databases"
@@ -125,24 +125,24 @@
     "link": "https://leetcode.com/problems/airplane-seat-assignment-probability/"
   },
   {
-    "title": "VaSearch Tree",
-    "question": "Given the root of a binary tree, determine if it is a varch tree (BST).",
+    "title": "Validate Binary Search Tree",
+    "question": "Given the root of a binary tree, determine if it is a valid binary search tree (BST). A valid BST is defined as follows: The left subtree of a node contains only nodes with keys less than the node's key. The right subtree of a node contains only nodes with keys greater than the node's key. Both the left and right subtrees must also be binary search trees.",
     "difficulty": "Intermediate",
     "topics": [
       "Data Structures",
       "Algorithms"
     ],
-    "link": "https://leetcode.com/problems/vasearch-tree/"
+    "link": "https://leetcode.com/problems/validate-binary-search-tree/"
   },
   {
-    "title": "SMaximum",
-    "question": "You are given an array of integers nums, there is a sof size k which is moving from the very left of the array to the very right. Return the max s",
+    "title": "Sliding Window Maximum",
+    "question": "You are given an array of integers nums, there is a sliding window of size k which is moving from the very left of the array to the very right. You can only see the k numbers in the window. Each time the sliding window moves right by one position. Return the max sliding window.",
     "difficulty": "Advanced",
     "topics": [
       "Arrays",
       "Algorithms"
     ],
-    "link": "https://leetcode.com/problems/smaximum/"
+    "link": "https://leetcode.com/problems/sliding-window-maximum/"
   },
   {
     "title": "N-Queen Problem",
@@ -190,5 +190,1278 @@
       "Databases"
     ],
     "link": "https://leetcode.com/problems/trips-and-users/"
+  },
+  {
+    "title": "Two Sum",
+    "question": "Given an array of integers `nums` and an integer `target`, return indices of the two numbers such that they add up to `target`. You may assume that each input would have exactly one solution, and you may not use the same element twice. You can return the answer in any order.",
+    "difficulty": "Beginner",
+    "topics": [
+      "Arrays",
+      "Algorithms"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: nums = [2,7,11,15], target = 9, Output: [0,1]",
+      "Input: nums = [3,2,4], target = 6, Output: [1,2]"
+    ],
+    "constraints": "2 <= nums.length <= 10^4\n-10^9 <= nums[i] <= 10^9\n-10^9 <= target <= 10^9",
+    "hints": "A hash map can be used to store the numbers seen so far and their indices. For each element, check if `target - element` exists in the map.",
+    "solution": "Iterate through the array. For each element `num`, calculate the complement `target - num`. Check if the complement exists in a hash map. If it does, you have found the pair. If not, add the current `num` and its index to the map. This approach has a time complexity of O(n)."
+  },
+  {
+    "title": "Valid Palindrome",
+    "question": "A phrase is a palindrome if, after converting all uppercase letters into lowercase letters and removing all non-alphanumeric characters, it reads the same forward and backward. Given a string `s`, return `true` if it is a palindrome, or `false` otherwise.",
+    "difficulty": "Beginner",
+    "topics": [
+      "Strings"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: s = \"A man, a plan, a canal: Panama\", Output: true",
+      "Input: s = \"race a car\", Output: false"
+    ],
+    "constraints": "1 <= s.length <= 2 * 10^5\ns consists only of printable ASCII characters.",
+    "hints": "Use two pointers, one starting from the beginning and one from the end of the string. Move them towards each other, skipping non-alphanumeric characters, and compare the characters at their positions.",
+    "solution": "First, filter the string to keep only alphanumeric characters and convert them to lowercase. Then, use a two-pointer approach. Initialize a left pointer at the start (index 0) and a right pointer at the end (index n-1). While left < right, check if the characters at both pointers are the same. If not, return false. If they are, increment the left pointer and decrement the right pointer. If the loop completes, it's a palindrome."
+  },
+  {
+    "title": "Invert Binary Tree",
+    "question": "Given the `root` of a binary tree, invert the tree, and return its root.",
+    "difficulty": "Beginner",
+    "topics": [
+      "Data Structures",
+      "Recursion"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: root = [4,2,7,1,3,6,9], Output: [4,7,2,9,6,3,1]",
+      "Input: root = [2,1,3], Output: [2,3,1]"
+    ],
+    "constraints": "The number of nodes in the tree is in the range [0, 100].\n-100 <= Node.val <= 100",
+    "hints": "Think about solving this recursively. What is the base case? For a given node, what needs to happen to its children?",
+    "solution": "This problem can be solved recursively. The base case is when the root is null. Otherwise, swap the left and right children of the current node. Then, recursively call the invert function on the new left child (the original right child) and the new right child (the original left child). Return the root."
+  },
+  {
+    "title": "Employees Earning More Than Their Managers",
+    "question": "Write a solution to find the employees who earn more than their managers. The `Employee` table has columns `id`, `name`, `salary`, and `managerId`.",
+    "difficulty": "Beginner",
+    "topics": [
+      "Databases"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: Employee table = {id: 1, name: 'Joe', salary: 70000, managerId: 3}, {id: 2, name: 'Henry', salary: 80000, managerId: 4}, {id: 3, name: 'Sam', salary: 60000, managerId: NULL}, {id: 4, name: 'Max', salary: 90000, managerId: NULL}. Output: 'Joe'"
+    ],
+    "constraints": "The `id` column is the primary key for this table. Each row of this table indicates the ID of an employee, their name, salary, and the ID of their manager.",
+    "hints": "You need to join the table with itself to compare an employee's salary with their manager's salary.",
+    "solution": "SELECT e1.name AS Employee FROM Employee e1 JOIN Employee e2 ON e1.managerId = e2.id WHERE e1.salary > e2.salary;"
+  },
+  {
+    "title": "Water Bottles",
+    "question": "There are `numBottles` water bottles that are initially full of water. You can exchange `numExchange` empty water bottles from the market with one full water bottle. The operation of drinking a full water bottle turns it into an empty bottle. Given the two integers `numBottles` and `numExchange`, return the maximum number of water bottles you can drink.",
+    "difficulty": "Beginner",
+    "topics": [
+      "Brainteaser"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: numBottles = 9, numExchange = 3, Output: 13",
+      "Input: numBottles = 15, numExchange = 4, Output: 19"
+    ],
+    "constraints": "1 <= numBottles <= 100\n2 <= numExchange <= 100",
+    "hints": "Simulate the process. Keep track of the total bottles drunk and the number of empty bottles you have.",
+    "solution": "Initialize `drunk_bottles = numBottles` and `empty_bottles = numBottles`. While `empty_bottles >= numExchange`, calculate how many new bottles you can get (`new_bottles = empty_bottles // numExchange`). Add `new_bottles` to `drunk_bottles`. Update `empty_bottles` to be the remainder plus the new bottles you just drank (`empty_bottles = (empty_bottles % numExchange) + new_bottles`). Repeat until you can no longer make an exchange."
+  },
+  {
+    "title": "Group Anagrams",
+    "question": "Given an array of strings `strs`, group the anagrams together. You can return the answer in any order. An Anagram is a word or phrase formed by rearranging the letters of a different word or phrase, typically using all the original letters exactly once.",
+    "difficulty": "Intermediate",
+    "topics": [
+      "Arrays",
+      "Strings",
+      "Algorithms"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: strs = [\"eat\",\"tea\",\"tan\",\"ate\",\"nat\",\"bat\"], Output: [[\"bat\"],[\"nat\",\"tan\"],[\"ate\",\"eat\",\"tea\"]]"
+    ],
+    "constraints": "1 <= strs.length <= 10^4\n0 <= strs[i].length <= 100\nstrs[i] consists of lowercase English letters.",
+    "hints": "Two strings are anagrams if and only if their sorted forms are equal. Use a hash map to group the strings.",
+    "solution": "Create a hash map. Iterate through each string in the input array. For each string, sort its characters to create a canonical representation (key). If the key is not in the hash map, create a new list for it. Append the original string to the list associated with that key. Finally, return the values of the hash map."
+  },
+  {
+    "title": "Permutations",
+    "question": "Given an array `nums` of distinct integers, return all the possible permutations. You can return the answer in any order.",
+    "difficulty": "Intermediate",
+    "topics": [
+      "Recursion",
+      "Algorithms"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: nums = [1,2,3], Output: [[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]]",
+      "Input: nums = [0,1], Output: [[0,1],[1,0]]"
+    ],
+    "constraints": "1 <= nums.length <= 6\n-10 <= nums[i] <= 10\nAll the integers of nums are unique.",
+    "hints": "Use a backtracking approach. In the recursive function, iterate through the numbers. If a number hasn't been used yet, add it to the current permutation and make a recursive call. Remember to backtrack by removing the number afterward.",
+    "solution": "A backtracking algorithm is suitable here. Define a recursive function `backtrack(current_permutation)`. The base case is when the length of `current_permutation` equals the length of `nums`, at which point you add a copy of it to the results. In the recursive step, loop through `nums`. If the current number is not already in `current_permutation`, add it, recurse with `backtrack(new_permutation)`, and then remove the number to backtrack for other possibilities."
+  },
+  {
+    "title": "Department Top Three Salaries",
+    "question": "A company's executives are interested in seeing who earns the most money in each of the company's departments. A high earner in a department is an employee who has a salary in the top three unique salaries for that department. Write a solution to find the employees who are high earners in each of their departments. The tables are `Employee` (`id`, `name`, `salary`, `departmentId`) and `Department` (`id`, `name`).",
+    "difficulty": "Advanced",
+    "topics": [
+      "Databases"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "See the problem link for detailed table examples."
+    ],
+    "constraints": "The `id` columns are primary keys. `Employee.departmentId` is a foreign key to `Department.id`.",
+    "hints": "You can use a window function like `DENSE_RANK()` to rank salaries within each department.",
+    "solution": "SELECT d.name AS Department, e.name AS Employee, e.salary AS Salary FROM Employee e JOIN Department d ON e.departmentId = d.id WHERE ( SELECT COUNT(DISTINCT e2.salary) FROM Employee e2 WHERE e2.salary > e.salary AND e2.departmentId = e.departmentId ) < 3;"
+  },
+  {
+    "title": "Trapping Rain Water",
+    "question": "Given `n` non-negative integers representing an elevation map where the width of each bar is 1, compute how much water it can trap after raining.",
+    "difficulty": "Advanced",
+    "topics": [
+      "Arrays",
+      "Algorithms"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: height = [0,1,0,2,1,0,1,3,2,1,2,1], Output: 6",
+      "Input: height = [4,2,0,3,2,5], Output: 9"
+    ],
+    "constraints": "n == height.length\n1 <= n <= 2 * 10^4\n0 <= height[i] <= 10^5",
+    "hints": "The amount of water trapped at any position is determined by the minimum of the maximum height to its left and the maximum height to its right, minus its own height. A two-pointer approach can solve this in O(n) time and O(1) space.",
+    "solution": "Use two pointers, `left` and `right`, starting at the two ends of the array. Also, maintain `left_max` and `right_max` heights seen so far. If `height[left]` is less than `height[right]`, it means the trapping water is limited by the left side. Calculate trapped water `left_max - height[left]` and add to total, then move `left` pointer. Otherwise, the water is limited by the right side. Calculate `right_max - height[right]` and move `right` pointer. Continue until pointers meet."
+  },
+  {
+    "title": "Sudoku Solver",
+    "question": "Write a program to solve a Sudoku puzzle by filling the empty cells. A sudoku solution must satisfy all of the following rules: 1. Each of the digits 1-9 must occur exactly once in each row. 2. Each of the digits 1-9 must occur exactly once in each column. 3. Each of the digits 1-9 must occur exactly once in each of the nine 3x3 sub-boxes of the grid. The '.' character indicates empty cells.",
+    "difficulty": "Advanced",
+    "topics": [
+      "Recursion",
+      "Algorithms"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: A 9x9 board with some numbers and '.' for empty cells. Output: The solved 9x9 board."
+    ],
+    "constraints": "board.length == 9\nboard[i].length == 9\nboard[i][j] is a digit or '.'.",
+    "hints": "This is a classic backtracking problem. Create a recursive function that tries to place numbers 1-9 in an empty cell. If a number is valid (doesn't violate Sudoku rules), place it and recurse to the next empty cell. If the recursion returns false, backtrack by resetting the cell to '.' and try the next number.",
+    "solution": "Implement a backtracking function `solve()`. Find the next empty cell (row, col). Iterate through numbers 1 to 9. For each number, check if it's valid to place it at (row, col) by checking the row, column, and 3x3 subgrid. If it's valid, place the number and recursively call `solve()`. If the recursive call returns true, it means a solution was found, so return true. If not, backtrack by removing the number (setting the cell back to '.') and try the next number. If no number from 1-9 works, return false."
+  },
+  {
+    "title": "Valid Anagram",
+    "question": "Given two strings s and t, return true if t is an anagram of s, and false otherwise.",
+    "difficulty": "Beginner",
+    "topics": [
+      "Strings",
+      "Algorithms"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: s = \"anagram\", t = \"nagaram\", Output: true",
+      "Input: s = \"rat\", t = \"car\", Output: false"
+    ],
+    "constraints": "1 <= s.length, t.length <= 5 * 10^4. s and t consist of lowercase English letters.",
+    "hints": "Two strings are anagrams if they contain the same characters with the same frequencies. A frequency map (or an array of size 26) can be used.",
+    "solution": "Check if the lengths of both strings are equal. If not, return false. Create an array of size 26 to store character counts. Iterate through the first string and increment the count for each character. Then, iterate through the second string and decrement the count for each character. If at any point a count becomes negative, return false. If the loop completes, they are anagrams."
+  },
+  {
+    "title": "Find the Index of the First Occurrence in a String",
+    "question": "Given two strings needle and haystack, return the index of the first occurrence of needle in haystack, or -1 if needle is not part of haystack.",
+    "difficulty": "Beginner",
+    "topics": [
+      "Strings"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: haystack = \"sadbutsad\", needle = \"sad\", Output: 0",
+      "Input: haystack = \"leetcode\", needle = \"leeto\", Output: -1"
+    ],
+    "constraints": "1 <= haystack.length, needle.length <= 10^4. haystack and needle consist of only lowercase English characters.",
+    "hints": "You can solve this by iterating through the haystack and checking for a substring match at each position. Most languages have a built-in function for this.",
+    "solution": "Iterate through the `haystack` string with a pointer `i` from 0 up to `len(haystack) - len(needle)`. At each position `i`, check if the substring `haystack[i : i + len(needle)]` is equal to `needle`. If it is, return `i`. If the loop finishes without finding a match, return -1."
+  },
+  {
+    "title": "Merge Two Sorted Lists",
+    "question": "You are given the heads of two sorted linked lists list1 and list2. Merge the two lists into one sorted list. The list should be made by splicing together the nodes of the first two lists. Return the head of the merged linked list.",
+    "difficulty": "Beginner",
+    "topics": [
+      "Data Structures",
+      "Recursion"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: list1 = [1,2,4], list2 = [1,3,4], Output: [1,1,2,3,4,4]"
+    ],
+    "constraints": "The number of nodes in both lists is in the range [0, 50]. -100 <= Node.val <= 100. Both list1 and list2 are sorted in non-decreasing order.",
+    "hints": "Create a dummy head node to simplify the logic. Compare the current nodes of list1 and list2 and append the smaller one to the merged list.",
+    "solution": "Create a dummy node to act as the starting point of the new list. Create a `current` pointer, initially pointing to the dummy node. While both `list1` and `list2` are not null, compare their values. Append the node with the smaller value to `current.next` and advance the pointer of that list. Move `current` to the new node. After the loop, one list may still have remaining nodes; append the rest of that list to the end of the merged list. Return `dummy.next`."
+  },
+  {
+    "title": "Missing Number",
+    "question": "Given an array `nums` containing `n` distinct numbers in the range `[0, n]`, return the only number in the range that is missing from the array.",
+    "difficulty": "Beginner",
+    "topics": [
+      "Arrays",
+      "Bit Manipulation"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: nums = [3,0,1], Output: 2",
+      "Input: nums = [9,6,4,2,3,5,7,0,1], Output: 8"
+    ],
+    "constraints": "n == nums.length. 1 <= n <= 10^4. 0 <= nums[i] <= n. All the numbers of nums are unique.",
+    "hints": "The sum of numbers from 0 to n can be calculated with the formula n*(n+1)/2. The missing number is the difference between this expected sum and the actual sum of the numbers in the array.",
+    "solution": "Calculate the expected sum of the numbers from 0 to `n` (where `n` is the length of the array) using the Gaussian sum formula: `expected_sum = n * (n + 1) / 2`. Calculate the actual sum of the elements in the input array. The difference `expected_sum - actual_sum` is the missing number."
+  },
+  {
+    "title": "Number of 1 Bits",
+    "question": "Write a function that takes the binary representation of an unsigned integer and returns the number of '1' bits it has (also known as the Hamming weight).",
+    "difficulty": "Beginner",
+    "topics": [
+      "Bit Manipulation"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: n = 11 (binary: 00000000000000000000000000001011), Output: 3"
+    ],
+    "constraints": "The input must be a binary string of length 32.",
+    "hints": "You can repeatedly check the last bit and then right-shift the number. An optimization is to use the operation n & (n - 1), which clears the least significant '1' bit.",
+    "solution": "Initialize a counter to 0. While `n` is not 0, perform the bitwise operation `n = n & (n - 1)`. This operation flips the least significant 1-bit to 0. Increment the counter in each iteration. The loop terminates when `n` becomes 0, and the counter will hold the total number of 1-bits."
+  },
+  {
+    "title": "Power of Two",
+    "question": "Given an integer n, return true if it is a power of two. Otherwise, return false. An integer n is a power of two, if there exists an integer x such that n == 2^x.",
+    "difficulty": "Beginner",
+    "topics": [
+      "Bit Manipulation"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: n = 1, Output: true",
+      "Input: n = 16, Output: true",
+      "Input: n = 3, Output: false"
+    ],
+    "constraints": "-2^31 <= n <= 2^31 - 1",
+    "hints": "A power of two in binary representation has exactly one '1' bit.",
+    "solution": "A positive integer `n` is a power of two if and only if it has exactly one bit set to 1 in its binary representation. The bitwise operation `n & (n - 1)` clears the least significant set bit. If `n` is a power of two, this operation will result in 0. So, the condition is `n > 0 AND (n & (n - 1)) == 0`."
+  },
+  {
+    "title": "Climbing Stairs",
+    "question": "You are climbing a staircase. It takes n steps to reach the top. Each time you can either climb 1 or 2 steps. In how many distinct ways can you climb to the top?",
+    "difficulty": "Beginner",
+    "topics": [
+      "Recursion",
+      "Algorithms"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: n = 2, Output: 2",
+      "Input: n = 3, Output: 3"
+    ],
+    "constraints": "1 <= n <= 45",
+    "hints": "This problem is a classic dynamic programming problem. The number of ways to reach step n is the sum of ways to reach step n-1 and step n-2. This is the Fibonacci sequence.",
+    "solution": "The number of ways to reach step `n`, `ways(n)`, is `ways(n-1) + ways(n-2)`. This is the same recurrence relation as the Fibonacci sequence. The base cases are `ways(1) = 1` and `ways(2) = 2`. You can solve this using dynamic programming with an array to store the results for each step from 1 to `n`, avoiding recomputation."
+  },
+  {
+    "title": "Delete Duplicate Emails",
+    "question": "Write a solution to delete all duplicate email entries in a table named Person, keeping only unique emails based on its smallest id. The table has columns id and email.",
+    "difficulty": "Beginner",
+    "topics": [
+      "Databases"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: Person table = {{id: 1, email: 'john@example.com'}, {id: 2, email: 'bob@example.com'}, {id: 3, email: 'john@example.com'}}. Output: The table should be modified to {{id: 1, email: 'john@example.com'}, {id: 2, email: 'bob@example.com'}}."
+    ],
+    "constraints": "The id column is the primary key for this table.",
+    "hints": "Use a self-join to find rows that have the same email but a larger id.",
+    "solution": "DELETE p1 FROM Person p1, Person p2 WHERE p1.email = p2.email AND p1.id > p2.id;"
+  },
+  {
+    "title": "Contains Duplicate",
+    "question": "Given an integer array nums, return true if any value appears at least twice in the array, and return false if every element is distinct.",
+    "difficulty": "Beginner",
+    "topics": [
+      "Arrays"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: nums = [1,2,3,1], Output: true",
+      "Input: nums = [1,2,3,4], Output: false"
+    ],
+    "constraints": "1 <= nums.length <= 10^5. -10^9 <= nums[i] <= 10^9.",
+    "hints": "Use a hash set to keep track of the numbers you have seen. If you encounter a number that is already in the set, you have found a duplicate.",
+    "solution": "Initialize an empty hash set. Iterate through the `nums` array. For each number, check if it's already in the hash set. If it is, return `true`. Otherwise, add the number to the set. If the loop completes without finding any duplicates, return `false`."
+  },
+  {
+    "title": "Fizz Buzz",
+    "question": "Given an integer n, return a string array answer (1-indexed) where: answer[i] == \"FizzBuzz\" if i is divisible by 3 and 5. answer[i] == \"Fizz\" if i is divisible by 3. answer[i] == \"Buzz\" if i is divisible by 5. answer[i] == i (as a string) if none of the above conditions are true.",
+    "difficulty": "Beginner",
+    "topics": [
+      "Brainteaser"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: n = 3, Output: [\"1\",\"2\",\"Fizz\"]",
+      "Input: n = 5, Output: [\"1\",\"2\",\"Fizz\",\"4\",\"Buzz\"]"
+    ],
+    "constraints": "1 <= n <= 10^4",
+    "hints": "Loop from 1 to n and use the modulo operator (%) to check for divisibility. Be careful about the order of checks.",
+    "solution": "Initialize an empty list for the results. Loop from `i = 1` to `n`. Inside the loop, check for divisibility. First, check `if i % 15 == 0`, append 'FizzBuzz'. Then, `elif i % 3 == 0`, append 'Fizz'. Then, `elif i % 5 == 0`, append 'Buzz'. Otherwise, append the string representation of `i`. Return the list."
+  },
+  {
+    "title": "Nim Game",
+    "question": "You are playing the following Nim Game with your friend: Initially, there is a heap of stones on the table. You and your friend will alternate taking turns, and you go first. On each turn, the person whose turn it is will remove 1 to 3 stones from the heap. The one who removes the last stone is the winner. Given n, the number of stones in the heap, return true if you can win the game assuming both you and your friend play optimally.",
+    "difficulty": "Beginner",
+    "topics": [
+      "Brainteaser"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: n = 4, Output: false",
+      "Input: n = 1, Output: true",
+      "Input: n = 2, Output: true"
+    ],
+    "constraints": "1 <= n <= 2^31 - 1",
+    "hints": "Think about the losing positions. If you are left with 4 stones, no matter how many you take (1, 2, or 3), your opponent can take the rest and win. Can you generalize this?",
+    "solution": "The losing positions are multiples of 4. If the number of stones `n` is a multiple of 4, you will lose if your opponent plays optimally. Any number of stones you remove (1, 2, or 3), your opponent can remove `4 - your_move` stones, leaving you with a smaller multiple of 4. This continues until you are left with 4 stones, and you lose. Therefore, you can win if and only if `n` is not divisible by 4. The solution is simply `return n % 4 != 0`."
+  },
+  {
+    "title": "Product of Array Except Self",
+    "question": "Given an integer array nums, return an array answer such that answer[i] is equal to the product of all the elements of nums except nums[i]. You must write an algorithm that runs in O(n) time and without using the division operation.",
+    "difficulty": "Intermediate",
+    "topics": [
+      "Arrays",
+      "Algorithms"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: nums = [1,2,3,4], Output: [24,12,8,6]",
+      "Input: nums = [-1,1,0,-3,3], Output: [0,0,9,0,0]"
+    ],
+    "constraints": "2 <= nums.length <= 10^5. -30 <= nums[i] <= 30. The product of any prefix or suffix of nums is guaranteed to fit in a 32-bit integer.",
+    "hints": "Calculate prefix products in one pass and suffix products in another pass. The result for an index i is the product of the prefix product up to i-1 and the suffix product from i+1.",
+    "solution": "Create a result array of the same size as `nums`. First, iterate from left to right, filling the result array with prefix products. `result[i]` will store the product of all elements to the left of `i`. Then, iterate from right to left. Maintain a `right_product` variable. For each `i`, multiply `result[i]` by `right_product`, and then update `right_product` by multiplying it with `nums[i]`. This completes the calculation in O(n) time and O(1) extra space (if the result array doesn't count)."
+  },
+  {
+    "title": "3Sum",
+    "question": "Given an integer array nums, return all the triplets [nums[i], nums[j], nums[k]] such that i != j, i != k, and j != k, and nums[i] + nums[j] + nums[k] == 0. Notice that the solution set must not contain duplicate triplets.",
+    "difficulty": "Intermediate",
+    "topics": [
+      "Arrays",
+      "Algorithms"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: nums = [-1,0,1,2,-1,-4], Output: [[-1,-1,2],[-1,0,1]]"
+    ],
+    "constraints": "3 <= nums.length <= 3000. -10^5 <= nums[i] <= 10^5.",
+    "hints": "Sort the array first. Then, iterate through the array with one pointer `i` and use two other pointers, `left` and `right`, to find pairs that sum up to `-nums[i]`.",
+    "solution": "First, sort the input array `nums`. Then, iterate through the array with a loop for the first element `a`. To avoid duplicate triplets, skip identical elements for `a`. For each `a`, use a two-pointer approach (left and right) on the rest of the array to find two numbers `b` and `c` such that `a + b + c = 0`. If the sum is less than zero, increment the left pointer. If it's greater than zero, decrement the right pointer. If it's zero, you've found a triplet. Add it to the result and move both pointers, making sure to skip any duplicate elements for `b` and `c`."
+  },
+  {
+    "title": "Longest Substring Without Repeating Characters",
+    "question": "Given a string s, find the length of the longest substring without repeating characters.",
+    "difficulty": "Intermediate",
+    "topics": [
+      "Strings",
+      "Algorithms"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: s = \"abcabcbb\", Output: 3",
+      "Input: s = \"pwwkew\", Output: 3"
+    ],
+    "constraints": "0 <= s.length <= 5 * 10^4. s consists of English letters, digits, symbols and spaces.",
+    "hints": "Use a sliding window approach with a hash set or a hash map to keep track of characters in the current window.",
+    "solution": "Use the sliding window technique. Maintain a window `[left, right]`. Use a hash map to store the most recent index of each character encountered. As you expand the window by moving `right`, if you encounter a character that is already in the map and its index is within the current window (`map[char] >= left`), you must shrink the window by moving the `left` pointer to `map[char] + 1`. Update the maximum length found at each step."
+  },
+  {
+    "title": "Generate Parentheses",
+    "question": "Given n pairs of parentheses, write a function to generate all combinations of well-formed parentheses.",
+    "difficulty": "Intermediate",
+    "topics": [
+      "Strings",
+      "Recursion"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: n = 3, Output: [\"((()))\",\"(()())\",\"(())()\",\"()(())\",\"()()()\"]",
+      "Input: n = 1, Output: [\"()\"]"
+    ],
+    "constraints": "1 <= n <= 8",
+    "hints": "Use backtracking. Keep track of the number of open and close parentheses used. You can add an open parenthesis if you haven't used all `n` of them. You can add a close parenthesis if it doesn't exceed the number of open parentheses.",
+    "solution": "A backtracking approach is ideal. Define a recursive function that builds the string. The function should take the current string, the number of open parentheses used (`open_count`), and the number of closed parentheses used (`close_count`) as parameters. The base case is when the string length is `2 * n`. The constraints for adding a parenthesis are: 1. You can add an open parenthesis `(` if `open_count < n`. 2. You can add a close parenthesis `)` if `close_count < open_count`. Recursively explore these two possibilities."
+  },
+  {
+    "title": "Kth Smallest Element in a BST",
+    "question": "Given the root of a binary search tree, and an integer k, return the kth smallest value (1-indexed) of all the values of the nodes in the tree.",
+    "difficulty": "Intermediate",
+    "topics": [
+      "Data Structures",
+      "Algorithms"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: root = [3,1,4,null,2], k = 1, Output: 1",
+      "Input: root = [5,3,6,2,4,null,null,1], k = 3, Output: 3"
+    ],
+    "constraints": "The number of nodes in the tree is n. 1 <= k <= n <= 10^4. 0 <= Node.val <= 10^4.",
+    "hints": "An in-order traversal of a BST visits nodes in ascending order.",
+    "solution": "Perform an in-order traversal of the BST. This traversal visits the nodes in sorted order. While traversing, keep a counter. When the counter reaches `k`, the current node's value is the kth smallest element. You can implement this recursively or iteratively with a stack. The iterative approach using a stack allows you to stop the traversal as soon as the kth element is found."
+  },
+  {
+    "title": "Subsets",
+    "question": "Given an integer array nums of unique elements, return all possible subsets (the power set). The solution set must not contain duplicate subsets. Return the solution in any order.",
+    "difficulty": "Intermediate",
+    "topics": [
+      "Bit Manipulation",
+      "Recursion"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: nums = [1,2,3], Output: [[],[1],[2],[1,2],[3],[1,3],[2,3],[1,2,3]]"
+    ],
+    "constraints": "1 <= nums.length <= 10. -10 <= nums[i] <= 10. All the numbers of nums are unique.",
+    "hints": "This can be solved with backtracking. For each element, you have two choices: either include it in the current subset or not.",
+    "solution": "A backtracking or recursive approach works well. Define a function `backtrack(start_index, current_subset)`. Add `current_subset` to the results list. Then, loop from `start_index` to the end of `nums`. In each iteration, add `nums[i]` to `current_subset`, make a recursive call `backtrack(i + 1, current_subset)`, and then remove `nums[i]` to backtrack."
+  },
+  {
+    "title": "Single Number II",
+    "question": "Given an integer array nums where every element appears three times except for one, which appears exactly once. Find the single element and return it.",
+    "difficulty": "Intermediate",
+    "topics": [
+      "Bit Manipulation",
+      "Algorithms"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: nums = [2,2,3,2], Output: 3",
+      "Input: nums = [0,1,0,1,0,1,99], Output: 99"
+    ],
+    "constraints": "1 <= nums.length <= 3 * 10^4. -2^31 <= nums[i] <= 2^31 - 1. Each element in nums appears exactly three times except for one element which appears once.",
+    "hints": "Consider the sum of bits at each position. For each bit position from 0 to 31, the sum of the bits for all numbers will be a multiple of 3 if the single number's bit at that position is 0, and `(multiple of 3) + 1` if it's 1.",
+    "solution": "Iterate through each bit position from 0 to 31. For each bit position `i`, count how many numbers in the array have the `i`-th bit set. Sum these counts. The sum modulo 3 will be either 0 or 1. If it's 1, it means the single number has its `i`-th bit set. Construct the result number by setting its `i`-th bit if the sum modulo 3 is 1."
+  },
+  {
+    "title": "Combinations",
+    "question": "Given two integers n and k, return all possible combinations of k numbers chosen from the range [1, n]. You may return the answer in any order.",
+    "difficulty": "Intermediate",
+    "topics": [
+      "Recursion"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: n = 4, k = 2, Output: [[1,2],[1,3],[1,4],[2,3],[2,4],[3,4]]"
+    ],
+    "constraints": "1 <= n <= 20. 1 <= k <= n.",
+    "hints": "Use backtracking. Define a recursive function that builds a combination. The function needs to know the starting number to consider and the current combination being built.",
+    "solution": "Use a backtracking function `backtrack(start_number, current_combination)`. The base case is when `len(current_combination) == k`, at which point you add a copy to the results. In the recursive step, loop from `start_number` to `n`. In each iteration, add the current number `i` to the combination, make a recursive call `backtrack(i + 1, current_combination)`, and then remove `i` to backtrack."
+  },
+  {
+    "title": "Department Highest Salary",
+    "question": "Write a solution to find employees who have the highest salary in each of their departments. The tables are Employee (id, name, salary, departmentId) and Department (id, name).",
+    "difficulty": "Intermediate",
+    "topics": [
+      "Databases"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "See problem link for detailed examples."
+    ],
+    "constraints": "id columns are primary keys.",
+    "hints": "Find the maximum salary for each department first, then find the employees who match that department and salary.",
+    "solution": "SELECT d.name AS Department, e.name AS Employee, e.salary AS Salary FROM Employee e JOIN Department d ON e.departmentId = d.id WHERE (e.departmentId, e.salary) IN (SELECT departmentId, MAX(salary) FROM Employee GROUP BY departmentId);"
+  },
+  {
+    "title": "Consecutive Numbers",
+    "question": "Write a solution to find all numbers that appear at least three times consecutively in the Logs table. The table has columns id and num.",
+    "difficulty": "Intermediate",
+    "topics": [
+      "Databases"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "See problem link for detailed examples."
+    ],
+    "constraints": "id is the primary key.",
+    "hints": "You can use self-joins or window functions like LAG() or LEAD() to compare a row with its neighbors.",
+    "solution": "SELECT DISTINCT l1.num AS ConsecutiveNums FROM Logs l1 JOIN Logs l2 ON l1.id = l2.id - 1 JOIN Logs l3 ON l1.id = l3.id - 2 WHERE l1.num = l2.num AND l2.num = l3.num;"
+  },
+  {
+    "title": "Exchange Seats",
+    "question": "Write a solution to swap the seat id of every two consecutive students. If the number of students is odd, the id of the last student is not swapped. The table is Seat (id, student).",
+    "difficulty": "Intermediate",
+    "topics": [
+      "Databases"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "See problem link for detailed examples."
+    ],
+    "constraints": "id is the primary key.",
+    "hints": "Use a CASE statement to handle the logic for swapping. Consider the even and odd ids, and also the case of the last student if the total count is odd.",
+    "solution": "SELECT CASE WHEN MOD(id, 2) != 0 AND id = (SELECT COUNT(*) FROM Seat) THEN id WHEN MOD(id, 2) != 0 THEN id + 1 ELSE id - 1 END AS id, student FROM Seat ORDER BY id;"
+  },
+  {
+    "title": "Bulb Switcher",
+    "question": "There are n bulbs that are initially off. You first turn on all the bulbs. Then, you turn off every second bulb. On the third round, you toggle every third bulb (turning on if it's off or turning off if it's on). For the ith round, you toggle every ith bulb. For the nth round, you only toggle the last bulb. Return the number of bulbs that are on after n rounds.",
+    "difficulty": "Intermediate",
+    "topics": [
+      "Brainteaser"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: n = 3, Output: 1",
+      "Input: n = 0, Output: 0",
+      "Input: n = 1, Output: 1"
+    ],
+    "constraints": "0 <= n <= 10^9",
+    "hints": "A bulb `i` is toggled in round `j` if `j` is a divisor of `i`. A bulb remains on if it is toggled an odd number of times. Which numbers have an odd number of divisors?",
+    "solution": "A bulb `i` will be on if it is toggled an odd number of times. The number of times a bulb is toggled is equal to the number of its divisors. Only perfect squares have an odd number of divisors. Therefore, the problem reduces to finding the number of perfect squares less than or equal to `n`. This is simply the integer part of the square root of `n`."
+  },
+  {
+    "title": "Angle Between Hands of a Clock",
+    "question": "Given two numbers, hour and minutes, return the smaller angle (in degrees) between the two hands of a clock.",
+    "difficulty": "Intermediate",
+    "topics": [
+      "Brainteaser"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: hour = 12, minutes = 30, Output: 165",
+      "Input: hour = 3, minutes = 30, Output: 75"
+    ],
+    "constraints": "1 <= hour <= 12. 0 <= minutes <= 59.",
+    "hints": "Calculate the position of the hour hand and the minute hand in degrees from the 12 o'clock position. The minute hand moves 6 degrees per minute. The hour hand moves 0.5 degrees per minute.",
+    "solution": "The minute hand moves 360 degrees in 60 minutes, so its position is `minutes * 6` degrees. The hour hand moves 360 degrees in 12 hours, or 30 degrees per hour. It also moves with the minutes, at a rate of 0.5 degrees per minute. Its position is `(hour % 12) * 30 + minutes * 0.5` degrees. The angle between them is the absolute difference of their positions. Since we want the smaller angle, the answer is `min(angle, 360 - angle)`."
+  },
+  {
+    "title": "Text Justification",
+    "question": "Given an array of strings words and a width maxWidth, format the text such that each line has exactly maxWidth characters and is fully (left and right) justified. You should pack your words in a greedy approach; that is, pack as many words as you can in each line. Pad extra spaces ' ' when necessary so that each line has exactly maxWidth characters. Extra spaces between words should be distributed as evenly as possible. If the number of spaces on a line does not divide evenly between words, the empty slots on the left will be assigned more spaces than the slots on the right. For the last line of text, it should be left-justified and no extra space is inserted between words.",
+    "difficulty": "Advanced",
+    "topics": [
+      "Strings",
+      "Algorithms"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: words = [\"This\", \"is\", \"an\", \"example\", \"of\", \"text\", \"justification.\"], maxWidth = 16, Output: [\"This    is    an\", \"example  of text\", \"justification.  \"]"
+    ],
+    "constraints": "1 <= words.length <= 300. 1 <= words[i].length <= 20. 1 <= maxWidth <= 100.",
+    "hints": "Process the words line by line. Greedily determine how many words can fit on a single line. Then, calculate the number of spaces needed and distribute them.",
+    "solution": "Iterate through the words, forming one line at a time. In a loop, collect words for the current line until adding the next word exceeds `maxWidth`. Once a line is formed, calculate the total number of spaces to be added (`maxWidth - length of words`). For a non-last line, distribute these spaces. The number of gaps is `num_words - 1`. `base_spaces = total_spaces // gaps`, and `extra_spaces = total_spaces % gaps`. The first `extra_spaces` gaps get `base_spaces + 1` spaces, the rest get `base_spaces`. The last line is a special case and is simply left-justified with single spaces and padded with spaces at the end."
+  },
+  {
+    "title": "Minimum Window Substring",
+    "question": "Given two strings s and t of lengths m and n respectively, return the minimum window substring of s such that every character in t (including duplicates) is included in the window. If there is no such substring, return the empty string \"\".",
+    "difficulty": "Advanced",
+    "topics": [
+      "Strings"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: s = \"ADOBECODEBANC\", t = \"ABC\", Output: \"BANC\""
+    ],
+    "constraints": "m == s.length, n == t.length. 1 <= m, n <= 10^5. s and t consist of uppercase and lowercase English letters.",
+    "hints": "Use a sliding window approach. Use a hash map to store the character frequencies of t. Expand the window by moving the right pointer. When the window contains all characters of t, try to shrink it from the left.",
+    "solution": "Use the sliding window technique with two pointers, `left` and `right`. Create a frequency map for the characters in `t`. Maintain a counter for how many required characters have been found in the current window. Expand the window by moving `right`. When a character from `s` is encountered that is in the map, decrement its count in the map. If its count becomes 0, increment the found-character counter. Once the counter equals the number of unique characters in `t`, you have a valid window. Now, try to shrink the window from the `left` side. While shrinking, if you remove a character that was required, decrement the found-character counter and stop shrinking. Keep track of the minimum window found."
+  },
+  {
+    "title": "Merge k Sorted Lists",
+    "question": "You are given an array of k linked-lists lists, where each linked-list is sorted in ascending order. Merge all the linked-lists into one sorted linked-list and return it.",
+    "difficulty": "Advanced",
+    "topics": [
+      "Data Structures",
+      "Algorithms"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: lists = [[1,4,5],[1,3,4],[2,6]], Output: [1,1,2,3,4,4,5,6]"
+    ],
+    "constraints": "k == lists.length. 0 <= k <= 10^4. 0 <= lists[i].length <= 500. -10^4 <= lists[i][j] <= 10^4. lists[i] is sorted in ascending order.",
+    "hints": "A min-heap (priority queue) is an efficient way to keep track of the smallest current element among all the lists.",
+    "solution": "Use a min-heap to store the first node from each of the `k` lists. Create a dummy head for the result list. In a loop, extract the minimum node from the heap, append it to the result list. If that extracted node has a next node in its original list, add that next node to the heap. Repeat this process until the heap is empty. The time complexity is O(N log k) where N is the total number of nodes and k is the number of lists."
+  },
+  {
+    "title": "Largest Rectangle in Histogram",
+    "question": "Given an array of integers heights representing the histogram's bar height where the width of each bar is 1, return the area of the largest rectangle in the histogram.",
+    "difficulty": "Advanced",
+    "topics": [
+      "Data Structures",
+      "Arrays"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: heights = [2,1,5,6,2,3], Output: 10"
+    ],
+    "constraints": "1 <= heights.length <= 10^5. 0 <= heights[i] <= 10^4.",
+    "hints": "Use a monotonic stack. The stack will store indices of bars in increasing order of height. When you encounter a bar that is smaller than the one at the top of the stack, you can calculate the area for the popped bar.",
+    "solution": "Use a monotonic stack that stores indices of the `heights` array. Iterate through the heights. If the current bar is taller than the bar at the stack's top, push its index onto the stack. If it's shorter, pop from the stack until the condition is met. For each popped bar, calculate the area it can form. The height is `heights[popped_index]`. The width is from the current index `i` back to the index of the new top of the stack. Keep track of the maximum area found."
+  },
+  {
+    "title": "Maximal Rectangle",
+    "question": "Given a rows x cols binary matrix filled with 0's and 1's, find the largest rectangle containing only 1's and return its area.",
+    "difficulty": "Advanced",
+    "topics": [
+      "Data Structures",
+      "Arrays"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: matrix = [[\"1\",\"0\",\"1\",\"0\",\"0\"],[\"1\",\"0\",\"1\",\"1\",\"1\"],[\"1\",\"1\",\"1\",\"1\",\"1\"],[\"1\",\"0\",\"0\",\"1\",\"0\"]], Output: 6"
+    ],
+    "constraints": "rows == matrix.length. cols == matrix[i].length. 1 <= row, cols <= 200. matrix[i][j] is '0' or '1'.",
+    "hints": "This problem can be reduced to the 'Largest Rectangle in Histogram' problem. For each row, build a histogram representing the heights of consecutive 1's ending at that row.",
+    "solution": "Iterate through each row of the matrix. For each row, create a histogram `heights` array where `heights[j]` is the number of consecutive '1's above `matrix[i][j]` (including itself). If `matrix[i][j]` is '0', the height is 0. After creating the histogram for a row, use the algorithm for 'Largest Rectangle in Histogram' (using a monotonic stack) to find the largest rectangle in that histogram. Update the overall maximum area found across all rows."
+  },
+  {
+    "title": "Maximum XOR of Two Numbers in an Array",
+    "question": "Given an integer array nums, return the maximum result of nums[i] XOR nums[j], where i <= j.",
+    "difficulty": "Advanced",
+    "topics": [
+      "Bit Manipulation",
+      "Data Structures"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: nums = [3,10,5,25,2,8], Output: 28",
+      "Input: nums = [14,70,53,83,49,91,36,80,92,51,66,70], Output: 127"
+    ],
+    "constraints": "1 <= nums.length <= 2 * 10^5. 0 <= nums[i] <= 2^31 - 1.",
+    "hints": "Use a Trie (prefix tree) to store the binary representations of the numbers. For each number, traverse the Trie to find the other number that would maximize the XOR result.",
+    "solution": "Build a Trie from the binary representations of all numbers in the array. Each node in the Trie will have two children, one for bit 0 and one for bit 1. Then, for each number `num` in the array, traverse the Trie again. At each bit position (from most significant to least), try to follow the path of the opposite bit to maximize the XOR. If the opposite bit path exists, take it and add `(1 << i)` to the current max XOR. If not, follow the path of the same bit. Keep track of the overall maximum XOR found."
+  },
+  {
+    "title": "Reverse Bits",
+    "question": "Reverse bits of a given 32-bit unsigned integer.",
+    "difficulty": "Advanced",
+    "topics": [
+      "Bit Manipulation"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: n = 43261596 (binary: 00000010100101000001111010011100), Output: 964176192 (binary: 00111001011110000010100101000000)"
+    ],
+    "constraints": "The input must be a binary string of length 32.",
+    "hints": "Iterate 32 times. In each iteration, take the last bit of the input number and append it to the result, then shift the input number to the right and the result to the left.",
+    "solution": "Initialize a result variable to 0. Loop 32 times. In each iteration, left-shift the `result` by 1. Then, get the least significant bit of the input `n` using `(n & 1)`. Add this bit to the `result`. Finally, right-shift the input `n` by 1. After 32 iterations, `result` will hold the bit-reversed number."
+  },
+  {
+    "title": "Counting Bits",
+    "question": "Given an integer n, return an array ans of length n + 1 such that for each i (0 <= i <= n), ans[i] is the number of 1's in the binary representation of i.",
+    "difficulty": "Advanced",
+    "topics": [
+      "Bit Manipulation",
+      "Algorithms"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: n = 2, Output: [0,1,1]",
+      "Input: n = 5, Output: [0,1,1,2,1,2]"
+    ],
+    "constraints": "0 <= n <= 10^5",
+    "hints": "You can use dynamic programming. Notice the relationship between the number of set bits of `i` and `i / 2`. The number of set bits in `i` is `dp[i >> 1] + (i & 1)`.",
+    "solution": "Create a DP array `ans` of size `n + 1`. `ans[0]` is 0. Iterate from `i = 1` to `n`. The number of 1's in `i` can be calculated from a previously computed value. The recurrence relation is `ans[i] = ans[i >> 1] + (i & 1)`. `i >> 1` is `i` divided by 2 (integer division), and `i & 1` gives the least significant bit (1 if `i` is odd, 0 if even). This allows you to compute the result for all numbers up to `n` in O(n) time."
+  },
+  {
+    "title": "Word Ladder",
+    "question": "A transformation sequence from word beginWord to word endWord using a dictionary wordList is a sequence of words beginWord -> s1 -> s2 -> ... -> sk such that: Every adjacent pair of words differs by a single letter. All words s1 through sk are in wordList. Note that beginWord does not need to be in wordList. sk == endWord. Given two words, beginWord and endWord, and a dictionary wordList, return the number of words in the shortest transformation sequence from beginWord to endWord, or 0 if no such sequence exists.",
+    "difficulty": "Advanced",
+    "topics": [
+      "Recursion",
+      "Algorithms"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: beginWord = \"hit\", endWord = \"cog\", wordList = [\"hot\",\"dot\",\"dog\",\"lot\",\"log\",\"cog\"], Output: 5"
+    ],
+    "constraints": "1 <= beginWord.length <= 10. endWord.length == beginWord.length. 1 <= wordList.length <= 5000. wordList[i].length == beginWord.length.",
+    "hints": "This problem can be modeled as finding the shortest path in a graph. The words are the nodes, and an edge exists between two words if they differ by one letter. Breadth-First Search (BFS) is suitable for finding the shortest path.",
+    "solution": "Use Breadth-First Search (BFS). Start a queue with `(beginWord, 1)`, where 1 is the sequence length. Use a set for `wordList` for efficient lookups and to keep track of visited words. While the queue is not empty, dequeue a word and its current path length. Generate all possible next words by changing one character at a time (from 'a' to 'z' for each position). If a generated word is the `endWord`, return the current path length + 1. If it's in the `wordList` set, add it to the queue and remove it from the set to avoid cycles."
+  },
+  {
+    "title": "Regular Expression Matching",
+    "question": "Given an input string s and a pattern p, implement regular expression matching with support for '.' and '*'. '.' Matches any single character. '*' Matches zero or more of the preceding element. The matching should cover the entire input string (not partial).",
+    "difficulty": "Advanced",
+    "topics": [
+      "Recursion",
+      "Strings"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: s = \"aa\", p = \"a*\", Output: true",
+      "Input: s = \"ab\", p = \".*\", Output: true"
+    ],
+    "constraints": "1 <= s.length <= 20. 1 <= p.length <= 20. s contains only lowercase English letters. p contains only lowercase English letters, '.', and '*'.",
+    "hints": "This problem can be solved with dynamic programming or recursion with memoization. The state can be defined by the current positions in the string `s` and pattern `p`.",
+    "solution": "Use dynamic programming. Create a 2D DP table `dp[i][j]` which is true if the first `i` characters of `s` match the first `j` characters of `p`. The recurrence relations are: 1. If `p[j-1]` is a character or '.', `dp[i][j] = dp[i-1][j-1]` if `s[i-1]` matches `p[j-1]`. 2. If `p[j-1]` is '*', it can match zero or more of the preceding element `p[j-2]`. Zero matches means `dp[i][j] = dp[i][j-2]`. One or more matches means `dp[i][j] = dp[i-1][j]` if `s[i-1]` matches `p[j-2]`."
+  },
+  {
+    "title": "N-Queens II",
+    "question": "The n-queens puzzle is the problem of placing n queens on an n x n chessboard such that no two queens attack each other. Given an integer n, return the number of distinct solutions to the n-queens puzzle.",
+    "difficulty": "Advanced",
+    "topics": [
+      "Recursion"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: n = 4, Output: 2",
+      "Input: n = 1, Output: 1"
+    ],
+    "constraints": "1 <= n <= 9",
+    "hints": "This is a variation of the N-Queens problem. Use backtracking to explore placing queens row by row. Instead of storing the board configurations, just count the valid ones.",
+    "solution": "Use a backtracking algorithm. Define a recursive function `solve(row)` that tries to place a queen in the given `row`. Iterate through each column `col` in that row. For each column, check if placing a queen at `(row, col)` is safe (i.e., not attacked by any previously placed queens). To check for safety, you need to verify that no other queen is in the same column, or on the two diagonals. Use helper arrays or sets to keep track of occupied columns and diagonals. If the placement is safe, make the recursive call `solve(row + 1)`. The base case is when `row == n`, which means a valid solution has been found; increment a global counter. Remember to backtrack by removing the queen's state before returning."
+  },
+  {
+    "title": "Human Traffic of Stadium",
+    "question": "Write a solution to find the IDs of stadium visits with 3 or more consecutive visits with 100 or more people. The table is Stadium (id, visit_date, people).",
+    "difficulty": "Advanced",
+    "topics": [
+      "Databases"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "See problem link for detailed examples."
+    ],
+    "constraints": "id is the primary key.",
+    "hints": "Use window functions like LAG() and LEAD() to access previous and next rows to check for consecutive visits.",
+    "solution": "First, filter the stadium table for visits with 100 or more people. Then, use window functions to find consecutive runs. A common trick is to use `id - ROW_NUMBER() OVER (ORDER BY id)` to create a grouping `id` for consecutive rows. Then, group by this calculated `id` and select the groups having a count of 3 or more. Finally, select all original `id`s that belong to these valid groups."
+  },
+  {
+    "title": "Median of Two Sorted Arrays",
+    "question": "Given two sorted arrays nums1 and nums2 of size m and n respectively, return the median of the two sorted arrays. The overall run time complexity should be O(log (m+n)).",
+    "difficulty": "Advanced",
+    "topics": [
+      "Arrays",
+      "Algorithms"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: nums1 = [1,3], nums2 = [2], Output: 2.0",
+      "Input: nums1 = [1,2], nums2 = [3,4], Output: 2.5"
+    ],
+    "constraints": "nums1.length == m. nums2.length == n. 0 <= m, n <= 1000. 1 <= m + n <= 2000.",
+    "hints": "This problem can be solved by finding a partition in both arrays such that all elements on the left side of the partitions are less than or equal to all elements on the right side. This can be achieved with binary search.",
+    "solution": "The goal is to partition the combined array into two equal halves. We can use binary search on the smaller of the two arrays. For a given partition `partitionX` in `nums1`, the corresponding partition `partitionY` in `nums2` is determined by the total length. We need to find a partition where `max(leftX) <= min(rightY)` and `max(leftY) <= min(rightX)`. If this condition is met, the median can be calculated from these four boundary elements. If the condition is not met, adjust the binary search range in `nums1` accordingly."
+  },
+  {
+    "title": "The Skyline Problem",
+    "question": "A city's skyline is the outer contour of the silhouette formed by all the buildings in that city when viewed from a distance. Given the locations and heights of all the buildings, return the skyline formed by these buildings collectively. The geometric information of each building is given in the array buildings where buildings[i] = [lefti, righti, heighti].",
+    "difficulty": "Advanced",
+    "topics": [
+      "Data Structures",
+      "Algorithms"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: buildings = [[2,9,10],[3,7,15],[5,12,12],[15,20,10],[19,24,8]], Output: [[2,10],[3,15],[7,12],[12,0],[15,10],[20,8],[24,0]]"
+    ],
+    "constraints": "1 <= buildings.length <= 10^4. 0 <= lefti < righti <= 2^31 - 1. 1 <= heighti <= 2^31 - 1.",
+    "hints": "This can be solved using a sweep-line algorithm combined with a max-heap. Treat the left and right edges of buildings as critical points. Sort these points. Process them in order, updating the current maximum height in the heap.",
+    "solution": "First, transform the buildings array into a list of critical points. Each building `[L, R, H]` contributes two points: `(L, -H)` for a start point and `(R, H)` for an end point. The negative height for start points helps in sorting and processing. Sort these critical points primarily by x-coordinate, and secondarily by height. Initialize a result list and a max-heap (priority queue) that will store active building heights, with an initial height of 0. Iterate through the sorted points. For a start point `(x, -H)`, add `H` to the heap. For an end point `(x, H)`, remove `H` from the heap. After each update, if the current max height in the heap is different from the previous max height, it means a skyline key point is found, so add `(x, new_max_height)` to the result."
+  },
+  {
+    "title": "Find Median from Data Stream",
+    "question": "The median is the middle value in an ordered integer list. If the size of the list is even, there is no middle value, and the median is the mean of the two middle values. Implement the MedianFinder class: MedianFinder() initializes the MedianFinder object. void addNum(int num) adds the integer num from the data stream to the data structure. double findMedian() returns the median of all elements so far.",
+    "difficulty": "Advanced",
+    "topics": [
+      "Data Structures"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "MedianFinder mf = new MedianFinder(); mf.addNum(1); mf.addNum(2); mf.findMedian(); -> 1.5; mf.addNum(3); mf.findMedian(); -> 2.0"
+    ],
+    "constraints": "-10^5 <= num <= 10^5. There will be at least one element in the data structure before calling findMedian. At most 5 * 10^4 calls will be made to addNum and findMedian.",
+    "hints": "Use two heaps: a max-heap to store the smaller half of the numbers and a min-heap to store the larger half. This keeps the median elements at the top of the heaps.",
+    "solution": "Maintain two heaps: a max-heap `small_half` and a min-heap `large_half`. The `small_half` stores the smaller half of the numbers, and `large_half` stores the larger half. The heaps should be balanced such that their sizes differ by at most 1. When adding a new number, add it to `small_half`. Then, move the largest element from `small_half` to `large_half`. If `large_half` becomes larger than `small_half`, move its smallest element back to `small_half`. To find the median, if the heap sizes are equal, the median is the average of the tops of both heaps. If `small_half` is larger, its top is the median."
+  },
+  {
+    "title": "Frog Jump",
+    "question": "A frog is crossing a river. The river is divided into some number of units, and at each unit, there may or may not exist a stone. The frog can jump on a stone, but it must not jump into the water. Given a list of stones' positions (in units) in sorted ascending order, determine if the frog can cross the river by landing on the last stone. Initially, the frog is on the first stone and assumes the first jump must be 1 unit. If the frog's last jump was k units, its next jump must be either k - 1, k, or k + 1 units. The frog can only jump in the forward direction.",
+    "difficulty": "Advanced",
+    "topics": [
+      "Brainteaser"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: stones = [0,1,3,5,6,8,12,17], Output: true",
+      "Input: stones = [0,1,2,3,4,8,9,11], Output: false"
+    ],
+    "constraints": "2 <= stones.length <= 2000. 0 <= stones[i] <= 2^31 - 1. stones[0] == 0.",
+    "hints": "This can be solved with dynamic programming or DFS with memoization. The state can be defined by the current stone's index and the size of the last jump.",
+    "solution": "Use a hash map to store the possible jump sizes that can reach each stone. The map will be `map<stone_position, set<jump_size>>`. Initialize `map[0] = {0}`. Iterate through each stone position in the sorted `stones` array. For each stone, iterate through the jump sizes `k` that can reach it. For each `k`, explore the next possible jumps `k-1, k, k+1`. If `stone + next_jump` is a valid stone position in the river, add `next_jump` to the set of jump sizes for that next stone. If the last stone is ever reached (i.e., its entry in the map is non-empty), return true."
+  },
+  {
+    "title": "Candy",
+    "question": "There are n children standing in a line. Each child is assigned a rating value given in the integer array ratings. You are giving candies to these children subjected to the following requirements: Each child must have at least one candy. Children with a higher rating get more candies than their neighbors. Return the minimum number of candies you need to have to distribute the candies to the children.",
+    "difficulty": "Advanced",
+    "topics": [
+      "Brainteaser",
+      "Algorithms"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: ratings = [1,0,2], Output: 5",
+      "Input: ratings = [1,2,2], Output: 4"
+    ],
+    "constraints": "n == ratings.length. 1 <= n <= 2 * 10^4. 0 <= ratings[i] <= 2 * 10^4.",
+    "hints": "Use two passes. The first pass from left to right ensures the condition with the left neighbor is met. The second pass from right to left ensures the condition with the right neighbor is met.",
+    "solution": "Create a `candies` array of the same size as `ratings`, initialized to all 1s. First, iterate from left to right. If `ratings[i] > ratings[i-1]`, then child `i` must have more candies than child `i-1`, so set `candies[i] = candies[i-1] + 1`. Next, iterate from right to left. If `ratings[i] > ratings[i+1]`, child `i` must have more candies than child `i+1`. Set `candies[i] = max(candies[i], candies[i+1] + 1)`. The `max` is important to not violate the condition from the first pass. Finally, sum up all values in the `candies` array."
+  },
+  {
+    "title": "Min Cost Climbing Stairs",
+    "question": "You are given an integer array `cost` where `cost[i]` is the cost of the `i`th step on a staircase. Once you pay the cost, you can either climb one or two steps. You can either start from the step with index 0, or the step with index 1. Return the minimum cost to reach the top of the floor.",
+    "difficulty": "Beginner",
+    "topics": [
+      "Dynamic Programming",
+      "Arrays"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: cost = [10,15,20], Output: 15",
+      "Input: cost = [1,100,1,1,1,100,1,1,100,1], Output: 6"
+    ],
+    "constraints": "2 <= cost.length <= 1000. 0 <= cost[i] <= 999.",
+    "hints": "The cost to reach step `i` is `cost[i]` plus the minimum of the costs to reach step `i-1` and `i-2`. The final answer is the minimum of the costs to reach the last two steps.",
+    "solution": "This is a classic dynamic programming problem. Let `dp[i]` be the minimum cost to reach step `i`. The recurrence relation is `dp[i] = cost[i] + min(dp[i-1], dp[i-2])`. The base cases are `dp[0] = cost[0]` and `dp[1] = cost[1]`. You can optimize the space complexity to O(1) by only storing the costs for the previous two steps."
+  },
+  {
+    "title": "Best Time to Buy and Sell Stock",
+    "question": "You are given an array `prices` where `prices[i]` is the price of a given stock on the `i`th day. You want to maximize your profit by choosing a single day to buy one stock and choosing a different day in the future to sell that stock. Return the maximum profit you can achieve from this transaction. If you cannot achieve any profit, return 0.",
+    "difficulty": "Beginner",
+    "topics": [
+      "Dynamic Programming",
+      "Arrays"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: prices = [7,1,5,3,6,4], Output: 5",
+      "Input: prices = [7,6,4,3,1], Output: 0"
+    ],
+    "constraints": "1 <= prices.length <= 10^5. 0 <= prices[i] <= 10^4.",
+    "hints": "Keep track of the minimum price found so far. For each day, calculate the potential profit if you sell on that day, and update the maximum profit.",
+    "solution": "Iterate through the `prices` array. Maintain two variables: `min_price` (initialized to a very large number) and `max_profit` (initialized to 0). For each price, update `min_price = min(min_price, current_price)`. Then, update `max_profit = max(max_profit, current_price - min_price)`. The final `max_profit` is the answer."
+  },
+  {
+    "title": "House Robber",
+    "question": "You are a professional robber planning to rob houses along a street. Each house has a certain amount of money stashed, the only constraint stopping you from robbing each of them is that adjacent houses have security systems connected and it will automatically contact the police if two adjacent houses were broken into on the same night. Given an integer array `nums` representing the amount of money of each house, return the maximum amount of money you can rob tonight without alerting the police.",
+    "difficulty": "Beginner",
+    "topics": [
+      "Dynamic Programming",
+      "Arrays"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: nums = [1,2,3,1], Output: 4",
+      "Input: nums = [2,7,9,3,1], Output: 12"
+    ],
+    "constraints": "1 <= nums.length <= 100. 0 <= nums[i] <= 400.",
+    "hints": "For each house, you have two choices: either rob it or not. If you rob house `i`, you cannot rob house `i-1`, so the max money is `nums[i] + max_money_up_to[i-2]`. If you don't rob it, the max money is `max_money_up_to[i-1]`.",
+    "solution": "Let `dp[i]` be the maximum amount of money that can be robbed up to house `i`. The recurrence relation is `dp[i] = max(dp[i-1], dp[i-2] + nums[i])`. This can be solved in O(n) time and O(1) space by only keeping track of the previous two maximums (`rob_prev` and `rob_prev_prev`)."
+  },
+  {
+    "title": "Coin Change",
+    "question": "You are given an integer array `coins` representing coins of different denominations and an integer `amount` representing a total amount of money. Return the fewest number of coins that you need to make up that amount. If that amount of money cannot be made up by any combination of the coins, return -1. You may assume that you have an infinite number of each kind of coin.",
+    "difficulty": "Intermediate",
+    "topics": [
+      "Dynamic Programming"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: coins = [1,2,5], amount = 11, Output: 3",
+      "Input: coins = [2], amount = 3, Output: -1"
+    ],
+    "constraints": "1 <= coins.length <= 12. 1 <= coins[i] <= 2^31 - 1. 0 <= amount <= 10^4.",
+    "hints": "Use dynamic programming. Let `dp[i]` be the minimum number of coins to make amount `i`. The state transition would be `dp[i] = min(dp[i], dp[i - coin] + 1)` for each coin.",
+    "solution": "Create a DP array `dp` of size `amount + 1`, initialized to a large value (representing infinity), with `dp[0] = 0`. Iterate from `i = 1` to `amount`. For each `i`, iterate through the available `coins`. If `i >= coin`, update `dp[i] = min(dp[i], dp[i - coin] + 1)`. The final answer is `dp[amount]`, or -1 if it remains at the large initial value."
+  },
+  {
+    "title": "Longest Increasing Subsequence",
+    "question": "Given an integer array `nums`, return the length of the longest strictly increasing subsequence.",
+    "difficulty": "Intermediate",
+    "topics": [
+      "Dynamic Programming"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: nums = [10,9,2,5,3,7,101,18], Output: 4",
+      "Input: nums = [0,1,0,3,2,3], Output: 4"
+    ],
+    "constraints": "1 <= nums.length <= 2500. -10^4 <= nums[i] <= 10^4.",
+    "hints": "Let `dp[i]` be the length of the longest increasing subsequence that ends at index `i`. To compute `dp[i]`, you need to look at all `j < i` and find the one where `nums[j] < nums[i]` that maximizes `dp[j]`.",
+    "solution": "A classic O(n^2) DP solution involves an array `dp` where `dp[i]` stores the length of the LIS ending at index `i`. Iterate `i` from 0 to n-1. For each `i`, iterate `j` from 0 to `i-1`. If `nums[i] > nums[j]`, update `dp[i] = max(dp[i], dp[j] + 1)`. The answer is the maximum value in the `dp` array. A more advanced O(n log n) solution exists using patience sorting and binary search."
+  },
+  {
+    "title": "Unique Paths",
+    "question": "A robot is located at the top-left corner of a `m x n` grid. The robot can only move either down or right at any point in time. The robot is trying to reach the bottom-right corner of the grid. How many possible unique paths are there?",
+    "difficulty": "Intermediate",
+    "topics": [
+      "Dynamic Programming",
+      "Math"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: m = 3, n = 7, Output: 28",
+      "Input: m = 3, n = 2, Output: 3"
+    ],
+    "constraints": "1 <= m, n <= 100.",
+    "hints": "The number of ways to get to a cell `(i, j)` is the sum of the number of ways to get to the cell above it `(i-1, j)` and the cell to its left `(i, j-1)`.",
+    "solution": "Use a 2D DP table `dp[m][n]`. `dp[i][j]` will store the number of unique paths to reach cell `(i, j)`. Initialize the first row and first column to 1, as there is only one way to reach any cell in them. Then, for every other cell, `dp[i][j] = dp[i-1][j] + dp[i][j-1]`. The answer is `dp[m-1][n-1]`. This can also be solved combinatorially: total moves are `(m-1) + (n-1)`, and we must choose `m-1` of them to be 'down' moves, so the answer is C(m-1+n-1, m-1)."
+  },
+  {
+    "title": "Edit Distance",
+    "question": "Given two strings `word1` and `word2`, return the minimum number of operations required to convert `word1` to `word2`. You have the following three operations permitted on a word: Insert a character, Delete a character, Replace a character.",
+    "difficulty": "Advanced",
+    "topics": [
+      "Dynamic Programming",
+      "Strings"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: word1 = \"horse\", word2 = \"ros\", Output: 3",
+      "Input: word1 = \"intention\", word2 = \"execution\", Output: 5"
+    ],
+    "constraints": "0 <= word1.length, word2.length <= 500. word1 and word2 consist of lowercase English letters.",
+    "hints": "This is the Levenshtein distance problem. Use a 2D DP table. `dp[i][j]` will be the minimum distance between the first `i` characters of `word1` and the first `j` characters of `word2`.",
+    "solution": "Create a 2D DP table `dp` of size `(len(word1)+1) x (len(word2)+1)`. `dp[i][j]` represents the edit distance for `word1[:i]` and `word2[:j]`. If `word1[i-1] == word2[j-1]`, then `dp[i][j] = dp[i-1][j-1]`. Otherwise, `dp[i][j] = 1 + min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1])`, corresponding to deletion, insertion, and replacement, respectively."
+  },
+  {
+    "title": "Burst Balloons",
+    "question": "You are given `n` balloons, indexed from 0 to `n - 1`. Each balloon has a number painted on it represented by the array `nums`. You are asked to burst all the balloons. If you burst the `i`th balloon, you will get `nums[left] * nums[i] * nums[right]` coins. Here, `left` and `right` are the adjacent indices to `i`. After the burst, `left` and `right` then become adjacent. Return the maximum coins you can collect by bursting the balloons wisely.",
+    "difficulty": "Advanced",
+    "topics": [
+      "Dynamic Programming"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: nums = [3,1,5,8], Output: 167"
+    ],
+    "constraints": "n == nums.length. 1 <= n <= 300. 0 <= nums[i] <= 100.",
+    "hints": "Think backwards. Instead of which balloon to burst first, consider which balloon to burst last. If you burst balloon `i` last within a range `[left, right]`, the problem splits into two independent subproblems `[left, i]` and `[i, right]`.",
+    "solution": "Use dynamic programming. Let `dp[i][j]` be the maximum coins obtained from bursting all balloons in the range `(i, j)`. The final answer will be `dp[0][n+1]` after padding the `nums` array with 1s at both ends. The recurrence is `dp[i][j] = max(dp[i][j], nums[i] * nums[k] * nums[j] + dp[i][k] + dp[k][j])` for all `k` between `i` and `j`."
+  },
+  {
+    "title": "Distinct Subsequences",
+    "question": "Given two strings `s` and `t`, return the number of distinct subsequences of `s` which equals `t`.",
+    "difficulty": "Advanced",
+    "topics": [
+      "Dynamic Programming",
+      "Strings"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: s = \"rabbbit\", t = \"rabbit\", Output: 3",
+      "Input: s = \"babgbag\", t = \"bag\", Output: 5"
+    ],
+    "constraints": "1 <= s.length, t.length <= 1000. s and t consist of English letters.",
+    "hints": "Use a 2D DP table. `dp[i][j]` will be the number of distinct subsequences of `s`'s first `i` characters that equal `t`'s first `j` characters.",
+    "solution": "Let `dp[i][j]` be the number of distinct subsequences of `s[0...i-1]` that form `t[0...j-1]`. The state transition is as follows: If `s[i-1] != t[j-1]`, then `dp[i][j] = dp[i-1][j]`. If `s[i-1] == t[j-1]`, then `dp[i][j] = dp[i-1][j] + dp[i-1][j-1]`. The first term accounts for matches using `s` up to `i-2`, and the second term accounts for the new matches formed by using `s[i-1]`."
+  },
+  {
+    "title": "Find Center of Star Graph",
+    "question": "There is an undirected star graph consisting of `n` nodes labeled from 1 to `n`. A star graph is a graph where there is one center node and exactly `n - 1` edges that connect the center node to every other node. You are given a 2D integer array `edges` where each `edges[i] = [ui, vi]` indicates that there is an edge between the nodes `ui` and `vi`. Return the center of the given star graph.",
+    "difficulty": "Beginner",
+    "topics": [
+      "Graph"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: edges = [[1,2],[2,3],[4,2]], Output: 2",
+      "Input: edges = [[1,2],[5,1],[1,3],[1,4]], Output: 1"
+    ],
+    "constraints": "3 <= n <= 10^5. edges.length == n - 1. edges[i].length == 2.",
+    "hints": "The center node must appear in every edge. You only need to check the first two edges.",
+    "solution": "The center node is the only node that is common to all edges. Therefore, it must be present in the first edge `edges[0]` and the second edge `edges[1]`. You can simply check which node from the first edge also appears in the second edge. If `edges[0][0]` is in `edges[1]`, it's the center. Otherwise, `edges[0][1]` must be the center."
+  },
+  {
+    "title": "Flood Fill",
+    "question": "An image is represented by an `m x n` integer grid `image` where `image[i][j]` represents the pixel value of the image. You are also given three integers `sr`, `sc`, and `color`. You should perform a flood fill on the image starting from the pixel `image[sr][sc]`. To perform a flood fill, consider the starting pixel, plus any pixels connected 4-directionally to the starting pixel of the same color as the starting pixel, plus any pixels connected 4-directionally to those pixels (also with the same color), and so on. Replace the color of all of the aforementioned pixels with `color`. Return the modified image.",
+    "difficulty": "Beginner",
+    "topics": [
+      "Graph",
+      "Recursion"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: image = [[1,1,1],[1,1,0],[1,0,1]], sr = 1, sc = 1, color = 2, Output: [[2,2,2],[2,2,0],[2,0,1]]"
+    ],
+    "constraints": "m == image.length. n == image[i].length. 1 <= m, n <= 50. 0 <= image[i][j], color < 2^16.",
+    "hints": "Use Depth-First Search (DFS) or Breadth-First Search (BFS) starting from the given coordinates. Keep track of the original color and only traverse to neighbors with that same color.",
+    "solution": "This is a graph traversal problem on a grid. A recursive DFS approach is clean. Create a helper function `dfs(row, col)`. The base cases for the recursion are: if the coordinates are out of bounds, or if the color of the current pixel is not the original starting color. In the function, change the color of the current pixel to the new `color`. Then, make recursive calls for the 4 adjacent neighbors (up, down, left, right)."
+  },
+  {
+    "title": "Number of Islands",
+    "question": "Given an `m x n` 2D binary grid `grid` which represents a map of '1's (land) and '0's (water), return the number of islands. An island is surrounded by water and is formed by connecting adjacent lands horizontally or vertically.",
+    "difficulty": "Beginner",
+    "topics": [
+      "Graph",
+      "Data Structures"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: grid = [[\"1\",\"1\",\"0\",\"0\",\"0\"], [\"1\",\"1\",\"0\",\"0\",\"0\"], [\"0\",\"0\",\"1\",\"0\",\"0\"], [\"0\",\"0\",\"0\",\"1\",\"1\"]], Output: 3"
+    ],
+    "constraints": "m == grid.length. n == grid[i].length. 1 <= m, n <= 300. grid[i][j] is '0' or '1'.",
+    "hints": "Iterate through each cell of the grid. If you find a '1', you've found a new island. Increment your island count and then use DFS or BFS to find all connected '1's and change them to '0's to mark them as visited.",
+    "solution": "Initialize an `island_count` to 0. Iterate through every cell `(i, j)` of the grid. If `grid[i][j]` is '1', it means you've discovered a new, unvisited island. Increment `island_count`. Then, start a traversal (DFS or BFS) from `(i, j)`. In the traversal, visit all connected land cells ('1's) and change their value to '0' to sink the island, effectively marking it as visited. Continue the iteration until all cells are checked."
+  },
+  {
+    "title": "Clone Graph",
+    "question": "Given a reference of a node in a connected undirected graph. Return a deep copy (clone) of the graph. Each node in the graph contains a value and a list of its neighbors.",
+    "difficulty": "Intermediate",
+    "topics": [
+      "Graph",
+      "Data Structures"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: adjList = [[2,4],[1,3],[2,4],[1,3]], Output: [[2,4],[1,3],[2,4],[1,3]]"
+    ],
+    "constraints": "The number of nodes in the graph is in the range [0, 100]. 1 <= Node.val <= 100. Node.val is unique for each node.",
+    "hints": "Use a hash map to store the mapping from original nodes to their copies. This prevents infinite loops in case of cycles and avoids re-creating nodes.",
+    "solution": "Use a hash map `visited` to map original nodes to their newly created copies. Perform a graph traversal (DFS or BFS). Let's use DFS. Create a recursive function `clone(node)`. If `node` is already in `visited`, return `visited[node]`. Otherwise, create a new node `copy` with the same value, and add it to the `visited` map: `visited[node] = copy`. Then, iterate through the `neighbors` of the original `node`. For each neighbor, recursively call `clone(neighbor)` and add the result to the `copy`'s neighbor list. Return the `copy`."
+  },
+  {
+    "title": "Rotting Oranges",
+    "question": "You are given an `m x n` `grid` where each cell can have one of three values: `0` representing an empty cell, `1` representing a fresh orange, or `2` representing a rotten orange. Every minute, any fresh orange that is 4-directionally adjacent to a rotten orange becomes rotten. Return the minimum number of minutes that must elapse until no cell has a fresh orange. If this is impossible, return -1.",
+    "difficulty": "Intermediate",
+    "topics": [
+      "Graph",
+      "Algorithms"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: grid = [[2,1,1],[1,1,0],[0,1,1]], Output: 4",
+      "Input: grid = [[0,2]], Output: 0"
+    ],
+    "constraints": "m == grid.length. n == grid[i].length. 1 <= m, n <= 10.",
+    "hints": "This problem can be modeled as finding the shortest path from multiple sources, which is a perfect use case for Breadth-First Search (BFS). Start the BFS from all initially rotten oranges simultaneously.",
+    "solution": "Use a multi-source BFS. First, iterate through the grid to find all initially rotten oranges and add their coordinates to a queue. Also, count the number of fresh oranges. Then, start the BFS. In each level of the BFS (representing one minute), dequeue all rotten oranges, and for each one, check its 4-directional neighbors. If a neighbor is a fresh orange, turn it rotten, decrement the fresh orange count, and enqueue it. Keep track of the minutes (levels). After the BFS, if the `fresh_orange_count` is 0, return the minutes elapsed. Otherwise, return -1."
+  },
+  {
+    "title": "Pacific Atlantic Water Flow",
+    "question": "There is an `m x n` rectangular island that borders both the Pacific Ocean and the Atlantic Ocean. The Pacific Ocean touches the island's left and top edges, and the Atlantic Ocean touches the island's right and bottom edges. The island is partitioned into a grid of square cells. You are given an `m x n` integer matrix `heights` where `heights[r][c]` represents the height above sea level of the cell at coordinate `(r, c)`. Rain water can flow to neighboring cells (north, south, east, west) if the neighboring cell's height is less than or equal to the current cell's height. Return a list of grid coordinates where rain water can flow to both the Pacific and Atlantic oceans.",
+    "difficulty": "Intermediate",
+    "topics": [
+      "Graph"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: heights = [[1,2,2,3,5],[3,2,3,4,4],[2,4,5,3,1],[6,7,1,4,5],[5,1,1,2,4]], Output: [[0,4],[1,3],[1,4],[2,2],[3,0],[3,1],[4,0]]"
+    ],
+    "constraints": "m == heights.length. n == heights[i].length. 1 <= m, n <= 200.",
+    "hints": "Instead of checking from each cell if it can reach both oceans, start from the oceans and see which cells can be reached. Perform two separate traversals (DFS or BFS), one starting from all Pacific border cells and one from all Atlantic border cells.",
+    "solution": "Create two boolean matrices, `pacific_reachable` and `atlantic_reachable`. Start a DFS/BFS from all cells on the Pacific border (top and left rows). During this traversal, mark all cells that can be reached in `pacific_reachable`. The rule for traversal is that you can move from a cell to a neighbor if the neighbor's height is greater than or equal to the current cell's height (reverse flow). Do the same for the Atlantic border (bottom and right rows), marking cells in `atlantic_reachable`. Finally, iterate through the grid and collect all coordinates `(i, j)` where both `pacific_reachable[i][j]` and `atlantic_reachable[i][j]` are true."
+  },
+  {
+    "title": "Reconstruct Itinerary",
+    "question": "You are given a list of airline tickets where `tickets[i] = [from_i, to_i]` represent the departure and the arrival airports of one flight. Reconstruct the itinerary in order and return it. All of the tickets belong to a man who departs from 'JFK'. Thus, the itinerary must begin with 'JFK'. If there are multiple valid itineraries, you should return the itinerary that has the smallest lexical order when read as a single string. For example, the itinerary ['JFK', 'LGA'] has a smaller lexical order than ['JFK', 'LGB'].",
+    "difficulty": "Advanced",
+    "topics": [
+      "Graph",
+      "Algorithms"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: tickets = [[\"JFK\",\"SFO\"],[\"JFK\",\"ATL\"],[\"SFO\",\"ATL\"],[\"ATL\",\"JFK\"],[\"ATL\",\"SFO\"]], Output: [\"JFK\",\"ATL\",\"JFK\",\"SFO\",\"ATL\",\"SFO\"]"
+    ],
+    "constraints": "1 <= tickets.length <= 300. tickets[i].length == 2. from_i.length == 3.",
+    "hints": "This is a problem of finding an Eulerian path in a graph. Model the airports as nodes and tickets as directed edges. Use Hierholzer's algorithm, which involves a post-order DFS traversal.",
+    "solution": "Build an adjacency list (map from string to a list of strings) representing the flights. To handle the lexical order requirement, sort the destination lists for each airport in reverse lexical order so that we can pop from the end. Then, perform a post-order DFS starting from 'JFK'. Use a stack for the traversal. From the current airport, visit the next unvisited destination in its sorted list. Once you reach an airport with no more outgoing flights, add it to your result path. Since we process destinations in reverse lexical order, the path is built backwards."
+  },
+  {
+    "title": "Cheapest Flights Within K Stops",
+    "question": "There are `n` cities connected by some number of flights. You are given an array `flights` where `flights[i] = [from_i, to_i, price_i]` indicates that there is a flight from city `from_i` to city `to_i` with cost `price_i`. You are also given three integers `src`, `dst`, and `k`. Return the cheapest price to travel from `src` to `dst` with at most `k` stops. If there is no such route, return -1.",
+    "difficulty": "Advanced",
+    "topics": [
+      "Graph",
+      "Dynamic Programming"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: n = 4, flights = [[0,1,100],[1,2,100],[2,0,100],[1,3,600],[2,3,200]], src = 0, dst = 3, k = 1, Output: 700"
+    ],
+    "constraints": "1 <= n <= 100. 0 <= flights.length <= (n * (n - 1) / 2). 0 <= from_i, to_i < n.",
+    "hints": "This is a shortest path problem with a constraint on the number of edges. A standard Dijkstra's algorithm won't work directly. A modified Dijkstra's or a Bellman-Ford-like approach is needed.",
+    "solution": "This problem can be solved using a modified Dijkstra's algorithm where the state in the priority queue is `(cost, city, stops)`. Prioritize lower cost. When exploring neighbors, if the number of stops is within the `k` limit, push the new state to the priority queue. Alternatively, a Bellman-Ford approach is very suitable. Initialize distances to infinity. Relax all edges `k+1` times. A `prices` array stores the minimum cost to reach each city. In each iteration, a temporary `temp_prices` array is used to store the updated prices based on the prices from the previous iteration."
+  },
+  {
+    "title": "Critical Connections in a Network",
+    "question": "There are `n` servers numbered from 0 to `n - 1` connected by undirected server-to-server `connections` forming a network where `connections[i] = [ai, bi]` represents a connection between servers `ai` and `bi`. Any server can reach any other server. A critical connection is a connection that, if removed, will make some server unable to reach some other server. Return all critical connections in the network in any order.",
+    "difficulty": "Advanced",
+    "topics": [
+      "Graph",
+      "Algorithms"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: n = 4, connections = [[0,1],[1,2],[2,0],[1,3]], Output: [[1,3]]"
+    ],
+    "constraints": "2 <= n <= 10^5. n - 1 <= connections.length <= 10^5.",
+    "hints": "This is a problem of finding bridges in a graph. Tarjan's bridge-finding algorithm can be used, which is based on a DFS traversal.",
+    "solution": "Use Tarjan's bridge-finding algorithm. Perform a DFS traversal of the graph. For each node, maintain two values: a `discovery_time` (when the node is first visited) and a `low_link` value (the lowest discovery time reachable from the current node, including through back-edges). An edge `(u, v)` (where `v` is a child of `u` in the DFS tree) is a bridge if and only if `low_link[v] > discovery_time[u]`. This condition means there is no back-edge from `v` or any of its descendants to `u` or any of its ancestors."
+  },
+  {
+    "title": "Palindrome Number",
+    "question": "Given an integer `x`, return `true` if `x` is a palindrome, and `false` otherwise.",
+    "difficulty": "Beginner",
+    "topics": [
+      "Math"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: x = 121, Output: true",
+      "Input: x = -121, Output: false",
+      "Input: x = 10, Output: false"
+    ],
+    "constraints": "-2^31 <= x <= 2^31 - 1",
+    "hints": "Try reversing the second half of the number and comparing it with the first half. Be careful with negative numbers and numbers ending in 0.",
+    "solution": "Negative numbers are not palindromes. For non-negative numbers, you can reverse the number and check if it's equal to the original. A more efficient way without potential overflow is to reverse only the second half. Create a `reverted_number` while repeatedly taking the last digit of `x` (`x % 10`) and adding it to `reverted_number`, then dividing `x` by 10. Stop when `x` is less than or equal to `reverted_number`. If the original number of digits is odd, the middle digit will be the last digit of `x`, so we can ignore it by `reverted_number / 10`."
+  },
+  {
+    "title": "Sqrt(x)",
+    "question": "Given a non-negative integer `x`, compute and return the square root of `x`. Since the return type is an integer, the decimal part is truncated, and only the integer part of the result is returned.",
+    "difficulty": "Beginner",
+    "topics": [
+      "Math",
+      "Algorithms"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: x = 4, Output: 2",
+      "Input: x = 8, Output: 2"
+    ],
+    "constraints": "0 <= x <= 2^31 - 1",
+    "hints": "You are not allowed to use any built-in exponent function or operator. Binary search is an effective approach to find the integer square root.",
+    "solution": "Use binary search to find the integer square root. The search space is from 0 to `x`. For each middle element `mid`, check if `mid * mid` is equal to, less than, or greater than `x`. If `mid * mid == x`, `mid` is the answer. If `mid * mid < x`, the answer might be `mid` or something larger, so search in the right half `[mid + 1, right]`. If `mid * mid > x`, the answer must be smaller, so search in the left half `[left, mid - 1]`."
+  },
+  {
+    "title": "Happy Number",
+    "question": "Write an algorithm to determine if a number `n` is happy. A happy number is a number defined by the following process: Starting with any positive integer, replace the number by the sum of the squares of its digits. Repeat the process until the number equals 1 (where it will stay), or it loops endlessly in a cycle which does not include 1. Those numbers for which this process ends in 1 are happy. Return `true` if `n` is a happy number, and `false` if not.",
+    "difficulty": "Beginner",
+    "topics": [
+      "Math",
+      "Data Structures"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: n = 19, Output: true",
+      "Input: n = 2, Output: false"
+    ],
+    "constraints": "1 <= n <= 2^31 - 1",
+    "hints": "If a number is not happy, it will eventually enter a cycle. Use a hash set to detect if you've seen a number before. This is similar to cycle detection in a linked list.",
+    "solution": "Use a hash set to keep track of the numbers encountered during the process. In a loop, calculate the sum of the squares of the digits of the current number. If the new number is 1, return `true`. If the new number is already in the hash set, it means you've entered a cycle, so return `false`. Otherwise, add the new number to the set and continue the loop."
+  },
+  {
+    "title": "Pow(x, n)",
+    "question": "Implement `pow(x, n)`, which calculates `x` raised to the power `n` (i.e., x^n).",
+    "difficulty": "Intermediate",
+    "topics": [
+      "Math",
+      "Recursion"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: x = 2.00000, n = 10, Output: 1024.00000",
+      "Input: x = 2.10000, n = 3, Output: 9.26100",
+      "Input: x = 2.00000, n = -2, Output: 0.25000"
+    ],
+    "constraints": "-100.0 < x < 100.0. -2^31 <= n <= 2^31 - 1.",
+    "hints": "A naive solution of multiplying `x` `n` times will be too slow. Use recursion with the property that x^n = (x^(n/2))^2. This is known as exponentiation by squaring.",
+    "solution": "Use a recursive approach (exponentiation by squaring). The base case is when `n` is 0, return 1. For the recursive step, calculate `half = pow(x, n / 2)`. If `n` is even, the result is `half * half`. If `n` is odd, the result is `half * half * x`. Handle negative `n` by calculating `pow(1/x, -n)`."
+  },
+  {
+    "title": "String to Integer (atoi)",
+    "question": "Implement the `myAtoi(string s)` function, which converts a string to a 32-bit signed integer (similar to C/C++'s `atoi` function). The algorithm is: 1. Read in and ignore any leading whitespace. 2. Check if the next character is '-' or '+'. 3. Read in next the characters until the next non-digit character or the end of the input is reached. 4. Convert these digits into an integer. 5. If the integer is out of the 32-bit signed integer range, then clamp the integer so that it remains in the range.",
+    "difficulty": "Intermediate",
+    "topics": [
+      "Math",
+      "Strings"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: s = \"42\", Output: 42",
+      "Input: s = \"   -42\", Output: -42",
+      "Input: s = \"4193 with words\", Output: 4193"
+    ],
+    "constraints": "0 <= s.length <= 200. s consists of English letters (lower-case and upper-case), digits (0-9), ' ', '+', '-', and '.'.",
+    "hints": "Carefully handle all edge cases: leading whitespace, optional sign, non-digit characters, and integer overflow.",
+    "solution": "Iterate through the string, keeping track of the state. First, skip leading whitespace. Then, check for a '+' or '-' sign and store it. After that, iterate while the characters are digits. In each step, update the result: `result = result * 10 + digit`. Before updating, check if this operation would cause an overflow. If `result > (MAX_INT / 10)` or `(result == (MAX_INT / 10) AND digit > 7)`, it will overflow. Handle this by clamping the result to `INT_MAX` or `INT_MIN` based on the sign."
+  },
+  {
+    "title": "Integer to Roman",
+    "question": "Given an integer, convert it to a roman numeral. Roman numerals are represented by seven different symbols: I, V, X, L, C, D and M.",
+    "difficulty": "Intermediate",
+    "topics": [
+      "Math",
+      "Strings"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: num = 3, Output: \"III\"",
+      "Input: num = 58, Output: \"LVIII\"",
+      "Input: num = 1994, Output: \"MCMXCIV\""
+    ],
+    "constraints": "1 <= num <= 3999.",
+    "hints": "A greedy approach works best. Create a mapping of values to Roman symbols, including the special subtractive cases (like 900 for 'CM', 400 for 'CD', etc.). Iterate from the largest value to the smallest.",
+    "solution": "Create two parallel arrays: one for integer values `[1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1]` and one for the corresponding Roman symbols `[\"M\", \"CM\", \"D\", \"CD\", ..., \"I\"]`. Iterate through these values. For each value, while the input `num` is greater than or equal to it, append the corresponding symbol to the result string and subtract the value from `num`."
+  },
+  {
+    "title": "Max Points on a Line",
+    "question": "Given an array of `points` where `points[i] = [xi, yi]`, return the maximum number of points that lie on the same straight line.",
+    "difficulty": "Advanced",
+    "topics": [
+      "Math",
+      "Data Structures"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: points = [[1,1],[2,2],[3,3]], Output: 3",
+      "Input: points = [[1,1],[3,2],[5,3],[4,1],[2,3],[1,4]], Output: 4"
+    ],
+    "constraints": "1 <= points.length <= 300. points[i].length == 2.",
+    "hints": "For each point `p`, iterate through all other points `q`. Calculate the slope of the line formed by `p` and `q`. Use a hash map to store the counts of each slope. The maximum number of points on a line passing through `p` is `1 + max(slope_counts)`.",
+    "solution": "Iterate through each point `p1` as an anchor. For each `p1`, create a hash map to store slopes with respect to other points `p2`. The slope can be represented as a tuple `(dy, dx)` after reducing the fraction by their greatest common divisor (GCD) to handle precision issues. For each `p2`, calculate the slope, store it in the map, and increment its count. Keep track of the maximum frequency in the map for the current anchor `p1`. The overall maximum is the highest count found across all anchor points."
+  },
+  {
+    "title": "Integer to English Words",
+    "question": "Convert a non-negative integer `num` to its English words representation.",
+    "difficulty": "Advanced",
+    "topics": [
+      "Math",
+      "Strings"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: num = 123, Output: \"One Hundred Twenty Three\"",
+      "Input: num = 1234567, Output: \"One Million Two Hundred Thirty Four Thousand Five Hundred Sixty Seven\""
+    ],
+    "constraints": "0 <= num <= 2^31 - 1.",
+    "hints": "Handle the number in chunks of three digits (hundreds, tens, ones). Create a helper function that can convert any number from 1 to 999 into words. Then, apply this function to each chunk, adding the appropriate scale word (Thousand, Million, Billion).",
+    "solution": "Break the problem down. Create mappings for single digits (1-9), teens (10-19), and tens (20, 30, ..., 90). Write a helper function that takes a number less than 1000 and converts it to words. In the main function, process the input number in chunks of three, from right to left (billions, millions, thousands, and the rest). For each chunk that is non-zero, call the helper function and append the scale word (e.g., 'Thousand'). Combine the results, carefully handling spaces and edge cases like zero."
+  },
+  {
+    "title": "Reaching Points",
+    "question": "Given four integers `sx`, `sy`, `tx`, `ty`, return `true` if it's possible to transform the point `(sx, sy)` to `(tx, ty)` through some number of moves. A move consists of transforming a point `(x, y)` to either `(x, x + y)` or `(x + y, y)`.",
+    "difficulty": "Advanced",
+    "topics": [
+      "Math"
+    ],
+    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
+    "testCases": [
+      "Input: sx = 1, sy = 1, tx = 3, ty = 5, Output: true",
+      "Input: sx = 1, sy = 1, tx = 2, ty = 2, Output: false"
+    ],
+    "constraints": "1 <= sx, sy, tx, ty <= 10^9.",
+    "hints": "Working forwards can be complex. Try working backwards from `(tx, ty)`. A move `(x, y) -> (x, x+y)` can be reversed as `(x, z) -> (x, z-x)`. Similarly for the other move.",
+    "solution": "Work backwards from the target point `(tx, ty)`. While `tx > sx` and `ty > sy`, if `tx > ty`, you must have come from `(tx - ty, ty)`. So, update `tx = tx - ty`. If `ty > tx`, you must have come from `(tx, ty - tx)`. So, update `ty = ty - ty`. If `tx == ty`, you cannot go further back, so it's impossible. After the loop, check if the remaining `(tx, ty)` can be transformed from `(sx, sy)`. This happens if `tx == sx` and `(ty - sy)` is a multiple of `sx`, or if `ty == sy` and `(tx - sx)` is a multiple of `sy`."
   }
 ]
