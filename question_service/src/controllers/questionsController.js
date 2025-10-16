@@ -73,7 +73,7 @@ export async function deleteQuestion(req, res) {
     }
 }
 
-export async function getRandomQuestionByDifficultyAndTopic(req, res) {
+export async function getRandomQuestionIdByDifficultyAndTopic(req, res) {
     try {
         const { difficulty, topics } = req.body;
 
@@ -93,11 +93,10 @@ export async function getRandomQuestionByDifficultyAndTopic(req, res) {
 
         // does not work if no topic selected
         // does not work if no difficulty selected
-
-        res.status(200).json(data);
+        res.status(200).json(data[0]._id);
     } catch (error) {
         console.error("Error in getRandomQuestionByDifficultyAndTopic controller", error);
-        res.status(500).json({ message: "Internal server error" });
+        res.status(500).json({ message: error });
     }
 }
 

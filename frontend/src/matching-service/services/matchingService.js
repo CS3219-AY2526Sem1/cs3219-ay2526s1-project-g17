@@ -5,6 +5,8 @@
 /** @typedef {import("../types").Criteria} Criteria */
 /** @typedef {import("../types").MatchFoundNotification} MatchFoundNotification */
 
+import axios from "axios";
+
 const WS_URL = "ws://localhost:3001";
 
 /**
@@ -149,25 +151,13 @@ export const fetchTopics = async () => {
   // const response = await fetch('/api/topics');
   // return response.json();
 
-  // Dummy implementation
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve([
-        "Binary Tree",
-        "Array",
-        "Dynamic Programming",
-        "Graph",
-        "Hash Table",
-        "Two Pointers",
-        "Sliding Window",
-        "Backtracking",
-        "Binary Search",
-        "Linked List",
-        "Stack",
-        "Queue",
-      ]);
-    }, 500); // Simulate network delay
-  });
+  try {
+    const res = await axios.get("http://localhost:5001/api/questions/topics");
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching questions: ", error);
+    throw error;
+  }
 };
 
 /**
