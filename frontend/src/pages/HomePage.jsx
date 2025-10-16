@@ -5,12 +5,15 @@ import Profile from "../components/Profile";
 import LoginButton from "../components/LoginButton";
 import Header from "../components/Header";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom"; // Add this import
 
 export default function HomePage() {
   const { isLoading, isAuthenticated,
     getAccessTokenSilently, getAccessTokenWithPopup, loginWithPopup } = useAuth0();
 
   const [questions, setQuestions] = useState([{}]);
+
+  const navigate = useNavigate();
 
   const [state, setState] = useState({
     showResult: false,
@@ -141,6 +144,7 @@ export default function HomePage() {
           <button onClick={getAllQuestions}>log questions</button>
           <button onClick={tryCreateQuestion}>log try create question</button>
           <button onClick={tryDeleteQuestion}>log try delete question</button>
+          <button onClick={() => navigate("/match")}>matching service page</button>
         </div>
       )
     } else {
