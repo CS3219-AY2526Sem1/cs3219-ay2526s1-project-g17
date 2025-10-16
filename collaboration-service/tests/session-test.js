@@ -4,7 +4,7 @@ import { WebsocketProvider } from 'y-websocket';
 import * as Y from 'yjs';
 
 const PORT = 3002;
-const SESSION_ID = 'test-session-' + Date.now();
+const SESSION_ID = 'test-session';
 const USER_1 = 'user-1';
 const USER_2 = 'user-2';
 
@@ -17,6 +17,11 @@ const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 const socket1 = io(`http://localhost:${PORT}`, { reconnection: false });
 const ydoc1 = new Y.Doc();
 const ytext1 = ydoc1.getText('notebook');
+
+socket1.on('initialDoc', (encodedUpdate) => {
+  Y.applyUpdate(ydoc1, encodedUpdate);
+  console.log('[DOC] user-1 loaded initial content from server:', ydoc1.getText('notebook').toString());
+});
 
 const provider1 = new WebsocketProvider(
   `ws://localhost:${PORT}`,
@@ -31,6 +36,7 @@ socket1.emit('joinSession', { sessionId: SESSION_ID, userId: USER_1 });
 socket1.on('connect', () => console.log('[CONNECTION] Client 1: Socket.IO connected'));
 socket1.on('userJoined', (data) => console.log(`[USER JOINED] Client 1: User joined: ${data.userId}`));
 socket1.on('sessionTerminated', () => console.log('[SESSION TERMINATED] Client 1: Session terminated'));
+
 
 ytext1.observe(() => {
   console.log('[DOCUMENT] Client 1 sees:', `"${ytext1.toString()}"`);
@@ -47,6 +53,11 @@ const provider2 = new WebsocketProvider(
   ydoc2,
   { WebSocket: (await import('ws')).default }
 );
+
+socket2.on('initialDoc', (encodedUpdate) => {
+  Y.applyUpdate(ydoc2, encodedUpdate);
+  console.log('[DOC] user-2 loaded initial content from server:', ydoc2.getText('notebook').toString());
+});
 
 socket2.emit('joinSession', { sessionId: SESSION_ID, userId: USER_2 });
 
