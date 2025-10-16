@@ -6,7 +6,7 @@ import {
     createQuestion,
     editQuestion,
     deleteQuestion,
-    getRandomQuestionByDifficultyAndTopic,
+    getRandomQuestionIdByDifficultyAndTopic,
     getListOfQuestionsByDifficultyAndTopic,
     getListOfTopicsByDifficulty,
     getAllTopics
@@ -21,7 +21,7 @@ const router = express.Router();
 
 router.get("/", getAllQuestions);
 router.get("/randomList", getListOfQuestionsByDifficultyAndTopic);
-router.get("/randomQuestion", getRandomQuestionByDifficultyAndTopic);
+router.get("/randomQuestion", getRandomQuestionIdByDifficultyAndTopic);
 router.get("/topics", getAllTopics);
 router.get("/topicsByDifficulty", getListOfTopicsByDifficulty);
 router.get("/:id", getQuestionById);
