@@ -5,6 +5,8 @@ import http from 'http';
 import { Server as SocketIOServer } from 'socket.io';
 import app from './server.js';
 import Session from './model/session-model.js';
+import { LeveldbPersistence } from 'y-leveldb';
+import * as Y from 'yjs';
 
 dotenv.config();
 
@@ -13,6 +15,21 @@ const DB_URI = process.env.DB_CLOUD_URI;
 const SESSION_IDLE_TIMEOUT = 30_000; // 30 seconds
 
 const server = http.createServer(app);
+const ldbPersistence = new LeveldbPersistence('./yjs-docs'); // Local LevelDB persistence
+
+
+export async function getSessionYDoc(sessionId) {
+  // Returns the persisted Y.Doc if exists, otherwise creates new
+  const ydoc = await ldbPersistence.getYDoc(sessionId);
+  return ydoc;
+}
+
+// const ydoc = new Y.Doc()
+// ydoc.getArray('arr').insert(0, [1, 2, 3])
+// ydoc.getArray('arr').toArray() // => [1, 2, 3]
+
+// // store document updates retrieved from other clients
+// ldbPersistence.storeUpdate('test-session', Y.encodeStateAsUpdate(ydoc));
 
 // ====== 1. Socket.IO for session & presence logic ======
 const io = new SocketIOServer(server, {
@@ -33,6 +50,9 @@ io.on('connection', (socket) => {
     socket.join(sessionId);
     socket.data.sessionId = sessionId;
     socket.data.userId = userId;
+
+    const ydoc = await getSessionYDoc(sessionId);
+    socket.emit('initialDoc', Y.encodeStateAsUpdate(ydoc));
 
     // Cancel any pending auto-close for this session
     if (sessionTimeouts.has(sessionId)) {
@@ -84,7 +104,8 @@ io.on('connection', (socket) => {
 
 // ====== 2. Yjs WebSocket for collaborative editing (/collab) ======
 const { WebSocketServer } = await import('ws');
-const { setupWSConnection } = await import('y-websocket');
+import { setupWSConnection } from '@y/websocket-server/utils';
+
 
 const yjsWSS = new WebSocketServer({ server, path: '/collab' });
 
@@ -101,7 +122,8 @@ yjsWSS.on('connection', (ws, req) => {
     // Let y-websocket handle Yjs sync (CRDT)
     setupWSConnection(ws, req, {
       docName: sessionId,
-      gc: true // garbage collect deleted content
+      gc: true, // garbage collect deleted content
+      persistence: ldbPersistence // Use LevelDB persistence
       // Add `persistence: new MongodbPersistence(DB_URI)` later if needed
     });
   } catch (err) {

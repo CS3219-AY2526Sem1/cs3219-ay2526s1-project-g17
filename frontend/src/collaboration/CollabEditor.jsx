@@ -3,6 +3,7 @@ import { Editor } from "@monaco-editor/react";
 import * as Y from "yjs";
 import { WebsocketProvider } from "y-websocket";
 import { MonacoBinding } from "y-monaco";
+import { io } from 'socket.io-client';
 
 export default function CollabEditor({ sessionId }) {
     const ydocRef = useRef(null);
@@ -13,6 +14,33 @@ export default function CollabEditor({ sessionId }) {
         // create a Yjs doc + text
         const ydoc = new Y.Doc();
         const ytext = ydoc.getText("code");
+
+        // connect to Socket.IO for session management
+        const SOCKET_IO_BASE = import.meta.env.VITE_SOCKET_IO_BASE || "http://localhost:3002";
+        const socket = io(SOCKET_IO_BASE, { reconnection: true });
+
+        socket.on('connect', () => {
+            console.log('Connected to Socket.IO server');
+            socket.emit('joinSession', { sessionId, userId: `user-${Math.floor(Math.random() * 1000)}` });
+        });
+
+        socket.on('disconnect', () => {
+            console.log('Disconnected from Socket.IO server');
+        });
+
+        socket.on('initialDoc', (encodedUpdate) => {
+            Y.applyUpdate(ydoc, encodedUpdate);
+            console.log('Applied initial document update from server');
+        });
+
+        socket.on('userJoined', (data) => {
+            console.log(`User joined: ${data.userId}`);
+        });
+
+        socket.on('sessionTerminated', () => {
+            console.log('Session terminated by server');
+            // Optionally handle session termination (e.g., disable editor)
+        });
 
         // connect to backend’s Yjs server at /collab?sessionId=...
         const WS_BASE = import.meta.env.VITE_WS_BASE || "ws://localhost:3002";
