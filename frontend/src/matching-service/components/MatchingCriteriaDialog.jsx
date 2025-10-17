@@ -5,6 +5,10 @@ import {
   submitMatchRequestViaWebSocket,
 } from "../services/matchingService";
 import "./MatchingCriteriaDialog.css";
+import axios from "axios";
+import { useAuth0 } from "@auth0/auth0-react";
+import { MATCHING_SERVICE_URL } from "../constants";
+import { useNavigate } from "react-router";
 
 /**
  * @typedef {import("../types").MatchRequest} MatchRequest
@@ -25,6 +29,8 @@ const MatchingCriteriaDialog = ({ isOpen, onClose, onSubmit }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const { user } = useAuth0();
+  const navigate = useNavigate();
 
   const languages = [
     "JavaScript",
@@ -112,23 +118,38 @@ const MatchingCriteriaDialog = ({ isOpen, onClose, onSubmit }) => {
     setError("");
 
     try {
-      /** @type {MatchRequest} */
-      const matchRequest = {
-        type: "match-request",
-        criterias: selectedTopics.map((topic) => ({
-          difficulty,
-          language,
-          topic,
-        })),
-      };
-
-      const response = await submitMatchRequestViaWebSocket(matchRequest);
-      console.log(`Response: `, response);
-      if (response.success) {
-        onSubmit && onSubmit(matchRequest, response);
-        handleClose();
+      console.log("Check for existing match");
+      const res = await axios.get(
+        `${MATCHING_SERVICE_URL}/api/matching/initiateMatch`,
+        {
+          params: {
+            userId: user.sub,
+          },
+        }
+      );
+      const data = res.data;
+      console.log("Received data", data);
+      if (data.code == "has-existing") {
+        navigate(`collaboration/${data.session.session}`);
       } else {
-        setError("Failed to submit match request. Please try again.");
+        /** @type {MatchRequest} */
+        const matchRequest = {
+          type: "match-request",
+          criterias: selectedTopics.map((topic) => ({
+            difficulty,
+            language,
+            topic,
+          })),
+        };
+
+        const response = await submitMatchRequestViaWebSocket(matchRequest);
+        console.log(`Response: `, response);
+        if (response.success) {
+          onSubmit && onSubmit(matchRequest, response);
+          handleClose();
+        } else {
+          setError("Failed to submit match request. Please try again.");
+        }
       }
     } catch (err) {
       setError("Failed to submit match request. Please try again.");

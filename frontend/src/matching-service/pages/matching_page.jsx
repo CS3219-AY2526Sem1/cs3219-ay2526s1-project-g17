@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import MatchingCriteriaDialog from "../components/MatchingCriteriaDialog";
 import MatchingTimer from "../components/MatchingTimer";
 import { getWebSocketService } from "../services/matchingService";
-import { MATCH_CANCELLED, MATCH_FOUND, MATCH_TIMEOUT } from "../constants";
+import { MATCH_CANCELLED, MATCH_FOUND, MATCH_TIMEOUT, MATCHING_SERVICE_URL } from "../constants";
 import { useNavigate } from "react-router";
 
 export default function MatchingPage() {

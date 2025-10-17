@@ -151,10 +151,6 @@ export const getWebSocketService = () => wsService;
  * @returns {Promise<string[]>} Array of topic strings
  */
 export const fetchTopics = async () => {
-  // TODO: Replace with actual API call when backend is ready
-  // const response = await fetch('/api/topics');
-  // return response.json();
-
   try {
     const res = await axios.get("http://localhost:5001/api/questions/topics");
     return res.data;

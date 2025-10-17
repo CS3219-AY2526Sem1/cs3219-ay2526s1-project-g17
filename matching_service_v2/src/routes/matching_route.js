@@ -50,10 +50,17 @@ router.get("/initiateMatch", async (req, res) => {
       //TODO: Call collaboration service to check if there such session
       const session = await fetchSession(collaborationSession.session);
 
-      if (collaborationSession && session) {
-        res
-          .status(200)
-          .json({ code: "has-existing", session: collaborationSession });
+      if (collaborationSession) {
+        if (session) {
+          res
+            .status(200)
+            .json({ code: "has-existing", session: collaborationSession });
+        } else {
+          await collaborationService.deleteCollaborationSession(
+            userId,
+            matchedDetails.partner
+          );
+        }
       } else {
         res.status(200).json({ code: "no-existing" });
       }
