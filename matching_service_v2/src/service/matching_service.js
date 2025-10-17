@@ -74,7 +74,7 @@ export class MatchingService {
     }
 
     await this.matchRequestService.removeUserRequest(userId);
-    await this.matchedDetailsService.removeMatchedDetails(userId);
+    // await this.matchedDetailsService.removeMatchedDetails(userId);
   }
 
   /**

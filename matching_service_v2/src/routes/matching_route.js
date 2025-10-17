@@ -1,5 +1,5 @@
 import express from "express";
-import { collaborationService, matchedDetailsService } from "../server";
+import { collaborationService, matchedDetailsService } from "../server.js";
 
 const router = express.Router();
 
