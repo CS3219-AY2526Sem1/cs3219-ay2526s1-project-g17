@@ -18,11 +18,11 @@ services:
     env_file:
       - ./user-service/.env
   matching_service:
-    build: ./matching_service
+    build: ./matching_service_v2
     ports:
       - 3001:3001
     env_file:
-      - ./matching_service/.env
+      - ./matching_service_v2/.env
   question_service:
     build: ./question_service
     ports:
