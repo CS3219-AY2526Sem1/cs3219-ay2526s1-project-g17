@@ -55,4 +55,14 @@
  * @property {Criteria} criteria
  */
 
+/**
+ * @typedef {Object} MatchFound
+ * @property {"match-found"} type
+ * @property {CollaborationSession} session
+ */
+
+/**
+ * @typedef {MatchFound} ToUser
+ */
+
 export {};

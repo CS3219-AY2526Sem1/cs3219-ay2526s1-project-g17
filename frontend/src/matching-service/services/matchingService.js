@@ -19,6 +19,7 @@ class MatchingWebSocketService {
     this.messageHandlers = new Map();
     this.reconnectAttempts = 0;
     this.maxReconnectAttempts = 5;
+    this.manualDisconnect = false;
   }
 
   /**
@@ -50,7 +51,9 @@ class MatchingWebSocketService {
         this.ws.onclose = () => {
           console.log("WebSocket disconnected");
           this.isConnected = false;
-          this.attemptReconnect();
+          if (!this.manualDisconnect) {
+            this.attemptReconnect();
+          }
         };
 
         this.ws.onerror = (error) => {
@@ -124,6 +127,7 @@ class MatchingWebSocketService {
    * Disconnect from the WebSocket
    */
   disconnect() {
+    this.manualDisconnect = true;
     if (this.ws) {
       this.ws.close();
       this.ws = null;

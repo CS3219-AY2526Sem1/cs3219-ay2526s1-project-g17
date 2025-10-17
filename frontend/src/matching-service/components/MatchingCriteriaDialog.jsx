@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import {
   fetchTopics,
+  getWebSocketService,
   submitMatchRequestViaWebSocket,
 } from "../services/matchingService";
 import "./MatchingCriteriaDialog.css";
@@ -75,6 +76,12 @@ const MatchingCriteriaDialog = ({ isOpen, onClose, onSubmit }) => {
     setError("");
   };
 
+  const handleDisconnectAndClose = () => {
+    const wsService = getWebSocketService();
+    wsService.disconnect();
+    handleClose();
+  };
+
   const handleClose = () => {
     resetForm();
     onClose();
@@ -134,11 +141,15 @@ const MatchingCriteriaDialog = ({ isOpen, onClose, onSubmit }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="dialog-overlay" onClick={handleClose}>
+    <div className="dialog-overlay" onClick={handleDisconnectAndClose}>
       <div className="dialog-content" onClick={(e) => e.stopPropagation()}>
         <div className="dialog-header">
           <h2>Select Matching Criteria</h2>
-          <button className="close-button" onClick={handleClose} type="button">
+          <button
+            className="close-button"
+            onClick={handleDisconnectAndClose}
+            type="button"
+          >
             ×
           </button>
         </div>
@@ -228,7 +239,7 @@ const MatchingCriteriaDialog = ({ isOpen, onClose, onSubmit }) => {
             <button
               type="button"
               className="cancel-button"
-              onClick={handleClose}
+              onClick={handleDisconnectAndClose}
               disabled={isSubmitting}
             >
               Cancel

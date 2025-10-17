@@ -20,6 +20,7 @@ import { UserService } from "./user_service.js";
 /** @typedef {import("../types.js").MatchRequestEntity} MatchRequestEntity */
 /** @typedef {import("../types.js").Criteria} Criteria */
 /** @typedef {import("../types.js").CollaborationSession} CollaborationSession */
+/** @typedef {import("../types.js").MatchFound} MatchFound */
 
 export class MatchingService {
   constructor(
@@ -132,14 +133,11 @@ export class MatchingService {
     const requestData = await this.matchRequestService.getUserRequest(userId);
     console.log(`On Set: ${requestKey}: ${requestData.status}`);
     switch (requestData.status) {
-      // case "waiting":
-      //   await this.handleWaiting(userId, requestData);
-      //   break;
       case "matched":
         await this.handleMatched(userId);
         break;
       default:
-        throw new Error("Unrecognized state");
+        throw new Error(`Unrecognized status: ${requestData.status}`);
     }
   }
 
@@ -160,8 +158,13 @@ export class MatchingService {
         partner,
         matchedDetails.criteria
       );
-    console.log("Sent message", collaborationSession);
-    sendMessage(userInstance.ws, collaborationSession);
+    /** @type {MatchFound} */
+    const matchFoundMessage = {
+      type: "match-found",
+      session: collaborationSession,
+    };
+    console.log("Sent message", matchFoundMessage);
+    sendMessage(userInstance.ws, matchFoundMessage);
 
     await this.disposeUser(userId);
   }
