@@ -1,11 +1,9 @@
 import express from "express";
 import { collaborationService, matchedDetailsService } from "../server.js";
+import axios from "axios";
+import { COLLABORATION_URL } from "../constants.js";
 
 const router = express.Router();
-
-router.get("/", (req, res) => {
-  res.status(200).json({ message: "Hello from matching service" });
-});
 
 router.delete("/endSession", async (req, res) => {
   const { userId1, userId2 } = req.body;
@@ -22,6 +20,21 @@ router.delete("/endSession", async (req, res) => {
   }
 });
 
+/**
+ * @param {string} sessionId
+ */
+async function fetchSession(sessionId) {
+  try {
+    const res = await axios.get(`${COLLABORATION_URL}/sessions/${sessionId}`);
+    const data = res.data;
+    console.log("Session retrieved", data);
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch session", error);
+    return null;
+  }
+}
+
 router.get("/initiateMatch", async (req, res) => {
   const { userId } = req.body;
   try {
@@ -34,7 +47,10 @@ router.get("/initiateMatch", async (req, res) => {
           userId,
           matchedDetails.partner
         );
-      if (collaborationSession) {
+      //TODO: Call collaboration service to check if there such session
+      const session = await fetchSession(collaborationSession.session);
+
+      if (collaborationSession && session) {
         res
           .status(200)
           .json({ code: "has-existing", session: collaborationSession });
