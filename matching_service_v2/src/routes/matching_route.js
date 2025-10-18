@@ -1,5 +1,6 @@
 import express from "express";
 import { collaborationService, matchedDetailsService } from "../server.js";
+import { verifyAccessToken } from "../middleware/basic-access-control.js";
 
 const router = express.Router();
 
@@ -22,7 +23,7 @@ router.delete("/endSession", async (req, res) => {
   }
 });
 
-router.get("/initiateMatch", async (req, res) => {
+router.get("/initiateMatch", verifyAccessToken, async (req, res) => {
   const { userId } = req.body;
   try {
     const matchedDetails = await matchedDetailsService.getMatchedDetails(
