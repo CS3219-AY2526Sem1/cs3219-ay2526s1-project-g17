@@ -79,6 +79,7 @@ export default function CollabEditor({ sessionId }) {
       height="70vh"
       defaultLanguage="javascript"
       defaultValue="// Start typing together…"
+      theme="vs-dark"
       options={{ minimap: { enabled: false }, automaticLayout: true, fontSize: 14 }}
       onMount={onMount}
     />
