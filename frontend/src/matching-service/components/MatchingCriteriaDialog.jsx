@@ -29,7 +29,7 @@ const MatchingCriteriaDialog = ({ isOpen, onClose, onSubmit }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
-  const { user } = useAuth0();
+  const { user, getAccessTokenSilently } = useAuth0();
   const navigate = useNavigate();
 
   const languages = [
@@ -49,12 +49,6 @@ const MatchingCriteriaDialog = ({ isOpen, onClose, onSubmit }) => {
       loadTopics();
     }
   }, [isOpen]);
-
-  useEffect(() => {
-    if (!user) {
-      navigate("/");
-    }
-  }, [user]);
 
   const loadTopics = async () => {
     setIsLoading(true);
@@ -100,6 +94,11 @@ const MatchingCriteriaDialog = ({ isOpen, onClose, onSubmit }) => {
   };
 
   const handleSubmit = async (e) => {
+    if (!user || !user.sub) {
+      console.log("User not logged in");
+      navigate("/");
+      return;
+    }
     e.preventDefault();
 
     // Validation
@@ -125,9 +124,13 @@ const MatchingCriteriaDialog = ({ isOpen, onClose, onSubmit }) => {
 
     try {
       console.log("Check for existing match");
+      const token = await getAccessTokenSilently();
       const res = await axios.get(
         `${MATCHING_SERVICE_URL}/api/matching/initiateMatch`,
         {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
           params: {
             userId: user.sub,
           },

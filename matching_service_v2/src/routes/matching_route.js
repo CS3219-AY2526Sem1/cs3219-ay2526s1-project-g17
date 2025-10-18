@@ -2,6 +2,7 @@ import express from "express";
 import { collaborationService, matchedDetailsService } from "../server.js";
 import axios from "axios";
 import { COLLABORATION_URL } from "../constants.js";
+import { verifyAccessToken } from "../middleware/basic_access_control.js";
 
 const router = express.Router();
 
@@ -25,7 +26,9 @@ router.delete("/endSession", async (req, res) => {
  */
 async function fetchSession(sessionId) {
   try {
-    const res = await axios.get(`${COLLABORATION_URL}/sessions/${sessionId}`);
+    const url = `${COLLABORATION_URL}/sessions/${sessionId}`;
+    console.log(`GET ${url}`);
+    const res = await axios.get(url);
     const data = res.data;
     console.log("Session retrieved", data);
     return data;
@@ -35,7 +38,7 @@ async function fetchSession(sessionId) {
   }
 }
 
-router.get("/initiateMatch", async (req, res) => {
+router.get("/initiateMatch", verifyAccessToken, async (req, res) => {
   const { userId } = req.query;
   try {
     const matchedDetails = await matchedDetailsService.getMatchedDetails(

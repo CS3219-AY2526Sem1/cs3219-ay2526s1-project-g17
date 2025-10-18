@@ -2,11 +2,7 @@ import { useState, useEffect } from "react";
 import MatchingCriteriaDialog from "../components/MatchingCriteriaDialog";
 import MatchingTimer from "../components/MatchingTimer";
 import { getWebSocketService } from "../services/matchingService";
-import {
-  MATCH_CANCELLED,
-  MATCH_FOUND,
-  MATCH_TIMEOUT,
-} from "../constants";
+import { MATCH_CANCELLED, MATCH_FOUND, MATCH_TIMEOUT } from "../constants";
 import { useNavigate } from "react-router";
 import { useAuth0 } from "@auth0/auth0-react";
 
@@ -52,6 +48,11 @@ export default function MatchingPage() {
   }, []);
 
   const handleOpenDialog = async () => {
+    if (!user) {
+      console.log("User not logged in");
+      naviagte("/");
+      return;
+    }
     // Ensure WebSocket is connected before opening dialog
     const wsService = getWebSocketService();
     const userId = user.sub;
