@@ -1,22 +1,107 @@
-.collab-container {
+/* ----------------------------------
+ * 0. Global Styles
+ * ---------------------------------- */
+html, 
+body, 
+#root{
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+}
+
+body {
+    /* Prevents horizontal scrolling caused by the vertical scrollbar */
+    overflow-x: hidden; 
+}
+
+/* ----------------------------------
+ * 1. COLLABPAGE.JSX (Overall Layout & Header)
+ * ---------------------------------- */
+
+.collab-page-layout {
+    /* Full screen size */
     display: flex;
     flex-direction: column;
     height: 100vh;
     width: 100vw;
-    background-color: #1e1e1e;
+    /* Dark Theme */
+    background-color: #1e1e1e; /* VS Code dark background */
     color: #eee;
+    overflow: hidden; /* Prevent body scroll if content exceeds viewport */
 }
 
 .collab-header {
     padding: 8px 16px;
     border-bottom: 1px solid #333;
-    background-color: #252526;
+    background-color: #252526; /* Slightly darker than main body */
     display: flex;
     align-items: center;
     justify-content: space-between;
 }
 
-.collab-editor {
-    flex: 1;
+.collab-header h2 {
+    margin: 0;
+    font-size: 1.2em;
+    font-weight: 500;
+}
+
+.collab-main-content {
+    display: flex;
+    flex: 1; /* Takes up all available height below the header */
     overflow: hidden;
+}
+
+.left-panel-column {
+    display: flex;
+    flex-direction: column;
+    width: 40%; /* Allocate space for the panels */
+    min-width: 350px;
+    border-right: 1px solid #333;
+    overflow: hidden;
+}
+
+/* ----------------------------------
+ * 2. QUESTIONPANEL.JSX (Top Left Panel)
+ * ---------------------------------- */
+ 
+.question-panel-area {
+    flex: 6; /* Takes up 60% of the left column's height */
+    padding: 15px;
+    border-bottom: 1px solid #333;
+    overflow-y: auto; /* Allow scrolling for long questions */
+    background-color: #1e1e1e;
+}
+
+/* ----------------------------------
+ * 3. CHATPANEL.JSX (Bottom Left Panel)
+ * ---------------------------------- */
+
+.chat-panel-area {
+    flex: 4; /* Takes up 40% of the left column's height */
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    background-color: #252526; /* Slightly distinct background for chat */
+    overflow: hidden;
+}
+
+.chat-panel-area input[type="text"] {
+    margin-top: auto; /* Pushes the input field to the bottom */
+    padding: 8px;
+    border: 1px solid #555;
+    background-color: #3c3c3c;
+    color: #eee;
+    border-radius: 4px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* ----------------------------------
+ * 4. COLLABEDITOR.JSX (Right Panel)
+ * ---------------------------------- */
+
+.right-panel-column {
+    flex: 1; /* Takes up all remaining width */
+    overflow: hidden; /* Contains the Monaco editor */
 }
