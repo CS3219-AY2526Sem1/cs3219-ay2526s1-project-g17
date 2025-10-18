@@ -1,4 +1,7 @@
 export const userRequestKeyPrefix = "user_request:";
+export const MATCH_REQUEST_PREFIX = "MATCH_REQUEST";
 export const matchedPairKeyPrefix = "matched_pair:";
 export const matchedDetailsPrefix = "matched_details:";
 export const collaborationSessionPrefix = "collaboration_session:";
+export const MATCH_IDX = "MATCH_REQUEST";
+export const MATCHED_DETAILS_PREFIX = "MATCHED_DETAILS";

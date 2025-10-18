@@ -107,7 +107,7 @@ const MatchingCriteriaDialog = ({ isOpen, onClose, onSubmit }) => {
     try {
       /** @type {MatchRequest} */
       const matchRequest = {
-        type: "matchRequest",
+        type: "match-request",
         criterias: selectedTopics.map((topic) => ({
           difficulty,
           language,

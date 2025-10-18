@@ -24,5 +24,5 @@ async function seed() {
     }
 }
 
-// from backend folder, run "node seed.js"
+// from backend folder, run "node seeds\seed.js"
 seed();

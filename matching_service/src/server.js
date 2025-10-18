@@ -5,8 +5,9 @@ import { sendMessage } from "./utility/ws_util.js";
 import {} from "./types.js";
 import { MatchingService } from "./service/matching_service.js";
 import { initializeRedis } from "./model/redis_integration.js";
-import redisRepository from "./model/redis_repository.js";
+
 import { randomUUID } from "crypto";
+import { MatchRequestService } from "./service/match_request_service.js";
 
 /** @typedef {import("./types.js").MatchRequest} MatchRequest */
 /** @typedef {import("./types.js").UserInstance} UserInstance */
@@ -19,25 +20,30 @@ const port = process.env.PORT || 3001;
 
 const server = http.createServer(index);
 const wss = new WebSocketServer({ server, clientTracking: true });
-const matchingService = new MatchingService();
+
+const redisRepository = await initializeRedis();
+
+try {
+  await redisRepository.flushAll();
+  server.listen(port);
+  console.log("Matching service server listening on http://localhost:" + port);
+} catch (err) {
+  console.error("Failed to connect to DB");
+  console.error(err);
+  process.exit(1);
+}
+
+const matchRequestService = new MatchRequestService(
+  redisRepository.client,
+  redisRepository.subscriber
+);
+const matchingService = new MatchingService(redisRepository);
+
 process.on("SIGINT", () => {
   server.close(async () => {
-    await redisRepository.disconnect();
+    if (redisRepository) await redisRepository.disconnect();
   });
 });
-await initializeRedis()
-  .then(async () => {
-    await redisRepository.flushAll();
-    server.listen(port);
-    console.log(
-      "Matching service server listening on http://localhost:" + port
-    );
-  })
-  .catch((err) => {
-    console.error("Failed to connect to DB");
-    console.error(err);
-    process.exit(1);
-  });
 
 wss.on("connection", (ws, request) => {
   // const url = new URL(request.url, `http://${request.headers.host}`);
