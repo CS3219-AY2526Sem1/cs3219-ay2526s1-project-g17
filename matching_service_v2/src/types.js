@@ -18,6 +18,7 @@
 
 /**
  * @typedef {Object} MatchRequest
+ * @property {string} userId
  * @property {"match-request"} type
  * @property {Array<Criteria>} criterias
  * @property {number} time

@@ -36,28 +36,32 @@ async function fetchSession(sessionId) {
 }
 
 router.get("/initiateMatch", async (req, res) => {
-  const { userId } = req.body;
+  const { userId } = req.query;
   try {
     const matchedDetails = await matchedDetailsService.getMatchedDetails(
-      userId
+      userId.toString()
     );
     if (matchedDetails) {
       const collaborationSession =
         await collaborationService.getCollaborationSession(
-          userId,
+          userId.toString(),
           matchedDetails.partner
         );
       //TODO: Call collaboration service to check if there such session
       const session = await fetchSession(collaborationSession.session);
 
       if (collaborationSession) {
+        console.log(
+          `Has existing session on matching service: ${collaborationSession.session}`
+        );
         if (session) {
+          console.log(`${collaborationSession.session} is still active`);
           res
             .status(200)
             .json({ code: "has-existing", session: collaborationSession });
         } else {
           await collaborationService.deleteCollaborationSession(
-            userId,
+            userId.toString(),
             matchedDetails.partner
           );
         }

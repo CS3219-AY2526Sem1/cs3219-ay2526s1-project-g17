@@ -136,6 +136,8 @@ export class MatchingService {
       case "matched":
         await this.handleMatched(userId);
         break;
+      case "waiting":
+        break;
       default:
         throw new Error(`Unrecognized status: ${requestData.status}`);
     }

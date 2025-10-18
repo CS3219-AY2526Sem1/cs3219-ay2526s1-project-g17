@@ -1,7 +1,6 @@
 /** @typedef {import("../types").MatchRequest} MatchRequest */
 /** @typedef {import("../types").MessageToServer} MessageToServer */
 /** @typedef {import("../types").Notification} Notification */
-/** @typedef {import("../types").CollaborationSessionNotification} CollaborationSessionNotification */
 /** @typedef {import("../types").Criteria} Criteria */
 /** @typedef {import("../types").MatchFoundNotification} MatchFoundNotification */
 
@@ -24,12 +23,13 @@ class MatchingWebSocketService {
 
   /**
    * Connect to the WebSocket server
+   * @param {string} userId
    * @returns {Promise<void>}
    */
-  connect() {
+  connect(userId) {
     return new Promise((resolve, reject) => {
       try {
-        this.ws = new WebSocket(WS_URL);
+        this.ws = new WebSocket(`${WS_URL}?userId=${userId}`);
 
         this.ws.onopen = () => {
           console.log("WebSocket connected");
@@ -52,7 +52,7 @@ class MatchingWebSocketService {
           console.log("WebSocket disconnected");
           this.isConnected = false;
           if (!this.manualDisconnect) {
-            this.attemptReconnect();
+            this.attemptReconnect(userId);
           }
         };
 
@@ -68,15 +68,16 @@ class MatchingWebSocketService {
 
   /**
    * Attempt to reconnect to the WebSocket server
+   * @param {string} userId
    */
-  attemptReconnect() {
+  attemptReconnect(userId) {
     if (this.reconnectAttempts < this.maxReconnectAttempts) {
       this.reconnectAttempts++;
       console.log(
         `Attempting to reconnect... (${this.reconnectAttempts}/${this.maxReconnectAttempts})`
       );
       setTimeout(() => {
-        this.connect().catch(() => {
+        this.connect(userId).catch(() => {
           // Will try again if this fails
         });
       }, 2000 * this.reconnectAttempts); // Exponential backoff
@@ -162,14 +163,15 @@ export const fetchTopics = async () => {
 
 /**
  * Submits a matching request via WebSocket
+ * @param {string} userId
  * @param {MatchRequest} matchRequest - The matching request object
  * @returns {Promise<Object>} Server response
  */
-export const submitMatchRequestViaWebSocket = async (matchRequest) => {
+export async function submitMatchRequestViaWebSocket(userId, matchRequest) {
   try {
     // Ensure WebSocket connection is established
     if (!wsService.isConnected) {
-      await wsService.connect();
+      await wsService.connect(userId);
     }
 
     // Send the match request
@@ -184,7 +186,7 @@ export const submitMatchRequestViaWebSocket = async (matchRequest) => {
     console.error("Error sending match request via WebSocket:", error);
     throw new Error("Failed to send match request via WebSocket");
   }
-};
+}
 
 /**
  * Cancel a matching request via WebSocket

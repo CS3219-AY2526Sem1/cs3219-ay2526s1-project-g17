@@ -2,14 +2,20 @@ import { useState, useEffect } from "react";
 import MatchingCriteriaDialog from "../components/MatchingCriteriaDialog";
 import MatchingTimer from "../components/MatchingTimer";
 import { getWebSocketService } from "../services/matchingService";
-import { MATCH_CANCELLED, MATCH_FOUND, MATCH_TIMEOUT, MATCHING_SERVICE_URL } from "../constants";
+import {
+  MATCH_CANCELLED,
+  MATCH_FOUND,
+  MATCH_TIMEOUT,
+} from "../constants";
 import { useNavigate } from "react-router";
+import { useAuth0 } from "@auth0/auth0-react";
 
 export default function MatchingPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isMatching, setIsMatching] = useState(false);
   const [matchRequestId, setMatchRequestId] = useState(null);
   const naviagte = useNavigate();
+  const { user } = useAuth0();
 
   useEffect(() => {
     const wsService = getWebSocketService();
@@ -42,14 +48,16 @@ export default function MatchingPage() {
       wsService.removeMessageHandler(MATCH_CANCELLED);
       wsService.removeMessageHandler(MATCH_TIMEOUT);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleOpenDialog = async () => {
     // Ensure WebSocket is connected before opening dialog
     const wsService = getWebSocketService();
+    const userId = user.sub;
     if (!wsService.isConnected) {
       try {
-        await wsService.connect();
+        await wsService.connect(userId);
         console.log("WebSocket reconnected for new match request");
       } catch (error) {
         console.error("Failed to reconnect WebSocket:", error);

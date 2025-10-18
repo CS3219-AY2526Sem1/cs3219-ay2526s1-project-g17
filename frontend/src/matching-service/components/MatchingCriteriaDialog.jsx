@@ -50,6 +50,12 @@ const MatchingCriteriaDialog = ({ isOpen, onClose, onSubmit }) => {
     }
   }, [isOpen]);
 
+  useEffect(() => {
+    if (!user) {
+      navigate("/");
+    }
+  }, [user]);
+
   const loadTopics = async () => {
     setIsLoading(true);
     setError("");
@@ -127,29 +133,43 @@ const MatchingCriteriaDialog = ({ isOpen, onClose, onSubmit }) => {
           },
         }
       );
+      /** @type {import("../types").InitiateMatchResponse} */
       const data = res.data;
       console.log("Received data", data);
-      if (data.code == "has-existing") {
-        navigate(`collaboration/${data.session.session}`);
-      } else {
-        /** @type {MatchRequest} */
-        const matchRequest = {
-          type: "match-request",
-          criterias: selectedTopics.map((topic) => ({
-            difficulty,
-            language,
-            topic,
-          })),
-        };
+      switch (data.code) {
+        case "has-existing":
+          /** @type {import("../types").MatchExists} */
+          data;
+          navigate(`collaboration/${data.session.session}`);
+          break;
+        case "no-existing":
+          {
+            /** @type {MatchRequest} */
+            const matchRequest = {
+              type: "match-request",
+              criterias: selectedTopics.map((topic) => ({
+                difficulty,
+                language,
+                topic,
+              })),
+            };
 
-        const response = await submitMatchRequestViaWebSocket(matchRequest);
-        console.log(`Response: `, response);
-        if (response.success) {
-          onSubmit && onSubmit(matchRequest, response);
-          handleClose();
-        } else {
-          setError("Failed to submit match request. Please try again.");
-        }
+            const response = await submitMatchRequestViaWebSocket(
+              user.sub,
+              matchRequest
+            );
+            console.log(`Response: `, response);
+            if (response.success) {
+              onSubmit && onSubmit(matchRequest, response);
+              handleClose();
+            } else {
+              setError("Failed to submit match request. Please try again.");
+            }
+          }
+          break;
+        default:
+          console.log(`Unaccounted case: ${data.code}`);
+          break;
       }
     } catch (err) {
       setError("Failed to submit match request. Please try again.");
