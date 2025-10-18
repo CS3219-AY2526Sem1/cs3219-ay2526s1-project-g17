@@ -11,3 +11,6 @@ export const ACCEPTANCE_TIMEOUT =
 export const REDIS_URL = isDEV
   ? process.env.DEV_REDIS_URL
   : process.env.REDIS_URL;
+
+export const AUTH0_DOMAIN = process.env.AUTH0_DOMAIN;
+export const AUTH0_AUDIENCE = process.env.AUTH0_AUDIENCE;
