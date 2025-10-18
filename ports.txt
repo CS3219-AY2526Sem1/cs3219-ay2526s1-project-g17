@@ -1,0 +1,13 @@
+frontend: 5173
+
+user-service: 3003
+
+matching-service: 3001
+
+question-service: 5001
+
+collaboration-service: 3002
+
+docker compose up -d to start entire application
+
+docker compose down to stop application

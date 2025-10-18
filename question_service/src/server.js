@@ -1,0 +1,30 @@
+import express from "express";
+import dotenv from "dotenv";
+import cors from "cors";
+
+import { connectDB } from "../config/db.js";
+import rateLimiter from "../middleware/rateLimiter.js";
+import questionRouter from "./routes/questionsRoutes.js";
+import { errorHandler } from "../middleware/error.middleware.js";
+
+const app = express();
+dotenv.config()
+const PORT = process.env.PORT || 5001;
+
+// middleware
+app.use(express.json());
+
+app.use(rateLimiter);
+app.use(cors());
+
+app.use("/api/questions", questionRouter);
+
+app.use(errorHandler);
+
+connectDB().then(() => {
+    app.listen(PORT, () => {
+        console.log("server started on port: 5001");
+    });
+});
+
+// from backend folder, npm run dev to start the server (use non-sch wifi)
