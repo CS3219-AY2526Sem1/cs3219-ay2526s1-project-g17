@@ -15,7 +15,7 @@ export default function CollabPage() {
     if (!sessionId) return <div style={{ padding: 16 }}>Missing sessionId in URL</div>;
 
     return (
-        <div className="collab-page-layout"> 
+        <div className="collab-page-layout" data-theme={theme}> 
             {/* 1. Header */}
             <header className="collab-header">
                 <h2>Session: {sessionId}</h2>
