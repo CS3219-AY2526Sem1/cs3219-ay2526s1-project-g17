@@ -63,6 +63,31 @@ io.on('connection', (socket) => {
     }
   });
 
+  // Message: Handle chat messages
+  socket.on('sendMessage', ({ sessionId, message }) => {
+    // Ensure user has joined this session
+    console.log(`Message from ${socket.data.userId} in session ${socket.data.sessionId}: ${message}`);
+
+    if (!socket.rooms.has(sessionId)) {
+      console.warn('User not in session room');
+      return;
+    }
+    
+    const userId = socket.data.userId;
+    if (!userId) return;
+
+    const payload = {
+      userId,
+      message,
+      timestamp: new Date().toISOString()
+    };
+
+    // Broadcast to all others in the session
+    socket.to(sessionId).emit('receiveMessage', payload);
+    // Also echo to sender (optional)
+    socket.emit('receiveMessage', payload);
+  });
+
   socket.on('terminateSession', async ({ sessionId }) => {
     await Session.findOneAndUpdate(
       { sessionId },
