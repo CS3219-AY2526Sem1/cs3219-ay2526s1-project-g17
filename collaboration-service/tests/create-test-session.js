@@ -6,7 +6,7 @@ import * as Y from 'yjs';
 
 dotenv.config({ path: './.env' });
 
-const sessionId = 'session-123';
+const sessionId = 'test-session';
 const userId = 'user-456';
 const questionId = 'q-789'; // can be any string for testing
 
@@ -18,19 +18,29 @@ async function createTestSession() {
     // Delete existing test session
     await Session.deleteOne({ sessionId });
 
-    // Create a dummy Yjs document
-    const ydoc = new Y.Doc();
-    const yText = ydoc.getText('sharedText');
-    yText.insert(0, 'Dummy content for testing'); // Add dummy content
-    const serializedYDoc = Y.encodeStateAsUpdate(ydoc); // Serialize the Yjs document
+    const dummyChatHistory = [
+        {
+            userId: 'system',
+            message: 'Welcome to the test session! Chat history is loading correctly.',
+            timestamp: new Date(Date.now() - 60000) // 1 minute ago
+        },
+        {
+            userId: 'tester-user',
+            message: 'Checking persistence!',
+            timestamp: new Date()
+        }
+    ];
 
 
     const session = new Session({
       sessionId,
       users: [userId],
+      chatHistory: dummyChatHistory,
       questionId,
+      createdAt: new Date(),
+      endedAt: null,
+      // code:
       code: '// Happy coding!',
-      yDoc: Buffer.from(serializedYDoc), // Store the serialized Yjs document
       isActive: true
     });
 
