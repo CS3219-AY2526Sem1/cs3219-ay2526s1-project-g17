@@ -65,9 +65,25 @@
  */
 
 /**
- * @typedef {Object} CollaborationSessionNotification
- * @property {"collaborationSession"} type
+ * @typedef {Object} CollaborationSession
+ * @property {Criteria} criteria
  * @property {string} session
+ * @property {[string, string]} userIds
+ */
+
+/**
+ * @typedef {MatchExists | MatchDoesNotExists} InitiateMatchResponse
+ */
+
+/**
+ * @typedef {object} MatchExists
+ * @property {'has-existing'} code
+ * @property {CollaborationSession} session
+ */
+
+/**
+ * @typedef {object} MatchDoesNotExists
+ * @property {'no-existing'} code
  */
 
 /**

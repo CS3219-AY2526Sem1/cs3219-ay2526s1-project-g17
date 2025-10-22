@@ -57,12 +57,13 @@ process.on("SIGINT", () => {
 });
 
 wss.on("connection", (ws, request) => {
-  /** @type {UserInstance} */
-  const userInstance = { id: randomUUID(), ws: ws };
-  console.log("New WebSocket connection");
+  const urlObj = new URL(request.url, `http://${request.headers.host}`);
+  const userId = urlObj.searchParams.get("userId");
 
-  // TODO Check user has existing request
-  // TODO if has then return the session and  close ws else make a request
+  console.log("WebSocket userId:", userId);
+  /** @type {UserInstance} */
+  const userInstance = { id: userId, ws: ws };
+  console.log("New WebSocket connection");
 
   ws.on("message", async (message) => {
     try {
