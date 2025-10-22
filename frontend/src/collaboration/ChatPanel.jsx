@@ -29,6 +29,12 @@ export default function ChatPanel({ sessionId, userId }) {
         console.log("Disconnected from Socket.IO server");
     });
 
+    socket.on("loadHistory", (history) => {
+        console.log('Chat history loaded:', history);
+        // Set the state with the full history array
+        setMessages(history); 
+    });
+
     socket.on("userJoined", (data) => {
         console.log(`User joined: ${data.userId}`);
     });
