@@ -44,8 +44,19 @@ io.on('connection', (socket) => {
     socket.data.sessionId = sessionId;
     socket.data.userId = userId;
 
-    const ydoc = await getSessionYDoc(sessionId);
-    socket.emit('initialDoc', Y.encodeStateAsUpdate(ydoc));
+    // const ydoc = await getSessionYDoc(sessionId);
+    // socket.emit('initialDoc', Y.encodeStateAsUpdate(ydoc));
+
+    const session = await Session.findOne({ sessionId });
+      
+      // 💥 LOAD AND SEND CHAT HISTORY 💥
+      if (session && session.chatHistory) {
+          // Send history as an initial block of messages
+          socket.emit('loadHistory', session.chatHistory.map(msg => ({
+              ...msg.toObject(),
+              timestamp: msg.timestamp.toISOString() // Format Date for client
+          })));
+      }
 
     // Cancel any pending auto-close for this session
     if (sessionTimeouts.has(sessionId)) {
@@ -55,16 +66,10 @@ io.on('connection', (socket) => {
 
     // Notify others in session
     socket.to(sessionId).emit('userJoined', { userId });
-
-    // Optional: send fallback code (if still used)
-    const session = await Session.findOne({ sessionId });
-    if (session?.code) {
-      socket.emit('codeUpdate', session.code);
-    }
   });
 
   // Message: Handle chat messages
-  socket.on('sendMessage', ({ sessionId, message }) => {
+  socket.on('sendMessage', async ({ sessionId, message }) => {
     // Ensure user has joined this session
     console.log(`Message from ${socket.data.userId} in session ${socket.data.sessionId}: ${message}`);
 
@@ -79,8 +84,20 @@ io.on('connection', (socket) => {
     const payload = {
       userId,
       message,
-      timestamp: new Date().toISOString()
+      timestamp: new Date()
     };
+
+    try {
+        await Session.findOneAndUpdate(
+            { sessionId },
+            { $push: { chatHistory: payload } }, // Use $push to append to the array
+            { new: true, runValidators: true }
+        );
+    } catch (error) {
+        console.error('Error persisting chat message:', error);
+        // Decide how to handle DB error (e.g., abort broadcast or log and continue)
+        return;
+    }
 
     // Broadcast to all others in the session
     socket.to(sessionId).emit('receiveMessage', payload);
