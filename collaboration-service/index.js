@@ -15,14 +15,7 @@ const DB_URI = process.env.DB_CLOUD_URI;
 const SESSION_IDLE_TIMEOUT = 30_000; // 30 seconds
 
 const server = http.createServer(app);
-const ldbPersistence = new LeveldbPersistence('./yjs-docs'); // Local LevelDB persistence
 
-
-export async function getSessionYDoc(sessionId) {
-  // Returns the persisted Y.Doc if exists, otherwise creates new
-  const ydoc = await ldbPersistence.getYDoc(sessionId);
-  return ydoc;
-}
 
 // const ydoc = new Y.Doc()
 // ydoc.getArray('arr').insert(0, [1, 2, 3])
@@ -105,11 +98,39 @@ io.on('connection', (socket) => {
 // ====== 2. Yjs WebSocket for collaborative editing (/collab) ======
 const { WebSocketServer } = await import('ws');
 import { setupWSConnection } from '@y/websocket-server/utils';
+const ldbPersistence = new LeveldbPersistence('./yjs-docs'); // Local LevelDB persistence
 
 
-const yjsWSS = new WebSocketServer({ server, path: '/collab' });
+export async function getSessionYDoc(sessionId) {
+  // Returns the persisted Y.Doc if exists, otherwise creates new
+  const ydoc = await ldbPersistence.getYDoc(sessionId);
+  return ydoc;
+}
+
+
+const yjsWSS = new WebSocketServer({ noServer: true });
+
+server.on('upgrade', (req, socket, head) => {
+  const pathname = new URL(req.url, 'http://localhost').pathname;
+
+  if (pathname === '/collab') {
+    yjsWSS.handleUpgrade(req, socket, head, (ws) => {
+      setupWSConnection(ws, req, {
+        docName: new URL(req.url, 'http://localhost').searchParams.get('sessionId'),
+        persistence: ldbPersistence
+      });
+    });
+  } else {
+    socket.destroy(); // let Socket.IO handle /socket.io, etc.
+  }
+});
 
 yjsWSS.on('connection', (ws, req) => {
+  const pathname = new URL(req.url, 'http://localhost').pathname;
+  if (pathname !== '/collab') {
+    ws.close(1008, 'Invalid path');
+    return;
+  }
   try {
     const url = new URL(req.url, `http://${req.headers.host}`);
     const sessionId = url.searchParams.get('sessionId');
