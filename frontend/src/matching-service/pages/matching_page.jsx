@@ -10,6 +10,8 @@ import {
 } from "../services/matchingService";
 import "./MatchingPage.css";
 import { NavigationBar } from "../../components/NavigationBar";
+import { useAuth0 } from "@auth0/auth0-react";
+import LoadingSpinner from "../../components/LoadingSpinner";
 
 export default function MatchingPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -20,6 +22,8 @@ export default function MatchingPage() {
   const [matchFoundData, setMatchFoundData] = useState(null);
   const [isAcceptingMatch, setIsAcceptingMatch] = useState(false);
   const [lastMatchCriteria, setLastMatchCriteria] = useState(null);
+
+  const { isLoading } = useAuth0();
 
   useEffect(() => {
     const wsService = getWebSocketService();
@@ -205,76 +209,83 @@ export default function MatchingPage() {
     }
   };
 
-  return (
-    <div className="matching-page">
-      <NavigationBar />
-      <div className="matching with-nav-offset">
-        {/* Timer overlay */}
-        <MatchingTimer
-          isVisible={isMatching}
-          requestId={matchRequestId}
-          onCancel={handleCancelMatch}
-        />
+  if (isLoading) {
+    return (
+      <LoadingSpinner text="Preparing your session" />
+    )
+  } else {
 
-        <main className="matching__container">
-          <section className="matching__hero">
-            <div className="matching__content">
-              <h1 className="matching__title">Find your coding partner</h1>
-              <p className="matching__subtitle">
-                Choose your difficulty, topics, and preferences — we’ll pair you in seconds.
-              </p>
+    return (
+      <div className="matching-page">
+        <NavigationBar />
+        <div className="matching with-nav-offset">
+          {/* Timer overlay */}
+          <MatchingTimer
+            isVisible={isMatching}
+            requestId={matchRequestId}
+            onCancel={handleCancelMatch}
+          />
 
-              {!isMatching && !matchedPartner && (
-                <div className="matching__actions">
-                  <button className="btn btn--primary" onClick={handleOpenDialog}>
-                    Find a Match
-                  </button>
-                </div>
-              )}
+          <main className="matching__container">
+            <section className="matching__hero">
+              <div className="matching__content">
+                <h1 className="matching__title">Find your coding partner</h1>
+                <p className="matching__subtitle">
+                  Choose your difficulty, topics, and preferences — we’ll pair you in seconds.
+                </p>
 
-              {matchedPartner && (
-                <div className="matching__card">
-                  <h2 className="matching__cardTitle">Match Found!</h2>
-                  <p>
-                    You have been matched with{" "}
-                    <strong>{matchedPartner.partner?.username || "Unknown user"}</strong>.
-                  </p>
+                {!isMatching && !matchedPartner && (
                   <div className="matching__actions">
-                    <button
-                      className="btn"
-                      onClick={() => {
-                        setMatchedPartner(null);
-                        handleOpenDialog();
-                      }}
-                    >
-                      Find Another Match
+                    <button className="btn btn--primary" onClick={handleOpenDialog}>
+                      Find a Match
                     </button>
                   </div>
-                </div>
-              )}
-            </div>
+                )}
 
-            <aside className="matching__art">
-              {/* Optional illustration/screenshot */}
-              <div className="matching__artBox" aria-hidden />
-            </aside>
-          </section>
-        </main>
+                {matchedPartner && (
+                  <div className="matching__card">
+                    <h2 className="matching__cardTitle">Match Found!</h2>
+                    <p>
+                      You have been matched with{" "}
+                      <strong>{matchedPartner.partner?.username || "Unknown user"}</strong>.
+                    </p>
+                    <div className="matching__actions">
+                      <button
+                        className="btn"
+                        onClick={() => {
+                          setMatchedPartner(null);
+                          handleOpenDialog();
+                        }}
+                      >
+                        Find Another Match
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
 
-        <MatchingCriteriaDialog
-          isOpen={isDialogOpen}
-          onClose={handleCloseDialog}
-          onSubmit={handleMatchSubmit}
-        />
+              <aside className="matching__art">
+                {/* Optional illustration/screenshot */}
+                <div className="matching__artBox" aria-hidden />
+              </aside>
+            </section>
+          </main>
 
-        <MatchFoundDialog
-          isOpen={isMatchFoundDialogOpen}
-          matchData={matchFoundData}
-          onAccept={handleAcceptMatch}
-          onReject={handleRejectMatch}
-          isAccepting={isAcceptingMatch}
-        />
+          <MatchingCriteriaDialog
+            isOpen={isDialogOpen}
+            onClose={handleCloseDialog}
+            onSubmit={handleMatchSubmit}
+          />
+
+          <MatchFoundDialog
+            isOpen={isMatchFoundDialogOpen}
+            matchData={matchFoundData}
+            onAccept={handleAcceptMatch}
+            onReject={handleRejectMatch}
+            isAccepting={isAcceptingMatch}
+          />
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
 }
