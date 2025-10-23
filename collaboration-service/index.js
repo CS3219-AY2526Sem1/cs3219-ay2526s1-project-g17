@@ -6,6 +6,7 @@ import { Server as SocketIOServer } from 'socket.io';
 import app from './server.js';
 import Session from './model/session-model.js';
 import { LeveldbPersistence } from 'y-leveldb';
+import { GoogleGenAI } from "@google/genai";
 import * as Y from 'yjs';
 
 dotenv.config();
@@ -13,6 +14,7 @@ dotenv.config();
 const PORT = process.env.PORT || 3002;
 const DB_URI = process.env.DB_CLOUD_URI;
 const SESSION_IDLE_TIMEOUT = 30_000; // 30 seconds
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 const server = http.createServer(app);
 
@@ -81,6 +83,59 @@ io.on('connection', (socket) => {
     const userId = socket.data.userId;
     if (!userId) return;
 
+let history = []; // Declared in the outer scope, as fixed before
+
+    const session = await Session.findOne({ sessionId });
+
+    if (session) {
+      console.log('Session found:', sessionId);
+
+      // 1. Combine the current message with the history from the DB
+      const fullConversation = [
+          ...session.chatHistory.map(msg => ({
+              userId: msg.userId,
+              message: msg.message
+          })),
+          { userId: userId, message: message } // The *new* message
+      ];
+
+      // 2. Group consecutive messages by their role (human/model)
+      const groupedHistory = [];
+      for (const msg of fullConversation) {
+        // Determine the Gemini role ('user' for any human, 'model' for the AI)
+        const geminiRole = msg.userId === 'gemini' ? 'model' : 'user';
+
+        // Get the last item added to the final history array
+        const lastTurn = groupedHistory[groupedHistory.length - 1];
+
+        // If the role is the same as the last message, merge the content
+        if (lastTurn && lastTurn.role === geminiRole) {
+            // Append new text to the last part's text, adding the author and a newline
+            const newText = `\n[${msg.userId}]: ${msg.message}`;
+            lastTurn.parts[0].text += newText;
+
+        } else {
+            // Otherwise, start a new turn (Content object)
+            // For human users, prepend the user ID to the message text for context
+            const initialText = geminiRole === 'user' 
+                ? `[${msg.userId}]: ${msg.message}` 
+                : msg.message;
+
+            groupedHistory.push({
+                role: geminiRole,
+                parts: [{ text: initialText }]
+            });
+        }
+      }
+
+      history = groupedHistory;
+    } else {
+      console.warn('Session not found:', sessionId);
+      // If session is not found, history will remain empty, which is fine
+    }
+
+
+    // Persist message to DB
     const payload = {
       userId,
       message,
@@ -103,6 +158,52 @@ io.on('connection', (socket) => {
     socket.to(sessionId).emit('receiveMessage', payload);
     // Also echo to sender (optional)
     socket.emit('receiveMessage', payload);
+
+    // Check for AI trigger words
+    if (message.includes('@gemini ')) {
+      try {
+        const chat = ai.chats.create({
+          model: "gemini-2.5-flash-lite",
+          history: history
+        })
+
+      const response = await chat.sendMessage({
+        message: message.replace('@gemini ', 'In 50 words, respond directly without any preamble: ')
+      });
+
+        // const response = await ai.models.generateContent({
+        //   model: "gemini-2.5-flash-lite",
+        //   // Send the whole chat history including the new message
+        //   contents: [
+        //     { role: "user", parts: [{ text: "Answer in 50 words: " + message }] }
+        //   ],
+        //   generationConfig: { maxOutputTokens: 50 }
+          
+        // })
+        console.log(response.text);
+        
+
+        const aiMessage = response.text;
+
+        const aiPayload = {
+          userId: 'gemini',
+          message: aiMessage,
+          timestamp: new Date()
+        };
+
+        // Persist AI message to DB
+        await Session.findOneAndUpdate(
+          { sessionId },
+          { $push: { chatHistory: aiPayload } },
+          { new: true, runValidators: true }
+        );
+
+        // Broadcast AI message
+        io.to(sessionId).emit('receiveMessage', aiPayload);
+      } catch (error) {
+        console.error('Error generating AI response:', error);
+      }
+    }
   });
 
   socket.on('terminateSession', async ({ sessionId }) => {
