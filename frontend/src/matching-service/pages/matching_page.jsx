@@ -1,10 +1,15 @@
 import { useState, useEffect } from "react";
 import MatchingCriteriaDialog from "../components/MatchingCriteriaDialog";
 import MatchingTimer from "../components/MatchingTimer";
+
 import { getWebSocketService } from "../services/matchingService";
+import "./MatchingPage.css";
+import { NavigationBar } from "../../components/NavigationBar";
+import { useAuth0 } from "@auth0/auth0-react";
+import LoadingSpinner from "../../components/LoadingSpinner";
 import { MATCH_CANCELLED, MATCH_FOUND, MATCH_TIMEOUT } from "../constants";
 import { useNavigate } from "react-router";
-import { useAuth0 } from "@auth0/auth0-react";
+
 
 export default function MatchingPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -12,6 +17,8 @@ export default function MatchingPage() {
   const [matchRequestId, setMatchRequestId] = useState(null);
   const naviagte = useNavigate();
   const { user } = useAuth0();
+
+  const { isLoading } = useAuth0();
 
   useEffect(() => {
     const wsService = getWebSocketService();
@@ -93,31 +100,76 @@ export default function MatchingPage() {
     console.log("Match request cancelled by user");
   };
 
-  return (
-    <div className="app-container">
-      {/* Timer overlay - appears at top center when matching */}
-      <MatchingTimer
-        isVisible={isMatching}
-        requestId={matchRequestId}
-        onCancel={handleCancelMatch}
-      />
+  if (isLoading) {
+    return (
+      <LoadingSpinner text="Preparing your session" />
+    )
+  } else {
 
-      <div className="main-content">
-        <h1>PeerPrep Matching Service</h1>
-        <p>Find your coding practice partner</p>
+    return (
+      <div className="matching-page">
+        <NavigationBar />
+        <div className="matching with-nav-offset">
+          {/* Timer overlay */}
+          <MatchingTimer
+            isVisible={isMatching}
+            requestId={matchRequestId}
+            onCancel={handleCancelMatch}
+          />
 
-        {!isMatching && (
-          <button className="find-match-button" onClick={handleOpenDialog}>
-            Find a Match
-          </button>
-        )}
+          <main className="matching__container">
+            <section className="matching__hero">
+              <div className="matching__content">
+                <h1 className="matching__title">Find your coding partner</h1>
+                <p className="matching__subtitle">
+                  Choose your difficulty, topics, and preferences — we’ll pair you in seconds.
+                </p>
+
+                {!isMatching && !matchedPartner && (
+                  <div className="matching__actions">
+                    <button className="btn btn--primary" onClick={handleOpenDialog}>
+                      Find a Match
+                    </button>
+                  </div>
+                )}
+
+                {matchedPartner && (
+                  <div className="matching__card">
+                    <h2 className="matching__cardTitle">Match Found!</h2>
+                    <p>
+                      You have been matched with{" "}
+                      <strong>{matchedPartner.partner?.username || "Unknown user"}</strong>.
+                    </p>
+                    <div className="matching__actions">
+                      <button
+                        className="btn"
+                        onClick={() => {
+                          setMatchedPartner(null);
+                          handleOpenDialog();
+                        }}
+                      >
+                        Find Another Match
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <aside className="matching__art">
+                {/* Optional illustration/screenshot */}
+                <div className="matching__artBox" aria-hidden />
+              </aside>
+            </section>
+          </main>
+
+          <MatchingCriteriaDialog
+            isOpen={isDialogOpen}
+            onClose={handleCloseDialog}
+            onSubmit={handleMatchSubmit}
+          />
+        </div>
       </div>
+    );
+  }
 
-      <MatchingCriteriaDialog
-        isOpen={isDialogOpen}
-        onClose={handleCloseDialog}
-        onSubmit={handleMatchSubmit}
-      />
-    </div>
-  );
 }

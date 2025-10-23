@@ -1,4 +1,18 @@
 :root {
+
+  /* Layout */
+  --nav-height: 80px;
+
+  --bg: #0f172a;
+  --brand: #6ea8fe;
+  --text: #e5e7eb;
+  --muted: #a1a1aa;
+
+  /* Effects */
+  --radius: 10px;
+  --shadow-sm: 0 6px 20px rgba(0,0,0,0.25);
+  --shadow-lg: 0 16px 48px rgba(0,0,0,0.35);
+
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
@@ -11,6 +25,8 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  
 }
 
 a {
@@ -24,11 +40,16 @@ a:hover {
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
   min-height: 100vh;
+  background:
+    radial-gradient(1200px 600px at 80% -10%, rgba(110,168,254,0.20), transparent 60%),
+    radial-gradient(1000px 500px at 0% 100%, rgba(99,102,241,0.15), transparent 60%),
+    var(--bg);
+  color: var(--text);
+  font-family: 'Inter', system-ui, sans-serif;
+  overflow-x: hidden;
 }
+
 
 h1 {
   font-size: 3.2em;
