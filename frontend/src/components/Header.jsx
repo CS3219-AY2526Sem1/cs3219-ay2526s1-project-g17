@@ -12,11 +12,11 @@ export default function Header() {
     return (
       <div className="header">
         <div className="left-section">
-          <Link to="/" className="header-link">Home Page</Link>
+          <Link to="/" className="header-link">PeerPrep</Link>
         </div>
         <div className="right-section">
           {/* Optional: show email if present */}
-          {user?.username && <span className="header-user">Hi, {user.username}</span>}
+          {user?.nickname && <span className="header-user">Hi, {user.nickname}</span>}
           <LogoutButton />
         </div>
       </div>
@@ -28,7 +28,7 @@ export default function Header() {
       <div className="header">
         <div className='left-section'>
           <Link to="/" className="header-link">
-            Home Page
+            PeerPrep
           </Link>
         </div>
         <div className='right-section'>
