@@ -19,10 +19,6 @@ const questionSchema = new mongoose.Schema(
             type: [String],
             required: true,
         },
-        link: {
-            type: String,
-            required: true,
-        },
         testCases: [String],
         constraints: String,
         hints: String,
