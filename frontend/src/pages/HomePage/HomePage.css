@@ -18,7 +18,7 @@
   gap: 32px;
   align-items: center;
   justify-content: center;
-  text-align: left; /* optional; can use center if your text should be centered */
+  text-align: center; /* optional; can use center if your text should be centered */
 }
 
 .hero__content {
@@ -45,6 +45,7 @@
 
 .hero__actions {
   display: flex;
+  justify-content: center;
   flex-wrap: wrap;
   gap: 12px;
   margin-top: 6px;
