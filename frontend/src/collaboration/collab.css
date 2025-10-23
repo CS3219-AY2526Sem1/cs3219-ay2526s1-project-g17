@@ -3,7 +3,7 @@
  * ---------------------------------- */
 @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&display=swap');
 
-html, 
+ html, 
 body, 
 #root {
     margin: 0;
@@ -11,17 +11,17 @@ body,
     height: 100%;
     width: 100%;
     font-family: 'Fira Code', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-}
+} 
 
 * { box-sizing: border-box; }
-
+/* 
 :root {
     --bg: #1e1e1e;
     --panel: #252526;
     --border: #2d2d2d;
     --text: #e5e5e5;
     --muted: #9aa0a6;
-}
+} */
 
 [data-theme="light"] {
     --bg: #ffffff;
