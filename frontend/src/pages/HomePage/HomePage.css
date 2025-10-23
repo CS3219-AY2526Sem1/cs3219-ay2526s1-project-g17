@@ -1,23 +1,3 @@
-:root{
-  --nav-height: 80px;         /* match your fixed nav/header height */
-  --bg: #0f172a;              /* slate-900-ish */
-  --panel: #111827;           /* zinc-900-ish */
-  --brand: #6ea8fe;           /* blue accent */
-  --text: #e5e7eb;            /* gray-200 */
-  --muted: #a1a1aa;           /* zinc-400 */
-}
-
-* { box-sizing: border-box; }
-
-.homepage {
-  min-height: 100vh;
-  background:
-    radial-gradient(1200px 600px at 80% -10%, rgba(110,168,254,0.20), transparent 60%),
-    radial-gradient(1000px 500px at 0% 100%, rgba(99,102,241,0.15), transparent 60%),
-    var(--bg);
-  color: var(--text);
-}
-
 /* Push page content below fixed nav/header & center vertically */
 .with-nav-offset {
   padding-top: var(--nav-height);
@@ -133,11 +113,6 @@
   }
 }
 
-/* Prevent tiny horizontal scrollbars if a parent uses 100vw */
-html, body {
-  width: 100%;
-  overflow-x: hidden;
-}
 
 
 
