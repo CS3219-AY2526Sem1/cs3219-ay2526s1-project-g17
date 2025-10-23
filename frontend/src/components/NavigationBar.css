@@ -30,8 +30,13 @@
 }
 
 #navbar__logo {
-  background-color: #ff8177;
-  background-image: linear-gradient(to top, #ff0844 0%, #ffd199 100%);
+  background-color: var(--brand);
+  /* background-image: linear-gradient(to top, #ff0844 0%, #ffd199 100%); */
+  background-image: linear-gradient(
+    to top,
+    rgba(110, 168, 254, 1) 0%,     /* bright blue base */
+    rgba(173, 216, 255, 1) 100%    /* soft sky highlight */
+  );
   background-size: 100%;
   -webkit-background-clip: text;
   -moz-background-clip: text;
