@@ -125,7 +125,7 @@ export default function MatchingPage() {
                   Choose your difficulty, topics, and preferences — we’ll pair you in seconds.
                 </p>
 
-                {!isMatching && !matchedPartner && (
+                {!isMatching && (
                   <div className="matching__actions">
                     <button className="btn btn--primary" onClick={handleOpenDialog}>
                       Find a Match
@@ -133,26 +133,7 @@ export default function MatchingPage() {
                   </div>
                 )}
 
-                {matchedPartner && (
-                  <div className="matching__card">
-                    <h2 className="matching__cardTitle">Match Found!</h2>
-                    <p>
-                      You have been matched with{" "}
-                      <strong>{matchedPartner.partner?.username || "Unknown user"}</strong>.
-                    </p>
-                    <div className="matching__actions">
-                      <button
-                        className="btn"
-                        onClick={() => {
-                          setMatchedPartner(null);
-                          handleOpenDialog();
-                        }}
-                      >
-                        Find Another Match
-                      </button>
-                    </div>
-                  </div>
-                )}
+                
               </div>
 
               <aside className="matching__art">
