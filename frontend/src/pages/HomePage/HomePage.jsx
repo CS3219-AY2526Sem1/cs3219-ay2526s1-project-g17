@@ -8,6 +8,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom"; // Add this import
 import "./HomePage.css"
 import { NavigationBar } from '../../components/NavigationBar';
+import LoadingSpinner from '../../components/LoadingSpinner';
 
 export default function HomePage() {
   const { isLoading, isAuthenticated, user,
@@ -167,7 +168,7 @@ export default function HomePage() {
   // }
 
   if (isLoading) {
-    return <p>Loading...</p>;
+    return <LoadingSpinner text='Preparing your session...' />
   } else {
     if (isAuthenticated) {
       return (
