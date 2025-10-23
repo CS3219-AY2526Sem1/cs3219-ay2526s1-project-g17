@@ -130,3 +130,26 @@
 **Note:**
 - All endpoints return JSON responses.
 - Admin-only endpoints require a valid JWT with admin privileges.
+
+
+# Question Service Justifications
+
+## NoSQL vs SQL
+
+### Database choice: MongoDB Atlas
+
+The Question Service uses MongoDB Atlas as its main database driver for the following reasons:
+- Since the Question Service manages only question objects, there is no need to maintain data integrity across multiple tables which is something that SQL databases provide
+- NoSQL schemas are flexible and new fields can be easily added without having to run expensive and slow commands such as ALTER TABLE
+- As more questions are added, it is easier to horizontally scale the database as MongoDB Atlas will automatically distribute the load and storage across multiple servers
+
+---
+
+## Container base image
+
+### Image choice: node:22-alpine
+
+The service uses node:22-alpine as its base image for the following reasons:
+- The node:22-alpine image is much smaller than the default node:22 image
+- The lightweight image allows the container to build quicker, deploy faster and minimise storage consumption
+- node is chosen as the runtime environment because the entire application is built using the Node.js framework
