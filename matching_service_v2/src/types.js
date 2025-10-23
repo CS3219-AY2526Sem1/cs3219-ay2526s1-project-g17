@@ -18,6 +18,7 @@
 
 /**
  * @typedef {Object} MatchRequest
+ * @property {string} userId
  * @property {"match-request"} type
  * @property {Array<Criteria>} criterias
  * @property {number} time
@@ -53,6 +54,16 @@
  * @typedef {Object} MatchedDetails
  * @property {string} partner
  * @property {Criteria} criteria
+ */
+
+/**
+ * @typedef {Object} MatchFound
+ * @property {"match-found"} type
+ * @property {CollaborationSession} session
+ */
+
+/**
+ * @typedef {MatchFound} ToUser
  */
 
 export {};

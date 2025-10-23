@@ -1,12 +1,10 @@
 import express from "express";
 import { collaborationService, matchedDetailsService } from "../server.js";
-import { verifyAccessToken } from "../middleware/basic-access-control.js";
+import axios from "axios";
+import { COLLABORATION_URL } from "../constants.js";
+import { verifyAccessToken } from "../middleware/basic_access_control.js";
 
 const router = express.Router();
-
-router.get("/", (req, res) => {
-  res.status(200).json({ message: "Hello from matching service" });
-});
 
 router.delete("/endSession", async (req, res) => {
   const { userId1, userId2 } = req.body;
@@ -23,22 +21,53 @@ router.delete("/endSession", async (req, res) => {
   }
 });
 
+/**
+ * @param {string} sessionId
+ */
+async function fetchSession(sessionId) {
+  try {
+    const url = `${COLLABORATION_URL}/sessions/${sessionId}`;
+    console.log(`GET ${url}`);
+    const res = await axios.get(url);
+    const data = res.data;
+    console.log("Session retrieved", data);
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch session", error);
+    return null;
+  }
+}
+
 router.get("/initiateMatch", verifyAccessToken, async (req, res) => {
-  const { userId } = req.body;
+  const { userId } = req.query;
   try {
     const matchedDetails = await matchedDetailsService.getMatchedDetails(
-      userId
+      userId.toString()
     );
     if (matchedDetails) {
       const collaborationSession =
         await collaborationService.getCollaborationSession(
-          userId,
+          userId.toString(),
           matchedDetails.partner
         );
+      //TODO: Call collaboration service to check if there such session
+      const session = await fetchSession(collaborationSession.session);
+
       if (collaborationSession) {
-        res
-          .status(200)
-          .json({ code: "has-existing", session: collaborationSession });
+        console.log(
+          `Has existing session on matching service: ${collaborationSession.session}`
+        );
+        if (session) {
+          console.log(`${collaborationSession.session} is still active`);
+          res
+            .status(200)
+            .json({ code: "has-existing", session: collaborationSession });
+        } else {
+          await collaborationService.deleteCollaborationSession(
+            userId.toString(),
+            matchedDetails.partner
+          );
+        }
       } else {
         res.status(200).json({ code: "no-existing" });
       }

@@ -26,33 +26,33 @@ export default function CollabEditor({
         const ydoc = new Y.Doc();
         const ytext = ydoc.getText("code");
 
-        // Connect to Socket.IO (for session management)
-        const SOCKET_IO_BASE = import.meta.env.VITE_SOCKET_IO_BASE || "http://localhost:3002";
-        const socket = io(SOCKET_IO_BASE, { reconnection: true });
-        socketRef.current = socket;
+        // // Connect to Socket.IO (for session management)
+        // const SOCKET_IO_BASE = import.meta.env.VITE_SOCKET_IO_BASE || "http://localhost:3002";
+        // const socket = io(SOCKET_IO_BASE, { reconnection: true });
+        // socketRef.current = socket;
 
-        socket.on("connect", () => {
-            console.log("Connected to Socket.IO server");
-            socket.emit("joinSession", { sessionId, userId: `user-${Math.floor(Math.random() * 1000)}` });
-        });
+        // socket.on("connect", () => {
+        //     console.log("Connected to Socket.IO server");
+        //     socket.emit("joinSession", { sessionId, userId: `user-${Math.floor(Math.random() * 1000)}` });
+        // });
 
-        socket.on("disconnect", () => {
-            console.log("Disconnected from Socket.IO server");
-        });
+        // socket.on("disconnect", () => {
+        //     console.log("Disconnected from Socket.IO server");
+        // });
 
-        socket.on("initialDoc", (encodedUpdate) => {
-            Y.applyUpdate(ydoc, encodedUpdate);
-            console.log("Applied initial document update from server");
-        });
+        // socket.on("initialDoc", (encodedUpdate) => {
+        //     Y.applyUpdate(ydoc, encodedUpdate);
+        //     console.log("Applied initial document update from server");
+        // });
 
-        socket.on("userJoined", (data) => {
-            console.log(`User joined: ${data.userId}`);
-        });
+        // socket.on("userJoined", (data) => {
+        //     console.log(`User joined: ${data.userId}`);
+        // });
 
-        socket.on("sessionTerminated", () => {
-            console.log("Session terminated by server");
-            editor.updateOptions({ readOnly: true });
-        });
+        // socket.on("sessionTerminated", () => {
+        //     console.log("Session terminated by server");
+        //     editor.updateOptions({ readOnly: true });
+        // });
 
         // Connect to Yjs WebSocket provider
         const WS_BASE = import.meta.env.VITE_WS_BASE || "ws://localhost:3002";

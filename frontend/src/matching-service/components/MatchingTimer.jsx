@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { cancelMatchRequest } from "../services/matchingService";
 import "./MatchingTimer.css";
 
@@ -12,17 +12,23 @@ import "./MatchingTimer.css";
 const MatchingTimer = ({ isVisible, requestId, onCancel }) => {
   const [timeElapsed, setTimeElapsed] = useState(0);
   const [isCancelling, setIsCancelling] = useState(false);
+  const startTimeRef = useRef(null);
 
   useEffect(() => {
     let interval = null;
 
     if (isVisible) {
+      startTimeRef.current = Date.now();
       setTimeElapsed(0);
+
       interval = setInterval(() => {
-        setTimeElapsed((prevTime) => prevTime + 1);
+        const now = Date.now();
+        const elapsed = Math.floor((now - startTimeRef.current) / 1000);
+        setTimeElapsed(elapsed);
       }, 1000);
     } else {
       setTimeElapsed(0);
+      startTimeRef.current = null;
     }
 
     return () => {

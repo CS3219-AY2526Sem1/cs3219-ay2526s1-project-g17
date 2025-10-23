@@ -1,9 +1,14 @@
 import React, { useState, useEffect } from "react";
 import {
   fetchTopics,
+  getWebSocketService,
   submitMatchRequestViaWebSocket,
 } from "../services/matchingService";
 import "./MatchingCriteriaDialog.css";
+import axios from "axios";
+import { useAuth0 } from "@auth0/auth0-react";
+import { MATCHING_SERVICE_URL } from "../constants";
+import { useNavigate } from "react-router";
 
 /**
  * @typedef {import("../types").MatchRequest} MatchRequest
@@ -24,6 +29,8 @@ const MatchingCriteriaDialog = ({ isOpen, onClose, onSubmit }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const { user, getAccessTokenSilently } = useAuth0();
+  const navigate = useNavigate();
 
   const languages = [
     "JavaScript",
@@ -75,12 +82,23 @@ const MatchingCriteriaDialog = ({ isOpen, onClose, onSubmit }) => {
     setError("");
   };
 
+  const handleDisconnectAndClose = () => {
+    const wsService = getWebSocketService();
+    wsService.disconnect();
+    handleClose();
+  };
+
   const handleClose = () => {
     resetForm();
     onClose();
   };
 
   const handleSubmit = async (e) => {
+    if (!user || !user.sub) {
+      console.log("User not logged in");
+      navigate("/");
+      return;
+    }
     e.preventDefault();
 
     // Validation
@@ -105,23 +123,56 @@ const MatchingCriteriaDialog = ({ isOpen, onClose, onSubmit }) => {
     setError("");
 
     try {
-      /** @type {MatchRequest} */
-      const matchRequest = {
-        type: "match-request",
-        criterias: selectedTopics.map((topic) => ({
-          difficulty,
-          language,
-          topic,
-        })),
-      };
+      console.log("Check for existing match");
+      const token = await getAccessTokenSilently();
+      const res = await axios.get(
+        `${MATCHING_SERVICE_URL}/api/matching/initiateMatch`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          params: {
+            userId: user.sub,
+          },
+        }
+      );
+      /** @type {import("../types").InitiateMatchResponse} */
+      const data = res.data;
+      console.log("Received data", data);
+      switch (data.code) {
+        case "has-existing":
+          /** @type {import("../types").MatchExists} */
+          data;
+          navigate(`collaboration/${data.session.session}`);
+          break;
+        case "no-existing":
+          {
+            /** @type {MatchRequest} */
+            const matchRequest = {
+              type: "match-request",
+              criterias: selectedTopics.map((topic) => ({
+                difficulty,
+                language,
+                topic,
+              })),
+            };
 
-      const response = await submitMatchRequestViaWebSocket(matchRequest);
-      console.log(`Response: `, response);
-      if (response.success) {
-        onSubmit && onSubmit(matchRequest, response);
-        handleClose();
-      } else {
-        setError("Failed to submit match request. Please try again.");
+            const response = await submitMatchRequestViaWebSocket(
+              user.sub,
+              matchRequest
+            );
+            console.log(`Response: `, response);
+            if (response.success) {
+              onSubmit && onSubmit(matchRequest, response);
+              handleClose();
+            } else {
+              setError("Failed to submit match request. Please try again.");
+            }
+          }
+          break;
+        default:
+          console.log(`Unaccounted case: ${data.code}`);
+          break;
       }
     } catch (err) {
       setError("Failed to submit match request. Please try again.");
@@ -134,11 +185,15 @@ const MatchingCriteriaDialog = ({ isOpen, onClose, onSubmit }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="dialog-overlay" onClick={handleClose}>
+    <div className="dialog-overlay" onClick={handleDisconnectAndClose}>
       <div className="dialog-content" onClick={(e) => e.stopPropagation()}>
         <div className="dialog-header">
           <h2>Select Matching Criteria</h2>
-          <button className="close-button" onClick={handleClose} type="button">
+          <button
+            className="close-button"
+            onClick={handleDisconnectAndClose}
+            type="button"
+          >
             ×
           </button>
         </div>
@@ -228,7 +283,7 @@ const MatchingCriteriaDialog = ({ isOpen, onClose, onSubmit }) => {
             <button
               type="button"
               className="cancel-button"
-              onClick={handleClose}
+              onClick={handleDisconnectAndClose}
               disabled={isSubmitting}
             >
               Cancel
