@@ -182,6 +182,7 @@ export default function HomePage() {
                 Welcome to <span className="brand">PeerPrep</span>, {user.nickname}
               </h1>
               <p className="hero__subtitle">
+                Problems are best solved together.
                 Pair up instantly, code collaboratively, and level up together.
               </p>
 

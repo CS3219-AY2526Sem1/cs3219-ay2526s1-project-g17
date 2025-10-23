@@ -55,7 +55,7 @@
 }
 
 
-/* Result card (reuses your dark panel aesthetic) */
+/* Result card (reuses dark panel aesthetic) */
 .matching__card {
   background: var(--panel);
   border: 1px solid rgba(255,255,255,0.08);
@@ -69,7 +69,7 @@
   font-size: 1.25rem;
 }
 
-/* Artwork / decorative block (optional image can replace this) */
+/* Artwork / decorative block (image can replace this) */
 .matching__art {
   display: grid;
   place-items: center;
