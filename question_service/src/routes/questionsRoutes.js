@@ -7,7 +7,6 @@ import {
     editQuestion,
     deleteQuestion,
     getRandomQuestionIdByDifficultyAndTopic,
-    getListOfQuestionsByDifficultyAndTopic,
     getListOfTopicsByDifficulty,
     getAllTopics
 } from "../controllers/questionsController.js";
@@ -20,7 +19,6 @@ const router = express.Router();
 
 
 router.get("/", getAllQuestions);
-router.get("/randomList", getListOfQuestionsByDifficultyAndTopic);
 router.get("/randomQuestion", getRandomQuestionIdByDifficultyAndTopic);
 router.get("/topics", getAllTopics);
 router.get("/topicsByDifficulty", getListOfTopicsByDifficulty);

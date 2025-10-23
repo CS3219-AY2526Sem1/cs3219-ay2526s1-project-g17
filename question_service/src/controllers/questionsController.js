@@ -100,32 +100,6 @@ export async function getRandomQuestionIdByDifficultyAndTopic(req, res) {
     }
 }
 
-export async function getListOfQuestionsByDifficultyAndTopic(req, res) {
-    try {
-        const { difficulty, topics } = req.body;
-
-        const data = await Question.aggregate()
-            .match({
-                difficulty: difficulty,
-                topics: { $in: topics } // will return a list of matches as long as one of the topics in the request is present in the database
-            });
-
-        if (data.length == 0) return res.status(404).json({ message: "No question matches the defined criteria" });
-
-        // if multiple topics are specified (for eg. array, oop):
-        // like q1 has [array, recursion]
-        // and  q2 has [recursion, oop]
-
-        // does not work if no topic selected
-        // does not work if no difficulty selected
-
-        res.status(200).json(data);
-    } catch (error) {
-        console.error("Error in getListOfQuestionsByDifficultyAndTopic controller", error);
-        res.status(500).json({ message: "Internal server error" });
-    }
-}
-
 export async function getListOfTopicsByDifficulty(_, res) {
     try {
         const data = await Question.find();
