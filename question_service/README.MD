@@ -101,23 +101,6 @@
 
 ---
 
-### Get List of Questions by Difficulty and Topics
-
-- **HTTP Method:** `GET`
-- **Endpoint:** `http://localhost:5001/api/questions/randomList`
-- **Query Parameters:**
-	- `difficulty` (string)
-	- `topics` (comma-separated string)
-- **Description:** Returns a list of questions matching the criteria.
-
-| Response Code | Explanation                                 |
-|--------------|---------------------------------------------|
-| 200 (OK)     | Success, questions returned                  |
-| 404          | No matching questions found                  |
-| 500          | Internal server error                        |
-
----
-
 ### Get All Topics
 
 - **HTTP Method:** `GET`
