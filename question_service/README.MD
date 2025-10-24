@@ -153,5 +153,3 @@ The service uses node:22-alpine as its base image for the following reasons:
 - The node:22-alpine image is much smaller than the default node:22 image
 - The lightweight image allows the container to build quicker, deploy faster and minimise storage consumption
 - node is chosen as the runtime environment because the entire application is built using the Node.js framework
-
-this is a test pr, build please
