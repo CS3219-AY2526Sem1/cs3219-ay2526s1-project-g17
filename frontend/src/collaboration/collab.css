@@ -123,6 +123,17 @@ body,
     box-sizing: border-box;
 }
 
+.chat-user-id {
+    margin-right: 5px;
+    font-weight: 700;
+    font-size: 1.05em;
+    color: rgb(56, 189, 53); 
+}
+
+.chat-user-id.gemini {
+    color: #44a4d7; /* Distinct color for 'gemini' */
+}
+
 /* ----------------------------------
  * 3. RIGHT PANEL (Monaco Editor)
  * ---------------------------------- */

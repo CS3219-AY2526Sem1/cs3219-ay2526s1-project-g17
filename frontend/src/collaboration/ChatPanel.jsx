@@ -79,11 +79,12 @@ const handleSubmit = (e) => {
           border: '1px solid #ccc', 
           padding: '10px',
           marginBottom: '10px',
-          borderRadius: '4px'
+          borderRadius: '4px',
+          textAlign: 'left'
         }}>
         {messages.map((msg, i) => (
           <div key={i} style={{ marginBottom: '8px' }}>
-            <strong>{msg.userId}:</strong> {msg.message}
+            <strong className={`chat-user-id ${msg.userId === 'gemini' ? 'gemini' : ''}`}>{msg.userId}:</strong> {msg.message}
           </div>
         ))}
         <div ref={messagesEndRef} />
