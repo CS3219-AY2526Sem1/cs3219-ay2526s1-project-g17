@@ -31,7 +31,7 @@ jobs:
         with:
           node-version: 22  
           cache: 'npm'
-          cache-dependency-path: question_service/package-lock.json # 
+          cache-dependency-path: question_service/package-lock.json
 
       - name: Install dependencies
         run: npm ci
@@ -65,7 +65,7 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v6
         with:
-          context: ./question-service
+          context: ./question_service # change this to your service, change the image names under tags below also!!
           push: true
           tags: |
             ghcr.io/cs3219-ay2526sem1/cs3219-ay2526s1-project-g17/question-service:${{ github.sha }}
