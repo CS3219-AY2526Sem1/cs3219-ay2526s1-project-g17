@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"; // 💥 Corrected imports
+import { useState, useEffect } from "react";
 
 const QUESTION_SERVICE_BASE_URL = 'http://localhost:5001/api/questions';
 
@@ -44,7 +44,7 @@ export default function QuestionPanel({ questionId }) {
     if (isLoading) {
         content = <p>Loading problem statement...</p>;
     } else if (error) {
-        content = <p style={{ color: 'red' }}>Error: {error}</p>;
+        content = <p className="error-message">Error: {error}</p>;
     } else if (question) {
         content = (
             <>

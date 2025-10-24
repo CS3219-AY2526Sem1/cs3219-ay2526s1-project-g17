@@ -5,7 +5,7 @@ export default function ChatPanel({ sessionId, userId }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const messagesEndRef = useRef(null);
-  const socketRef = useRef(null); // Add this
+  const socketRef = useRef(null);
 
   // Auto-scroll to bottom
   useEffect(() => {
@@ -70,24 +70,16 @@ const handleSubmit = (e) => {
 };
 
   return (
-    <div style={{ padding: '15px', height: '100%', display: 'flex', flexDirection: 'column' }}>
-      <h3 style={{ margin: '0 0 10px' }}>Collaborative Chat</h3>
+    <div className='chat-panel-area'>
+      <h3 className='chat-header'>Collaborative Chat</h3>
       
-      <div style={{ 
-          flex: 1, 
-          overflowY: 'auto', 
-          border: '1px solid #ccc', 
-          padding: '10px',
-          marginBottom: '10px',
-          borderRadius: '4px',
-          textAlign: 'left'
-        }}>
+      <div className='chat-container'>
         {messages.map((msg, i) => (
-          <div key={i} style={{ marginBottom: '8px' }}>
+          <div key={i} className='message'>
             <strong className={`chat-user-id ${msg.userId === 'gemini' ? 'gemini' : ''}`}>{msg.userId}:</strong> {msg.message}
           </div>
         ))}
-        <div ref={messagesEndRef} />
+        <div ref={messagesEndRef}/>
       </div>
 
       <form onSubmit={handleSubmit} style={{ display: 'flex' }}>
@@ -96,9 +88,9 @@ const handleSubmit = (e) => {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Type a message..."
-          style={{ flex: 1, padding: '8px', marginRight: '8px' }}
+          className='chat-input-box'
         />
-        <button type="submit" style={{ padding: '8px 12px' }}>Send</button>
+        <button type="submit" className='chat-submit-button'>Send</button>
       </form>
     </div>
   );
