@@ -26,9 +26,9 @@ body,
 [data-theme="light"] {
     --bg: #ffffff;
     --panel: #f0f0f0;
-    --border: #ccc;
+    --border: #dddddd;
     --text: #111111;
-    --muted: #666666;
+    --muted: #545454;
 }
 
 /* ----------------------------------
@@ -42,6 +42,7 @@ body,
     background-color: var(--bg);
     color: var(--text);
     overflow: hidden;
+    border: var(--border);
 }
 
 .collab-header {
@@ -103,6 +104,36 @@ body,
     background-color: var(--bg);
 }
 
+.question-title {
+    margin-bottom: 8px;
+    color: var(--text);
+}
+
+.question-topic-text {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 0.9em;
+    color: var(--muted);
+}
+
+.question-description {
+    white-space: pre-wrap; /* Preserve whitespace and line breaks */
+    line-height: 1.4em;
+    font-size: 1em;
+    color: var(--text);
+    border-top: 1px solid var(--border);
+    padding-top: 10px;
+}
+
+.question-difficulty {
+    margin-left: 10px;
+    font-size: 0.8em;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background-color: var(--text);
+    color: var(--bg);
+}
+
 .chat-panel-area {
     flex: 4; /* Takes up 40% of the left column's height */
     display: flex;
@@ -110,12 +141,13 @@ body,
     padding: 15px;
     background-color: var(--panel);
     overflow: hidden;
+    border: var(--border);
 }
 
 .chat-panel-area input[type="text"] {
     margin-top: auto; /* Push input to bottom */
     padding: 8px;
-    border: 1px solid #555;
+    border: 1px solid var(--border);
     background-color: var(--bg);
     color: var(--text);
     border-radius: 4px;
