@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import { useMemo, useState } from "react";
 import CollabEditor from "./CollabEditor";
 import QuestionPanel from "./QuestionPanel"; 
@@ -6,7 +6,9 @@ import ChatPanel from "./ChatPanel";
 import "./collab.css";
 
 export default function CollabPage() {
+    const location = useLocation();
     const { sessionId } = useParams();
+    const questionId = new URLSearchParams(location.search).get('questionId');
     const [theme, setTheme] = useState("vs-dark");
     const [lang, setLang] = useState("javascript");
     const [peers, setPeers] = useState([]); // awareness list
@@ -51,7 +53,7 @@ export default function CollabPage() {
                 {/* Left panel: Question + Chat */}
                 <div className="left-panel-column">
                     <div className="question-panel-area">
-                        <QuestionPanel sessionId={sessionId} /> 
+                        <QuestionPanel questionId={questionId} /> 
                     </div>
                     <div className="chat-panel-area">
                         <ChatPanel sessionId={sessionId} /> 
