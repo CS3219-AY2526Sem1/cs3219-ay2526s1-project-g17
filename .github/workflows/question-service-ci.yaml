@@ -5,13 +5,13 @@ on:
     branches:
       - 'master'
     paths:
-      - 'question-service/**'
+      - 'question_service/**'
       - '.github/workflows/question-service-ci.yml'
   pull_request:
     branches:
       - 'master'
     paths:
-      - 'question-service/**'
+      - 'question_service/**'
       - '.github/workflows/question-service-ci.yml'
 
 jobs:
