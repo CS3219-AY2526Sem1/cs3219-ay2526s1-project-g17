@@ -10,7 +10,6 @@ import LoadingSpinner from "../../components/LoadingSpinner";
 import { MATCH_CANCELLED, MATCH_FOUND, MATCH_TIMEOUT } from "../constants";
 import { useNavigate } from "react-router";
 
-
 export default function MatchingPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isMatching, setIsMatching] = useState(false);
@@ -101,11 +100,8 @@ export default function MatchingPage() {
   };
 
   if (isLoading) {
-    return (
-      <LoadingSpinner text="Preparing your session" />
-    )
+    return <LoadingSpinner text="Preparing your session" />;
   } else {
-
     return (
       <div className="matching-page">
         <NavigationBar />
@@ -122,18 +118,20 @@ export default function MatchingPage() {
               <div className="matching__content">
                 <h1 className="matching__title">Find your coding partner</h1>
                 <p className="matching__subtitle">
-                  Choose your difficulty, topics, and preferences — we’ll pair you in seconds.
+                  Choose your difficulty, topics, and preferences — we’ll pair
+                  you in seconds.
                 </p>
 
                 {!isMatching && (
                   <div className="matching__actions">
-                    <button className="btn btn--primary" onClick={handleOpenDialog}>
+                    <button
+                      className="btn btn--primary"
+                      onClick={handleOpenDialog}
+                    >
                       Find a Match
                     </button>
                   </div>
                 )}
-
-                
               </div>
 
               <aside className="matching__art">
@@ -152,5 +150,4 @@ export default function MatchingPage() {
       </div>
     );
   }
-
 }
