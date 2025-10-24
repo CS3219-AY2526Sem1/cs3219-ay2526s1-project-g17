@@ -68,5 +68,5 @@ jobs:
           context: ./question-service
           push: true
           tags: |
-            ghcr.io/${{ github.repository | toLowerCase }}/question-service:${{ github.sha }}
-            ghcr.io/${{ github.repository | toLowerCase }}/question-service:latest
+            ghcr.io/cs3219-ay2526sem1/cs3219-ay2526s1-project-g17/question-service:${{ github.sha }}
+            ghcr.io/cs3219-ay2526sem1/cs3219-ay2526s1-project-g17/question-service:latest
