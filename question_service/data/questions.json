@@ -6,8 +6,7 @@
     "topics": [
       "Strings",
       "Algorithms"
-    ],
-    "link": "https://leetcode.com/problems/reverse-string/"
+    ]
   },
   {
     "title": "Linked List Cycle Detection",
@@ -16,8 +15,7 @@
     "topics": [
       "Data Structures",
       "Algorithms"
-    ],
-    "link": "https://leetcode.com/problems/linked-list-cycle/"
+    ]
   },
   {
     "title": "Roman to Integer",
@@ -25,8 +23,7 @@
     "difficulty": "Beginner",
     "topics": [
       "Algorithms"
-    ],
-    "link": "https://leetcode.com/problems/roman-to-integer/"
+    ]
   },
   {
     "title": "Add Binary",
@@ -35,8 +32,7 @@
     "topics": [
       "Bit Manipulation",
       "Algorithms"
-    ],
-    "link": "https://leetcode.com/problems/add-binary/"
+    ]
   },
   {
     "title": "Fibonacci Number",
@@ -45,8 +41,7 @@
     "topics": [
       "Recursion",
       "Algorithms"
-    ],
-    "link": "https://leetcode.com/problems/fibonacci-number/"
+    ]
   },
   {
     "title": "Implement Stack using Queues",
@@ -54,8 +49,7 @@
     "difficulty": "Beginner",
     "topics": [
       "Data Structures"
-    ],
-    "link": "https://leetcode.com/problems/implement-stack-using-queues/"
+    ]
   },
   {
     "title": "Combine Two Tables",
@@ -63,8 +57,7 @@
     "difficulty": "Beginner",
     "topics": [
       "Databases"
-    ],
-    "link": "https://leetcode.com/problems/combine-two-tables/"
+    ]
   },
   {
     "title": "Repeated DNA Sequences",
@@ -73,8 +66,7 @@
     "topics": [
       "Algorithms",
       "Bit Manipulation"
-    ],
-    "link": "https://leetcode.com/problems/repeated-dna-sequences/"
+    ]
   },
   {
     "title": "Course Schedule",
@@ -83,8 +75,7 @@
     "topics": [
       "Data Structures",
       "Algorithms"
-    ],
-    "link": "https://leetcode.com/problems/course-schedule/"
+    ]
   },
   {
     "title": "LRU Cache Design",
@@ -92,8 +83,7 @@
     "difficulty": "Intermediate",
     "topics": [
       "Data Structures"
-    ],
-    "link": "https://leetcode.com/problems/lru-cache/"
+    ]
   },
   {
     "title": "Longest Common Subsequence",
@@ -102,8 +92,7 @@
     "topics": [
       "Strings",
       "Algorithms"
-    ],
-    "link": "https://leetcode.com/problems/longest-common-subsequence/"
+    ]
   },
   {
     "title": "Rotate Image",
@@ -112,8 +101,7 @@
     "topics": [
       "Arrays",
       "Algorithms"
-    ],
-    "link": "https://leetcode.com/problems/rotate-image/"
+    ]
   },
   {
     "title": "Airplane Seat Assignment Probability",
@@ -121,8 +109,7 @@
     "difficulty": "Intermediate",
     "topics": [
       "Brainteaser"
-    ],
-    "link": "https://leetcode.com/problems/airplane-seat-assignment-probability/"
+    ]
   },
   {
     "title": "Validate Binary Search Tree",
@@ -131,8 +118,7 @@
     "topics": [
       "Data Structures",
       "Algorithms"
-    ],
-    "link": "https://leetcode.com/problems/validate-binary-search-tree/"
+    ]
   },
   {
     "title": "Sliding Window Maximum",
@@ -141,8 +127,7 @@
     "topics": [
       "Arrays",
       "Algorithms"
-    ],
-    "link": "https://leetcode.com/problems/sliding-window-maximum/"
+    ]
   },
   {
     "title": "N-Queen Problem",
@@ -150,8 +135,7 @@
     "difficulty": "Advanced",
     "topics": [
       "Algorithms"
-    ],
-    "link": "https://leetcode.com/problems/n-queens/"
+    ]
   },
   {
     "title": "Serialize and Deserialize a Binary Tree",
@@ -160,8 +144,7 @@
     "topics": [
       "Data Structures",
       "Algorithms"
-    ],
-    "link": "https://leetcode.com/problems/serialize-and-deserialize-binary-tree/"
+    ]
   },
   {
     "title": "Wildcard Matching",
@@ -170,8 +153,7 @@
     "topics": [
       "Strings",
       "Algorithms"
-    ],
-    "link": "https://leetcode.com/problems/wildcard-matching/"
+    ]
   },
   {
     "title": "Chalkboard XOR Game",
@@ -179,8 +161,7 @@
     "difficulty": "Advanced",
     "topics": [
       "Brainteaser"
-    ],
-    "link": "https://leetcode.com/problems/chalkboard-xor-game/"
+    ]
   },
   {
     "title": "Trips and Users",
@@ -188,8 +169,7 @@
     "difficulty": "Advanced",
     "topics": [
       "Databases"
-    ],
-    "link": "https://leetcode.com/problems/trips-and-users/"
+    ]
   },
   {
     "title": "Two Sum",
@@ -199,7 +179,6 @@
       "Arrays",
       "Algorithms"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: nums = [2,7,11,15], target = 9, Output: [0,1]",
       "Input: nums = [3,2,4], target = 6, Output: [1,2]"
@@ -215,7 +194,6 @@
     "topics": [
       "Strings"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: s = \"A man, a plan, a canal: Panama\", Output: true",
       "Input: s = \"race a car\", Output: false"
@@ -232,7 +210,6 @@
       "Data Structures",
       "Recursion"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: root = [4,2,7,1,3,6,9], Output: [4,7,2,9,6,3,1]",
       "Input: root = [2,1,3], Output: [2,3,1]"
@@ -248,7 +225,6 @@
     "topics": [
       "Databases"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: Employee table = {id: 1, name: 'Joe', salary: 70000, managerId: 3}, {id: 2, name: 'Henry', salary: 80000, managerId: 4}, {id: 3, name: 'Sam', salary: 60000, managerId: NULL}, {id: 4, name: 'Max', salary: 90000, managerId: NULL}. Output: 'Joe'"
     ],
@@ -263,7 +239,6 @@
     "topics": [
       "Brainteaser"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: numBottles = 9, numExchange = 3, Output: 13",
       "Input: numBottles = 15, numExchange = 4, Output: 19"
@@ -281,7 +256,6 @@
       "Strings",
       "Algorithms"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: strs = [\"eat\",\"tea\",\"tan\",\"ate\",\"nat\",\"bat\"], Output: [[\"bat\"],[\"nat\",\"tan\"],[\"ate\",\"eat\",\"tea\"]]"
     ],
@@ -297,7 +271,6 @@
       "Recursion",
       "Algorithms"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: nums = [1,2,3], Output: [[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]]",
       "Input: nums = [0,1], Output: [[0,1],[1,0]]"
@@ -313,7 +286,6 @@
     "topics": [
       "Databases"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "See the problem link for detailed table examples."
     ],
@@ -329,7 +301,6 @@
       "Arrays",
       "Algorithms"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: height = [0,1,0,2,1,0,1,3,2,1,2,1], Output: 6",
       "Input: height = [4,2,0,3,2,5], Output: 9"
@@ -346,7 +317,6 @@
       "Recursion",
       "Algorithms"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: A 9x9 board with some numbers and '.' for empty cells. Output: The solved 9x9 board."
     ],
@@ -362,7 +332,6 @@
       "Strings",
       "Algorithms"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: s = \"anagram\", t = \"nagaram\", Output: true",
       "Input: s = \"rat\", t = \"car\", Output: false"
@@ -378,7 +347,6 @@
     "topics": [
       "Strings"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: haystack = \"sadbutsad\", needle = \"sad\", Output: 0",
       "Input: haystack = \"leetcode\", needle = \"leeto\", Output: -1"
@@ -395,7 +363,6 @@
       "Data Structures",
       "Recursion"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: list1 = [1,2,4], list2 = [1,3,4], Output: [1,1,2,3,4,4]"
     ],
@@ -411,7 +378,6 @@
       "Arrays",
       "Bit Manipulation"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: nums = [3,0,1], Output: 2",
       "Input: nums = [9,6,4,2,3,5,7,0,1], Output: 8"
@@ -427,7 +393,6 @@
     "topics": [
       "Bit Manipulation"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: n = 11 (binary: 00000000000000000000000000001011), Output: 3"
     ],
@@ -442,7 +407,6 @@
     "topics": [
       "Bit Manipulation"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: n = 1, Output: true",
       "Input: n = 16, Output: true",
@@ -460,7 +424,6 @@
       "Recursion",
       "Algorithms"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: n = 2, Output: 2",
       "Input: n = 3, Output: 3"
@@ -476,7 +439,6 @@
     "topics": [
       "Databases"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: Person table = {{id: 1, email: 'john@example.com'}, {id: 2, email: 'bob@example.com'}, {id: 3, email: 'john@example.com'}}. Output: The table should be modified to {{id: 1, email: 'john@example.com'}, {id: 2, email: 'bob@example.com'}}."
     ],
@@ -491,7 +453,6 @@
     "topics": [
       "Arrays"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: nums = [1,2,3,1], Output: true",
       "Input: nums = [1,2,3,4], Output: false"
@@ -507,7 +468,6 @@
     "topics": [
       "Brainteaser"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: n = 3, Output: [\"1\",\"2\",\"Fizz\"]",
       "Input: n = 5, Output: [\"1\",\"2\",\"Fizz\",\"4\",\"Buzz\"]"
@@ -523,7 +483,6 @@
     "topics": [
       "Brainteaser"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: n = 4, Output: false",
       "Input: n = 1, Output: true",
@@ -541,7 +500,6 @@
       "Arrays",
       "Algorithms"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: nums = [1,2,3,4], Output: [24,12,8,6]",
       "Input: nums = [-1,1,0,-3,3], Output: [0,0,9,0,0]"
@@ -558,7 +516,6 @@
       "Arrays",
       "Algorithms"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: nums = [-1,0,1,2,-1,-4], Output: [[-1,-1,2],[-1,0,1]]"
     ],
@@ -574,7 +531,6 @@
       "Strings",
       "Algorithms"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: s = \"abcabcbb\", Output: 3",
       "Input: s = \"pwwkew\", Output: 3"
@@ -591,7 +547,6 @@
       "Strings",
       "Recursion"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: n = 3, Output: [\"((()))\",\"(()())\",\"(())()\",\"()(())\",\"()()()\"]",
       "Input: n = 1, Output: [\"()\"]"
@@ -608,7 +563,6 @@
       "Data Structures",
       "Algorithms"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: root = [3,1,4,null,2], k = 1, Output: 1",
       "Input: root = [5,3,6,2,4,null,null,1], k = 3, Output: 3"
@@ -625,7 +579,6 @@
       "Bit Manipulation",
       "Recursion"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: nums = [1,2,3], Output: [[],[1],[2],[1,2],[3],[1,3],[2,3],[1,2,3]]"
     ],
@@ -641,7 +594,6 @@
       "Bit Manipulation",
       "Algorithms"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: nums = [2,2,3,2], Output: 3",
       "Input: nums = [0,1,0,1,0,1,99], Output: 99"
@@ -657,7 +609,6 @@
     "topics": [
       "Recursion"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: n = 4, k = 2, Output: [[1,2],[1,3],[1,4],[2,3],[2,4],[3,4]]"
     ],
@@ -672,7 +623,6 @@
     "topics": [
       "Databases"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "See problem link for detailed examples."
     ],
@@ -687,7 +637,6 @@
     "topics": [
       "Databases"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "See problem link for detailed examples."
     ],
@@ -702,7 +651,6 @@
     "topics": [
       "Databases"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "See problem link for detailed examples."
     ],
@@ -717,7 +665,6 @@
     "topics": [
       "Brainteaser"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: n = 3, Output: 1",
       "Input: n = 0, Output: 0",
@@ -734,7 +681,6 @@
     "topics": [
       "Brainteaser"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: hour = 12, minutes = 30, Output: 165",
       "Input: hour = 3, minutes = 30, Output: 75"
@@ -751,7 +697,6 @@
       "Strings",
       "Algorithms"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: words = [\"This\", \"is\", \"an\", \"example\", \"of\", \"text\", \"justification.\"], maxWidth = 16, Output: [\"This    is    an\", \"example  of text\", \"justification.  \"]"
     ],
@@ -766,7 +711,6 @@
     "topics": [
       "Strings"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: s = \"ADOBECODEBANC\", t = \"ABC\", Output: \"BANC\""
     ],
@@ -782,7 +726,6 @@
       "Data Structures",
       "Algorithms"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: lists = [[1,4,5],[1,3,4],[2,6]], Output: [1,1,2,3,4,4,5,6]"
     ],
@@ -798,7 +741,6 @@
       "Data Structures",
       "Arrays"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: heights = [2,1,5,6,2,3], Output: 10"
     ],
@@ -814,7 +756,6 @@
       "Data Structures",
       "Arrays"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: matrix = [[\"1\",\"0\",\"1\",\"0\",\"0\"],[\"1\",\"0\",\"1\",\"1\",\"1\"],[\"1\",\"1\",\"1\",\"1\",\"1\"],[\"1\",\"0\",\"0\",\"1\",\"0\"]], Output: 6"
     ],
@@ -830,7 +771,6 @@
       "Bit Manipulation",
       "Data Structures"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: nums = [3,10,5,25,2,8], Output: 28",
       "Input: nums = [14,70,53,83,49,91,36,80,92,51,66,70], Output: 127"
@@ -846,7 +786,6 @@
     "topics": [
       "Bit Manipulation"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: n = 43261596 (binary: 00000010100101000001111010011100), Output: 964176192 (binary: 00111001011110000010100101000000)"
     ],
@@ -862,7 +801,6 @@
       "Bit Manipulation",
       "Algorithms"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: n = 2, Output: [0,1,1]",
       "Input: n = 5, Output: [0,1,1,2,1,2]"
@@ -879,7 +817,6 @@
       "Recursion",
       "Algorithms"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: beginWord = \"hit\", endWord = \"cog\", wordList = [\"hot\",\"dot\",\"dog\",\"lot\",\"log\",\"cog\"], Output: 5"
     ],
@@ -895,7 +832,6 @@
       "Recursion",
       "Strings"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: s = \"aa\", p = \"a*\", Output: true",
       "Input: s = \"ab\", p = \".*\", Output: true"
@@ -911,7 +847,6 @@
     "topics": [
       "Recursion"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: n = 4, Output: 2",
       "Input: n = 1, Output: 1"
@@ -927,7 +862,6 @@
     "topics": [
       "Databases"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "See problem link for detailed examples."
     ],
@@ -943,7 +877,6 @@
       "Arrays",
       "Algorithms"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: nums1 = [1,3], nums2 = [2], Output: 2.0",
       "Input: nums1 = [1,2], nums2 = [3,4], Output: 2.5"
@@ -960,7 +893,6 @@
       "Data Structures",
       "Algorithms"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: buildings = [[2,9,10],[3,7,15],[5,12,12],[15,20,10],[19,24,8]], Output: [[2,10],[3,15],[7,12],[12,0],[15,10],[20,8],[24,0]]"
     ],
@@ -975,7 +907,6 @@
     "topics": [
       "Data Structures"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "MedianFinder mf = new MedianFinder(); mf.addNum(1); mf.addNum(2); mf.findMedian(); -> 1.5; mf.addNum(3); mf.findMedian(); -> 2.0"
     ],
@@ -990,7 +921,6 @@
     "topics": [
       "Brainteaser"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: stones = [0,1,3,5,6,8,12,17], Output: true",
       "Input: stones = [0,1,2,3,4,8,9,11], Output: false"
@@ -1007,7 +937,6 @@
       "Brainteaser",
       "Algorithms"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: ratings = [1,0,2], Output: 5",
       "Input: ratings = [1,2,2], Output: 4"
@@ -1024,7 +953,6 @@
       "Dynamic Programming",
       "Arrays"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: cost = [10,15,20], Output: 15",
       "Input: cost = [1,100,1,1,1,100,1,1,100,1], Output: 6"
@@ -1041,7 +969,6 @@
       "Dynamic Programming",
       "Arrays"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: prices = [7,1,5,3,6,4], Output: 5",
       "Input: prices = [7,6,4,3,1], Output: 0"
@@ -1058,7 +985,6 @@
       "Dynamic Programming",
       "Arrays"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: nums = [1,2,3,1], Output: 4",
       "Input: nums = [2,7,9,3,1], Output: 12"
@@ -1074,7 +1000,6 @@
     "topics": [
       "Dynamic Programming"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: coins = [1,2,5], amount = 11, Output: 3",
       "Input: coins = [2], amount = 3, Output: -1"
@@ -1090,7 +1015,6 @@
     "topics": [
       "Dynamic Programming"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: nums = [10,9,2,5,3,7,101,18], Output: 4",
       "Input: nums = [0,1,0,3,2,3], Output: 4"
@@ -1107,7 +1031,6 @@
       "Dynamic Programming",
       "Math"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: m = 3, n = 7, Output: 28",
       "Input: m = 3, n = 2, Output: 3"
@@ -1124,7 +1047,6 @@
       "Dynamic Programming",
       "Strings"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: word1 = \"horse\", word2 = \"ros\", Output: 3",
       "Input: word1 = \"intention\", word2 = \"execution\", Output: 5"
@@ -1140,7 +1062,6 @@
     "topics": [
       "Dynamic Programming"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: nums = [3,1,5,8], Output: 167"
     ],
@@ -1156,7 +1077,6 @@
       "Dynamic Programming",
       "Strings"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: s = \"rabbbit\", t = \"rabbit\", Output: 3",
       "Input: s = \"babgbag\", t = \"bag\", Output: 5"
@@ -1172,7 +1092,6 @@
     "topics": [
       "Graph"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: edges = [[1,2],[2,3],[4,2]], Output: 2",
       "Input: edges = [[1,2],[5,1],[1,3],[1,4]], Output: 1"
@@ -1189,7 +1108,6 @@
       "Graph",
       "Recursion"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: image = [[1,1,1],[1,1,0],[1,0,1]], sr = 1, sc = 1, color = 2, Output: [[2,2,2],[2,2,0],[2,0,1]]"
     ],
@@ -1205,7 +1123,6 @@
       "Graph",
       "Data Structures"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: grid = [[\"1\",\"1\",\"0\",\"0\",\"0\"], [\"1\",\"1\",\"0\",\"0\",\"0\"], [\"0\",\"0\",\"1\",\"0\",\"0\"], [\"0\",\"0\",\"0\",\"1\",\"1\"]], Output: 3"
     ],
@@ -1221,7 +1138,6 @@
       "Graph",
       "Data Structures"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: adjList = [[2,4],[1,3],[2,4],[1,3]], Output: [[2,4],[1,3],[2,4],[1,3]]"
     ],
@@ -1237,7 +1153,6 @@
       "Graph",
       "Algorithms"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: grid = [[2,1,1],[1,1,0],[0,1,1]], Output: 4",
       "Input: grid = [[0,2]], Output: 0"
@@ -1253,7 +1168,6 @@
     "topics": [
       "Graph"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: heights = [[1,2,2,3,5],[3,2,3,4,4],[2,4,5,3,1],[6,7,1,4,5],[5,1,1,2,4]], Output: [[0,4],[1,3],[1,4],[2,2],[3,0],[3,1],[4,0]]"
     ],
@@ -1269,7 +1183,6 @@
       "Graph",
       "Algorithms"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: tickets = [[\"JFK\",\"SFO\"],[\"JFK\",\"ATL\"],[\"SFO\",\"ATL\"],[\"ATL\",\"JFK\"],[\"ATL\",\"SFO\"]], Output: [\"JFK\",\"ATL\",\"JFK\",\"SFO\",\"ATL\",\"SFO\"]"
     ],
@@ -1285,7 +1198,6 @@
       "Graph",
       "Dynamic Programming"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: n = 4, flights = [[0,1,100],[1,2,100],[2,0,100],[1,3,600],[2,3,200]], src = 0, dst = 3, k = 1, Output: 700"
     ],
@@ -1301,7 +1213,6 @@
       "Graph",
       "Algorithms"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: n = 4, connections = [[0,1],[1,2],[2,0],[1,3]], Output: [[1,3]]"
     ],
@@ -1316,7 +1227,6 @@
     "topics": [
       "Math"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: x = 121, Output: true",
       "Input: x = -121, Output: false",
@@ -1334,7 +1244,6 @@
       "Math",
       "Algorithms"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: x = 4, Output: 2",
       "Input: x = 8, Output: 2"
@@ -1351,7 +1260,6 @@
       "Math",
       "Data Structures"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: n = 19, Output: true",
       "Input: n = 2, Output: false"
@@ -1368,7 +1276,6 @@
       "Math",
       "Recursion"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: x = 2.00000, n = 10, Output: 1024.00000",
       "Input: x = 2.10000, n = 3, Output: 9.26100",
@@ -1386,7 +1293,6 @@
       "Math",
       "Strings"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: s = \"42\", Output: 42",
       "Input: s = \"   -42\", Output: -42",
@@ -1404,7 +1310,6 @@
       "Math",
       "Strings"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: num = 3, Output: \"III\"",
       "Input: num = 58, Output: \"LVIII\"",
@@ -1422,7 +1327,6 @@
       "Math",
       "Data Structures"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: points = [[1,1],[2,2],[3,3]], Output: 3",
       "Input: points = [[1,1],[3,2],[5,3],[4,1],[2,3],[1,4]], Output: 4"
@@ -1439,7 +1343,6 @@
       "Math",
       "Strings"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: num = 123, Output: \"One Hundred Twenty Three\"",
       "Input: num = 1234567, Output: \"One Million Two Hundred Thirty Four Thousand Five Hundred Sixty Seven\""
@@ -1455,7 +1358,6 @@
     "topics": [
       "Math"
     ],
-    "link": "https://gemini.google.com/app/3f55c939d8ba9748",
     "testCases": [
       "Input: sx = 1, sy = 1, tx = 3, ty = 5, Output: true",
       "Input: sx = 1, sy = 1, tx = 2, ty = 2, Output: false"

@@ -8,6 +8,6 @@ question-service: 5001
 
 collaboration-service: 3002
 
-docker compose up -d to start entire application
+to start entire application: docker compose up --build -d 
 
-docker compose down to stop application
+to stop application: docker compose down

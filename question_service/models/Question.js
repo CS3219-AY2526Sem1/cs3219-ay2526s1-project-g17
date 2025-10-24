@@ -19,10 +19,6 @@ const questionSchema = new mongoose.Schema(
             type: [String],
             required: true,
         },
-        link: {
-            type: String,
-            required: true,
-        },
         testCases: [String],
         constraints: String,
         hints: String,
@@ -30,6 +26,9 @@ const questionSchema = new mongoose.Schema(
     },
     { timestamps: true }
 );
+
+// index for finding a random question by difficulty and topics
+questionSchema.index({ difficulty: 1, topics: 1 });
 
 const Question = mongoose.model("Question", questionSchema);
 

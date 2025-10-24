@@ -24,9 +24,14 @@ export async function getQuestionById(req, res) {
 
 export async function getAllTopics(_, res) {
     try {
-        const data = await Question.find();
-        const allTopics = [...new Set(data.flatMap(q => q.topics))];
+        const data = await Question.aggregate([
+            { $unwind: "$topics" }, // flatten the topics array
+            { $group: { _id: "$topics" } }, // group by unique topic values
+            { $sort: { _id: 1 } }, // sort topics alphabetically
+            { $group: { _id: null, allTopics: { $push: "$_id" } } } // collect all topics into array
+        ]);
 
+        const allTopics = data[0]?.allTopics || [];
         res.status(200).json(allTopics);
     } catch (error) {
         console.error("Error in getAllTopics controller", error);
@@ -97,32 +102,6 @@ export async function getRandomQuestionIdByDifficultyAndTopic(req, res) {
     } catch (error) {
         console.error("Error in getRandomQuestionByDifficultyAndTopic controller", error);
         res.status(500).json({ message: error });
-    }
-}
-
-export async function getListOfQuestionsByDifficultyAndTopic(req, res) {
-    try {
-        const { difficulty, topics } = req.body;
-
-        const data = await Question.aggregate()
-            .match({
-                difficulty: difficulty,
-                topics: { $in: topics } // will return a list of matches as long as one of the topics in the request is present in the database
-            });
-
-        if (data.length == 0) return res.status(404).json({ message: "No question matches the defined criteria" });
-
-        // if multiple topics are specified (for eg. array, oop):
-        // like q1 has [array, recursion]
-        // and  q2 has [recursion, oop]
-
-        // does not work if no topic selected
-        // does not work if no difficulty selected
-
-        res.status(200).json(data);
-    } catch (error) {
-        console.error("Error in getListOfQuestionsByDifficultyAndTopic controller", error);
-        res.status(500).json({ message: "Internal server error" });
     }
 }
 
