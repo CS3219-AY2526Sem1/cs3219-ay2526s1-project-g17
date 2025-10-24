@@ -24,9 +24,14 @@ export async function getQuestionById(req, res) {
 
 export async function getAllTopics(_, res) {
     try {
-        const data = await Question.find();
-        const allTopics = [...new Set(data.flatMap(q => q.topics))];
+        const data = await Question.aggregate([
+            { $unwind: "$topics" }, // flatten the topics array
+            { $group: { _id: "$topics" } }, // group by unique topic values
+            { $sort: { _id: 1 } }, // sort topics alphabetically
+            { $group: { _id: null, allTopics: { $push: "$_id" } } } // collect all topics into array
+        ]);
 
+        const allTopics = data[0]?.allTopics || [];
         res.status(200).json(allTopics);
     } catch (error) {
         console.error("Error in getAllTopics controller", error);
