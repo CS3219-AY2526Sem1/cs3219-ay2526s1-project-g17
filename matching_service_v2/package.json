@@ -17,6 +17,7 @@
     "@types/ws": "^8.18.1",
     "jest": "^30.2.0",
     "nodemon": "^3.1.10",
+    "socket.io-client": "^4.8.1",
     "typescript": "^5.9.3"
   },
   "dependencies": {
@@ -30,6 +31,7 @@
     "mongodb": "^6.20.0",
     "mongoose": "^8.18.2",
     "redis": "^5.8.3",
+    "socket.io": "^4.8.1",
     "ws": "^8.18.3"
   }
 }

@@ -5,61 +5,75 @@
 /** @typedef {import("../types").MatchFoundNotification} MatchFoundNotification */
 
 import axios from "axios";
+import { io } from "socket.io-client";
 
-const WS_URL = "ws://localhost:3001";
+const WS_URL = "http://localhost:3001";
 
 /**
- * WebSocket connection manager
+ * Socket.IO connection manager
  */
-class MatchingWebSocketService {
+class MatchingSocketIOService {
   constructor() {
-    this.ws = null;
-    this.isConnected = false;
+    this.socket = null;
     this.messageHandlers = new Map();
-    this.reconnectAttempts = 0;
-    this.maxReconnectAttempts = 5;
-    this.manualDisconnect = false;
+    this.userId = null;
   }
 
+  isConnected() {
+    if (this.socket) {
+      return this.socket.connected;
+    } else {
+      return false;
+    }
+  }
   /**
-   * Connect to the WebSocket server
+   * Connect to the Socket.IO server
    * @param {string} userId
    * @returns {Promise<void>}
    */
   connect(userId) {
     return new Promise((resolve, reject) => {
       try {
-        this.ws = new WebSocket(`${WS_URL}?userId=${userId}`);
+        this.userId = userId;
 
-        this.ws.onopen = () => {
-          console.log("WebSocket connected");
-          this.isConnected = true;
-          this.reconnectAttempts = 0;
+        // Create Socket.IO connection with query parameters
+        this.socket = io(WS_URL, {
+          query: { userId },
+          autoConnect: true,
+          reconnection: true,
+          reconnectionAttempts: 5,
+          reconnectionDelay: 2000,
+          reconnectionDelayMax: 10000,
+          timeout: 10000,
+        });
+
+        this.socket.on("connect", () => {
+          console.log("Socket.IO connected");
           resolve();
-        };
+        });
 
-        this.ws.onmessage = (event) => {
-          try {
-            const message = JSON.parse(event.data);
-            console.log(message);
-            this.handleMessage(message);
-          } catch (error) {
-            console.error("Error parsing WebSocket message:", error);
-          }
-        };
+        this.socket.on("message", (message) => {
+          console.log("Received message:", message);
+          this.handleMessage(message);
+        });
 
-        this.ws.onclose = () => {
-          console.log("WebSocket disconnected");
-          this.isConnected = false;
-          if (!this.manualDisconnect) {
-            this.attemptReconnect(userId);
-          }
-        };
+        this.socket.on("match-found", (data) => {
+          console.log("Match found:", data);
+          this.handleMessage({ type: "match-found", ...data });
+        });
 
-        this.ws.onerror = (error) => {
-          console.error("WebSocket error:", error);
+        this.socket.on("disconnect", (reason) => {
+          console.log("Socket.IO disconnected:", reason);
+        });
+
+        this.socket.on("connect_error", (error) => {
+          console.error("Socket.IO connection error:", error);
           reject(error);
-        };
+        });
+
+        this.socket.on("error", (error) => {
+          console.error("Socket.IO error:", error);
+        });
       } catch (error) {
         reject(error);
       }
@@ -67,33 +81,25 @@ class MatchingWebSocketService {
   }
 
   /**
-   * Attempt to reconnect to the WebSocket server
-   * @param {string} userId
+   * Send a message through Socket.IO with acknowledgment
+   * @param {string} eventName
+   * @param {Object} data
+   * @returns {Promise<Object>}
    */
-  attemptReconnect(userId) {
-    if (this.reconnectAttempts < this.maxReconnectAttempts) {
-      this.reconnectAttempts++;
-      console.log(
-        `Attempting to reconnect... (${this.reconnectAttempts}/${this.maxReconnectAttempts})`
-      );
-      setTimeout(() => {
-        this.connect(userId).catch(() => {
-          // Will try again if this fails
+  sendMessage(eventName, data) {
+    return new Promise((resolve, reject) => {
+      if (this.socket.connected && this.socket) {
+        this.socket.emit(eventName, data, (response) => {
+          if (response && response.success) {
+            resolve(response);
+          } else {
+            reject(new Error(response?.message || "Message failed"));
+          }
         });
-      }, 2000 * this.reconnectAttempts); // Exponential backoff
-    }
-  }
-
-  /**
-   * Send a message through the WebSocket
-   * @param {MessageToServer} message
-   */
-  sendMessage(message) {
-    if (this.isConnected && this.ws) {
-      this.ws.send(JSON.stringify(message));
-    } else {
-      throw new Error("WebSocket not connected");
-    }
+      } else {
+        reject(new Error("Socket.IO not connected"));
+      }
+    });
   }
 
   /**
@@ -112,7 +118,7 @@ class MatchingWebSocketService {
    * @param {Function} handler
    */
   onMessage(messageType, handler) {
-    console.log(messageType);
+    console.log("Registering handler for:", messageType);
     this.messageHandlers.set(messageType, handler);
   }
 
@@ -125,30 +131,35 @@ class MatchingWebSocketService {
   }
 
   /**
-   * Disconnect from the WebSocket
+   * Disconnect from Socket.IO
    */
   disconnect() {
-    this.manualDisconnect = true;
-    if (this.ws) {
-      this.ws.close();
-      this.ws = null;
-      this.isConnected = false;
+    if (this.socket) {
+      this.socket.disconnect();
+      this.socket = null;
     }
+  }
+
+  /**
+   * Check if socket is connected
+   * @returns {boolean}
+   */
+  isSocketConnected() {
+    return this.socket && this.socket.connected;
   }
 }
 
 // Create a singleton instance
-const wsService = new MatchingWebSocketService();
+const socketService = new MatchingSocketIOService();
 
 /**
- * Get the WebSocket service instance
- * @returns {MatchingWebSocketService}
+ * Get the Socket.IO service instance
+ * @returns {MatchingSocketIOService}
  */
-export const getWebSocketService = () => wsService;
+export const getWebSocketService = () => socketService;
 
 /**
  * Fetches available topics from the server
- * Currently returns dummy data as the backend endpoint is not implemented
  * @returns {Promise<string[]>} Array of topic strings
  */
 export const fetchTopics = async () => {
@@ -162,91 +173,34 @@ export const fetchTopics = async () => {
 };
 
 /**
- * Submits a matching request via WebSocket
+ * Submits a matching request via Socket.IO
  * @param {string} userId
  * @param {MatchRequest} matchRequest - The matching request object
  * @returns {Promise<Object>} Server response
  */
 export async function submitMatchRequestViaWebSocket(userId, matchRequest) {
   try {
-    // Ensure WebSocket connection is established
-    if (!wsService.isConnected) {
-      await wsService.connect(userId);
+    // Ensure Socket.IO connection is established
+    if (!socketService.isConnected()) {
+      await socketService.connect(userId);
     }
 
-    // Send the match request
-    wsService.sendMessage(matchRequest);
+    // Send the match request with acknowledgment
+    const response = await socketService.sendMessage(
+      "match-request",
+      matchRequest
+    );
 
     return {
       success: true,
-      message: "Match request sent via WebSocket",
-      requestId: Math.random().toString(36).substring(2, 9),
+      message: "Match request sent via Socket.IO",
+      requestId: matchRequest.requestId,
+      response: response,
     };
   } catch (error) {
-    console.error("Error sending match request via WebSocket:", error);
-    throw new Error("Failed to send match request via WebSocket");
+    console.error("Error sending match request via Socket.IO:", error);
+    throw new Error(
+      "Failed to send match request via Socket.IO: " + error.message
+    );
   }
 }
-
-/**
- * Cancel a matching request via WebSocket
- * @param {string} requestId - The request ID to cancel
- * @returns {Promise<void>}
- */
-export const cancelMatchRequest = async (requestId) => {
-  try {
-    if (!wsService.isConnected) {
-      throw new Error("WebSocket not connected");
-    }
-
-    wsService.sendMessage({
-      type: "match-cancel",
-      requestId: requestId,
-      time: Date.now(),
-    });
-  } catch (error) {
-    console.error("Error cancelling match request:", error);
-    throw error;
-  }
-};
-
-/**
- * Accept a match via WebSocket
- * @returns {Promise<void>}
- */
-export const acceptMatch = async () => {
-  try {
-    if (!wsService.isConnected) {
-      throw new Error("WebSocket not connected");
-    }
-
-    wsService.sendMessage({
-      type: "matchFoundResponse",
-      response: "accept",
-    });
-  } catch (error) {
-    console.error("Error accepting match:", error);
-    throw error;
-  }
-};
-
-/**
- * Reject a match via WebSocket
- * @param {string} matchId - The match ID to reject
- * @returns {Promise<void>}
- */
-export const rejectMatch = async () => {
-  try {
-    if (!wsService.isConnected) {
-      throw new Error("WebSocket not connected");
-    }
-
-    wsService.sendMessage({
-      type: "matchFoundResponse",
-      response: "reject",
-    });
-  } catch (error) {
-    console.error("Error rejecting match:", error);
-    throw error;
-  }
-};

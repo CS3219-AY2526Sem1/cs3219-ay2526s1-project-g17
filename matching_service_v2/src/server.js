@@ -1,11 +1,10 @@
 import http from "http";
 import index from "./index.js";
-import { WebSocketServer } from "ws";
+import { Server } from "socket.io";
 import {} from "./types.js";
 import { MatchingService } from "./service/matching_service.js";
 import { initializeRedis } from "./model/redis_integration.js";
 
-import { randomUUID } from "crypto";
 import { MatchRequestService } from "./service/match_request_service.js";
 import { MatchedDetailsService } from "./service/matched_details_service.js";
 import { CollaborationService } from "./service/collaboration_service.js";
@@ -19,7 +18,12 @@ import { CollaborationService } from "./service/collaboration_service.js";
 const port = process.env.PORT || 3001;
 
 const server = http.createServer(index);
-const wss = new WebSocketServer({ server, clientTracking: true });
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"],
+  },
+});
 
 export const redisRepository = await initializeRedis();
 
@@ -56,52 +60,88 @@ process.on("SIGINT", () => {
   });
 });
 
-wss.on("connection", (ws, request) => {
-  const urlObj = new URL(request.url, `http://${request.headers.host}`);
-  const userId = urlObj.searchParams.get("userId");
+io.on("connection", (socket) => {
+  const userId = Array.isArray(socket.handshake.query.userId)
+    ? socket.handshake.query.userId[0]
+    : socket.handshake.query.userId;
 
-  console.log("WebSocket userId:", userId);
+  console.log("Socket.IO userId:", userId);
   /** @type {UserInstance} */
-  const userInstance = { id: userId, ws: ws };
-  console.log("New WebSocket connection");
+  const userInstance = { id: userId, ws: socket };
+  console.log("New Socket.IO connection");
 
-  ws.on("message", async (message) => {
+  socket.join(`user:${userId}`);
+
+  socket.on("match-request", async (data, callback) => {
     try {
-      /** @type {UserMessage} */
-      // @ts-ignore
-      const data = JSON.parse(message);
-      console.log("Received message", data);
-      switch (data.type) {
-        case "match-request":
-          {
-            /** @type {MatchRequest} */
-            data;
-            data.time = Date.now();
-            await matchingService.addRequest(userInstance, data);
-          }
-          break;
-        case "match-cancel":
-          console.log("match cancelled by user");
-          ws.close();
-          break;
-        default:
-          console.log("unaccounted type", data);
-          break;
+      /** @type {MatchRequest} */
+      data.time = Date.now();
+      await matchingService.addRequest(userInstance, data);
+
+      if (callback && typeof callback === "function") {
+        callback({
+          type: "ack",
+          requestId: data.requestId,
+          success: true,
+        });
       }
     } catch (error) {
-      console.error("Error while parsing or handling message", message, error);
-      ws.send(
-        JSON.stringify({ type: "error", message: "Invalid JSON", e: error })
-      );
+      console.error("Error handling match-request:", error);
+      if (callback && typeof callback === "function") {
+        callback({
+          type: "error",
+          requestId: data.requestId,
+          success: false,
+          message: "Failed to process match request",
+          error: error.message,
+        });
+      }
     }
   });
 
-  ws.on("close", async () => {
-    console.log("On webserver close event");
-    await matchingService.disposeUser(userInstance.id);
+  socket.on("matchFoundResponse", async (data, callback) => {
+    try {
+      console.log("Match found response:", data);
+
+      if (callback && typeof callback === "function") {
+        callback({
+          type: "ack",
+          success: true,
+        });
+      }
+    } catch (error) {
+      console.error("Error handling matchFoundResponse:", error);
+      if (callback && typeof callback === "function") {
+        callback({
+          type: "error",
+          success: false,
+          message: "Failed to process match response",
+          error: error.message,
+        });
+      }
+    }
   });
 
-  ws.on("error", (e) => {
-    console.error(e);
+  socket.on("disconnect", async (reason) => {
+    console.log("Socket.IO disconnect event, reason:", reason);
+    switch (reason) {
+      case "transport error":
+      case "transport close":
+      case "parse error":
+      case "ping timeout":
+        break;
+
+      case "forced close":
+      case "server shutting down":
+      case "forced server close":
+      case "client namespace disconnect":
+      case "server namespace disconnect":
+        await matchingService.disposeUser(userInstance.id);
+        break;
+    }
+  });
+
+  socket.on("error", (error) => {
+    console.error("Socket.IO error:", error);
   });
 });

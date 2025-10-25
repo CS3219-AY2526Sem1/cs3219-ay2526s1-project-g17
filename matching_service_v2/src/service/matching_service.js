@@ -65,7 +65,7 @@ export class MatchingService {
     console.log("Dispose user");
     const userInstance = this.userService.getUser(userId);
     if (userInstance) {
-      userInstance.ws.close();
+      userInstance.ws.disconnect();
       this.userService.deleteUser(userId);
     }
     const unsub = this.activeListeners.get(userId);
@@ -75,7 +75,6 @@ export class MatchingService {
     }
 
     await this.matchRequestService.removeUserRequest(userId);
-    // await this.matchedDetailsService.removeMatchedDetails(userId);
   }
 
   /**

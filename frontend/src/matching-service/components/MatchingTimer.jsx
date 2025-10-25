@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
-import { cancelMatchRequest } from "../services/matchingService";
 import "./MatchingTimer.css";
 import { QUEUE_TIMEOUT } from "../constants";
+import { getWebSocketService } from "../services/matchingService";
 
 /**
  * Timer component that displays during matching process
@@ -10,7 +10,7 @@ import { QUEUE_TIMEOUT } from "../constants";
  * @param {string} props.requestId - The match request ID
  * @param {Function} props.onCancel - Callback when match is cancelled
  */
-const MatchingTimer = ({ isVisible, requestId, onCancel }) => {
+const MatchingTimer = ({ isVisible, onCancel }) => {
   const [timeElapsed, setTimeElapsed] = useState(0);
   const [isCancelling, setIsCancelling] = useState(false);
   const [showTimeoutDialog, setShowTimeoutDialog] = useState(false);
@@ -69,9 +69,7 @@ const MatchingTimer = ({ isVisible, requestId, onCancel }) => {
   const onTimeout = async () => {
     setIsCancelling(true);
     try {
-      if (requestId) {
-        await cancelMatchRequest(requestId);
-      }
+      disconnect();
       setShowTimeoutDialog(true);
     } catch (error) {
       console.error("Error cancelling match request:", error);
@@ -84,9 +82,7 @@ const MatchingTimer = ({ isVisible, requestId, onCancel }) => {
   const handleCancel = async () => {
     setIsCancelling(true);
     try {
-      if (requestId) {
-        await cancelMatchRequest(requestId);
-      }
+      disconnect();
       onCancel && onCancel();
     } catch (error) {
       console.error("Error cancelling match request:", error);
@@ -94,6 +90,12 @@ const MatchingTimer = ({ isVisible, requestId, onCancel }) => {
     } finally {
       setIsCancelling(false);
     }
+  };
+
+  const disconnect = () => {
+    const wsService = getWebSocketService();
+    wsService.disconnect();
+    console.log("Match request cancelled by user");
   };
 
   if (!isVisible) {
