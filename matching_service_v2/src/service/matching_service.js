@@ -175,8 +175,17 @@ export class MatchingService {
    * @private
    */
   async searchUser(userId) {
+    const backoffList = [500, 1000, 1500, 2000, 2500, 3000, 5000];
+    let backoffStage = 0;
     while (true) {
-      await delay(500);
+      const backoffTime = backoffList[backoffStage];
+      console.log(
+        `Back off time: ${backoffTime}, back off stage: ${backoffStage}`
+      );
+      await delay(backoffTime);
+      if (backoffStage < backoffList.length - 1) {
+        backoffStage += 1;
+      }
       const matchRequestEntity = await this.matchRequestService.getUserRequest(
         userId
       );
