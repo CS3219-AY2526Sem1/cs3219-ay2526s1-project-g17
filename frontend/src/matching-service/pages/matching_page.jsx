@@ -7,14 +7,12 @@ import "./MatchingPage.css";
 import { NavigationBar } from "../../components/NavigationBar";
 import { useAuth0 } from "@auth0/auth0-react";
 import LoadingSpinner from "../../components/LoadingSpinner";
-import { MATCH_CANCELLED, MATCH_FOUND, MATCH_TIMEOUT } from "../constants";
+import { MATCH_CANCELLED, MATCH_FOUND, MATCH_TIMEOUT, ACK } from "../constants";
 import { useNavigate } from "react-router";
-
 
 export default function MatchingPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isMatching, setIsMatching] = useState(false);
-  const [matchRequestId, setMatchRequestId] = useState(null);
   const naviagte = useNavigate();
   const { user } = useAuth0();
 
@@ -36,7 +34,6 @@ export default function MatchingPage() {
     wsService.onMessage(MATCH_TIMEOUT, (message) => {
       console.log("Match timeout:", message);
       setIsMatching(false);
-      setMatchRequestId(null);
       alert("Match request timed out. Please try again.");
     });
 
@@ -63,7 +60,7 @@ export default function MatchingPage() {
     // Ensure WebSocket is connected before opening dialog
     const wsService = getWebSocketService();
     const userId = user.sub;
-    if (!wsService.isConnected) {
+    if (!wsService.isConnected()) {
       try {
         await wsService.connect(userId);
         console.log("WebSocket reconnected for new match request");
@@ -86,7 +83,6 @@ export default function MatchingPage() {
 
     // Start the matching process
     setIsMatching(true);
-    setMatchRequestId(response.requestId);
 
     // Close the dialog (this is already handled in the dialog component)
     setIsDialogOpen(false);
@@ -94,46 +90,37 @@ export default function MatchingPage() {
 
   const handleCancelMatch = () => {
     setIsMatching(false);
-    setMatchRequestId(null);
-    const wsService = getWebSocketService();
-    wsService.disconnect();
-    console.log("Match request cancelled by user");
   };
 
   if (isLoading) {
-    return (
-      <LoadingSpinner text="Preparing your session" />
-    )
+    return <LoadingSpinner text="Preparing your session" />;
   } else {
-
     return (
       <div className="matching-page">
         <NavigationBar />
         <div className="matching with-nav-offset">
           {/* Timer overlay */}
-          <MatchingTimer
-            isVisible={isMatching}
-            requestId={matchRequestId}
-            onCancel={handleCancelMatch}
-          />
+          <MatchingTimer isVisible={isMatching} onCancel={handleCancelMatch} />
 
           <main className="matching__container">
             <section className="matching__hero">
               <div className="matching__content">
                 <h1 className="matching__title">Find your coding partner</h1>
                 <p className="matching__subtitle">
-                  Choose your difficulty, topics, and preferences — we’ll pair you in seconds.
+                  Choose your difficulty, topics, and preferences — we’ll pair
+                  you in seconds.
                 </p>
 
                 {!isMatching && (
                   <div className="matching__actions">
-                    <button className="btn btn--primary" onClick={handleOpenDialog}>
+                    <button
+                      className="btn btn--primary"
+                      onClick={handleOpenDialog}
+                    >
                       Find a Match
                     </button>
                   </div>
                 )}
-
-                
               </div>
 
               <aside className="matching__art">
@@ -152,5 +139,4 @@ export default function MatchingPage() {
       </div>
     );
   }
-
 }

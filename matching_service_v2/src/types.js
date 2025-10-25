@@ -1,4 +1,4 @@
-/** @typedef {import("ws").WebSocket} WebSocket*/
+/** @typedef {import("socket.io").Socket} SocketIOSocket*/
 
 /**
  * @typedef {"easy" | "medium" | "hard"} Difficulty
@@ -22,11 +22,13 @@
  * @property {"match-request"} type
  * @property {Array<Criteria>} criterias
  * @property {number} time
+ * @property {string} requestId
  */
 
 /**
  * @typedef {Object} MatchCancelRequest
  * @property {"match-cancel"} type
+ * @property {string} requestId
  */
 
 /**
@@ -39,7 +41,7 @@
 
 /**
  * @typedef {Object} UserInstance
- * @property {WebSocket} ws
+ * @property {SocketIOSocket} ws
  * @property {string} id
  */
 

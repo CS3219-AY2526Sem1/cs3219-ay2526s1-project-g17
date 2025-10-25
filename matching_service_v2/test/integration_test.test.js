@@ -99,7 +99,6 @@ describe("WebSocket Matching Service Integration Tests", () => {
       sendMessage(clientB, matchRequestB);
 
       // Wait for both clients to receive match notifications
-      /** @type {[MatchFoundNotification, MatchFoundNotification]} */
       const [matchNotificationA, matchNotificationB] = await Promise.all([
         waitForMessage(clientA, "matchFound"),
         waitForMessage(clientB, "matchFound"),

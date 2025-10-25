@@ -7,7 +7,7 @@ import {
 import "./MatchingCriteriaDialog.css";
 import axios from "axios";
 import { useAuth0 } from "@auth0/auth0-react";
-import { MATCHING_SERVICE_URL } from "../constants";
+import { MATCHING_SERVICE_URL, QUEUE_TIMEOUT } from "../constants";
 import { useNavigate } from "react-router";
 
 /**
