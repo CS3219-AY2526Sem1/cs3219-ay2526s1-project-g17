@@ -1,6 +1,5 @@
 import { MATCH_REQUEST_PREFIX } from "../constants.js";
 import { RedisRepository } from "../model/redis_repository.js";
-import { ACCEPTANCE_TIMEOUT } from "../server_config.js";
 import {
   delay,
   findMatchingCriteria,

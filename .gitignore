@@ -4,3 +4,4 @@ package-lock.json
 **/package-lock.json
 .github/secrets/
 **/.env
+.secrets

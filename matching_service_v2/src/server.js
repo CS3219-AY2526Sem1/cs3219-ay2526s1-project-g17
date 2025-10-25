@@ -27,6 +27,19 @@ const io = new Server(server, {
 
 export const redisRepository = await initializeRedis();
 
+console.log("=== Environment Configuration ===");
+console.log("NODE_ENV:", process.env.NODE_ENV || "not set");
+console.log("ENV:", process.env.ENV || "not set");
+console.log("PORT:", process.env.PORT || "not set");
+console.log("REDIS_URL:", process.env.REDIS_URL ? "✓ Set" : "✗ Not set");
+console.log("AUTH0_DOMAIN:", process.env.AUTH0_DOMAIN ? "✓ Set" : "✗ Not set");
+console.log(
+  "AUTH0_AUDIENCE:",
+  process.env.AUTH0_AUDIENCE ? "✓ Set" : "✗ Not set"
+);
+console.log("ACCEPTANCE_TIMEOUT:", process.env.ACCEPTANCE_TIMEOUT || "not set");
+console.log("=====================================");
+
 try {
   // await redisRepository.flushAll();
   server.listen(port);
