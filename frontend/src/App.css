@@ -1,0 +1,60 @@
+/* ===========================
+   App-level layout (no globals here)
+   =========================== */
+
+/* Top-level app wrapper if you use one */
+.app-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Content area where routes render */
+.app-content {
+  /* Keep content centered and spaced;
+     add .with-nav-offset to this (or a child) if you have a fixed nav */
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+/* If your navbar is fixed at the top, you can also add this class to .app-content */
+.app-content.with-nav-offset {
+  padding-top: var(--nav-height);
+}
+
+/* Optional panels/cards you might reuse */
+.card {
+  background: var(--panel);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  padding: 20px;
+  color: var(--text);
+}
+
+/* Button groups (shared layout) */
+.button-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+/* Center helpers */
+.centered {
+  display: grid;
+  place-items: center;
+}
+
+/* Example hero image styling if used across pages */
+.hero-art {
+  border-radius: 16px;
+  box-shadow: var(--shadow-lg), inset 0 0 0 1px rgba(255,255,255,0.06);
+  background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+}
+
+/* Responsive trims for app container spacing */
+@media (max-width: 900px) {
+  .app-content { padding: 28px 16px; }
+}
