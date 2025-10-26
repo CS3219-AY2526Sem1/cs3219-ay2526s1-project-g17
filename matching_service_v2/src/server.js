@@ -112,29 +112,6 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("matchFoundResponse", async (data, callback) => {
-    try {
-      console.log("Match found response:", data);
-
-      if (callback && typeof callback === "function") {
-        callback({
-          type: "ack",
-          success: true,
-        });
-      }
-    } catch (error) {
-      console.error("Error handling matchFoundResponse:", error);
-      if (callback && typeof callback === "function") {
-        callback({
-          type: "error",
-          success: false,
-          message: "Failed to process match response",
-          error: error.message,
-        });
-      }
-    }
-  });
-
   socket.on("disconnect", async (reason) => {
     console.log("Socket.IO disconnect event, reason:", reason);
     switch (reason) {

@@ -9,11 +9,12 @@ import { useAuth0 } from "@auth0/auth0-react";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import { MATCH_CANCELLED, MATCH_FOUND, MATCH_TIMEOUT, ACK } from "../constants";
 import { useNavigate } from "react-router";
+import { getRandomQuestion } from "../util";
 
 export default function MatchingPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isMatching, setIsMatching] = useState(false);
-  const naviagte = useNavigate();
+  const navigate = useNavigate();
   const { user } = useAuth0();
 
   const { isLoading } = useAuth0();
@@ -22,12 +23,22 @@ export default function MatchingPage() {
     const wsService = getWebSocketService();
 
     // Handle match found messages
-    wsService.onMessage(MATCH_FOUND, (message) => {
+    wsService.onMessage(MATCH_FOUND, async (message) => {
       console.log("Match found:", message);
       setIsMatching(false);
       const session = message.session;
       const sessionId = session.session;
-      naviagte(`collaboration/${sessionId}`);
+      const criteria = session.criteria;
+
+      // get question from question service
+      const question = await getRandomQuestion(criteria);
+      navigate(`/collaboration/${sessionId}`, {
+        state: {
+          session: session,
+          question: question,
+          timestamp: Date.now(),
+        },
+      });
     });
 
     // Handle match timeout messages
@@ -54,7 +65,7 @@ export default function MatchingPage() {
   const handleOpenDialog = async () => {
     if (!user) {
       console.log("User not logged in");
-      naviagte("/");
+      navigate("/");
       return;
     }
     // Ensure WebSocket is connected before opening dialog
