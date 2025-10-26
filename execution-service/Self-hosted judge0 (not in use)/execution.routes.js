@@ -1,5 +1,5 @@
 import express, { Router } from "express";
-import { execute, healthz, languages } from "../controllers/execution.controller.js";
+import { execute, healthz, languages } from "./execution.controller.js";
 // import { requireAuth } from "../middleware/auth.js";
 // import { rateLimit } from "../middleware/rateLimit.js";
 

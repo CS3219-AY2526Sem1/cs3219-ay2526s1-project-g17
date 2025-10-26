@@ -1,5 +1,5 @@
 import { LANG } from "../utils/languages.js";
-import { submitAndWait, listLanguages } from "../services/judge0.service.js";
+import { submitAndWait, listLanguages } from "./judge0.service.js";
 
 export async function healthz(_req, res) {
     res.status(200).send("ok");
