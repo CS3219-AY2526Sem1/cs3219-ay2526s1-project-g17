@@ -98,7 +98,7 @@ export async function getRandomQuestionIdByDifficultyAndTopic(req, res) {
 
         // does not work if no topic selected
         // does not work if no difficulty selected
-        res.status(200).json(data[0]);
+        res.status(200).json(data[0]._id);
     } catch (error) {
         console.error("Error in getRandomQuestionByDifficultyAndTopic controller", error);
         res.status(500).json({ message: error });

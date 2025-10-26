@@ -31,3 +31,7 @@ export async function getRandomQuestion(criteria) {
     return null;
   }
 }
+
+export function formSectionUrl(sessionId, questionId) {
+    return `/collaboration/${sessionId}?questionId=${questionId}`
+}

@@ -9,7 +9,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import { MATCH_CANCELLED, MATCH_FOUND, MATCH_TIMEOUT, ACK } from "../constants";
 import { useNavigate } from "react-router";
-import { getRandomQuestion } from "../util";
+import { formSectionUrl, getRandomQuestion } from "../util";
 
 export default function MatchingPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -31,11 +31,11 @@ export default function MatchingPage() {
       const criteria = session.criteria;
 
       // get question from question service
-      const question = await getRandomQuestion(criteria);
-      navigate(`/collaboration/${sessionId}`, {
+      const questionId = await getRandomQuestion(criteria);
+      navigate(formSectionUrl(sessionId, questionId), {
         state: {
           session: session,
-          question: question,
+          question: questionId,
           timestamp: Date.now(),
         },
       });

@@ -9,7 +9,7 @@ import axios from "axios";
 import { useAuth0 } from "@auth0/auth0-react";
 import { MATCHING_SERVICE_URL, QUEUE_TIMEOUT } from "../constants";
 import { useNavigate } from "react-router";
-import { getRandomQuestion } from "../util";
+import { formSectionUrl, getRandomQuestion } from "../util";
 
 /**
  * @typedef {import("../types").MatchRequest} MatchRequest
@@ -148,11 +148,11 @@ const MatchingCriteriaDialog = ({ isOpen, onClose, onSubmit }) => {
             const sessionId = data.session.session;
             const criteria = data.session.criteria;
             // get question from question service
-            const question = await getRandomQuestion(criteria);
-            navigate(`/collaboration/${sessionId}`, {
+            const questionId = await getRandomQuestion(criteria);
+            navigate(formSectionUrl(sessionId, questionId), {
               state: {
                 session: data.session,
-                question: question,
+                question: questionId,
                 timestamp: Date.now(),
               },
             });
