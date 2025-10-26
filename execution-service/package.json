@@ -2,13 +2,15 @@
   "name": "execution-service",
   "version": "1.0.0",
   "type": "module",
-  "main": "src/server.js",
+  "main": "server.js",
   "scripts": {
-    "start": "node src/server.js",
-    "dev": "nodemon src/server.js"
+    "start": "node server.js",
+    "dev": "nodemon server.js"
   },
   "dependencies": {
+    "axios": "^1.7.0",
     "cors": "^2.8.5",
+    "dotenv": "^16.4.0",
     "express": "^4.19.2",
     "node-fetch": "^3.3.2"
   },
