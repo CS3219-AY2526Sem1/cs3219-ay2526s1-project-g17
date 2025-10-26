@@ -27,6 +27,19 @@ const io = new Server(server, {
 
 export const redisRepository = await initializeRedis();
 
+console.log("=== Environment Configuration ===");
+console.log("NODE_ENV:", process.env.NODE_ENV || "not set");
+console.log("ENV:", process.env.ENV || "not set");
+console.log("PORT:", process.env.PORT || "not set");
+console.log("REDIS_URL:", process.env.REDIS_URL ? "✓ Set" : "✗ Not set");
+console.log("AUTH0_DOMAIN:", process.env.AUTH0_DOMAIN ? "✓ Set" : "✗ Not set");
+console.log(
+  "AUTH0_AUDIENCE:",
+  process.env.AUTH0_AUDIENCE ? "✓ Set" : "✗ Not set"
+);
+console.log("ACCEPTANCE_TIMEOUT:", process.env.ACCEPTANCE_TIMEOUT || "not set");
+console.log("=====================================");
+
 try {
   // await redisRepository.flushAll();
   server.listen(port);
@@ -93,29 +106,6 @@ io.on("connection", (socket) => {
           requestId: data.requestId,
           success: false,
           message: "Failed to process match request",
-          error: error.message,
-        });
-      }
-    }
-  });
-
-  socket.on("matchFoundResponse", async (data, callback) => {
-    try {
-      console.log("Match found response:", data);
-
-      if (callback && typeof callback === "function") {
-        callback({
-          type: "ack",
-          success: true,
-        });
-      }
-    } catch (error) {
-      console.error("Error handling matchFoundResponse:", error);
-      if (callback && typeof callback === "function") {
-        callback({
-          type: "error",
-          success: false,
-          message: "Failed to process match response",
           error: error.message,
         });
       }

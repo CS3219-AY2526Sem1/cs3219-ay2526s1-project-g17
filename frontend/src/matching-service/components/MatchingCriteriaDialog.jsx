@@ -9,6 +9,7 @@ import axios from "axios";
 import { useAuth0 } from "@auth0/auth0-react";
 import { MATCHING_SERVICE_URL, QUEUE_TIMEOUT } from "../constants";
 import { useNavigate } from "react-router";
+import { formSectionUrl, getRandomQuestion } from "../util";
 
 /**
  * @typedef {import("../types").MatchRequest} MatchRequest
@@ -41,7 +42,7 @@ const MatchingCriteriaDialog = ({ isOpen, onClose, onSubmit }) => {
     "Go",
     "Rust",
   ];
-  const difficulties = ["easy", "medium", "hard"];
+  const difficulties = ["Beginner", "Intermediate", "Advanced"];
 
   // Load topics when dialog opens
   useEffect(() => {
@@ -141,9 +142,21 @@ const MatchingCriteriaDialog = ({ isOpen, onClose, onSubmit }) => {
       console.log("Received data", data);
       switch (data.code) {
         case "has-existing":
-          /** @type {import("../types").MatchExists} */
-          data;
-          navigate(`collaboration/${data.session.session}`);
+          {
+            /** @type {import("../types").MatchExists} */
+            data;
+            const sessionId = data.session.session;
+            const criteria = data.session.criteria;
+            // get question from question service
+            const questionId = await getRandomQuestion(criteria);
+            navigate(formSectionUrl(sessionId, questionId), {
+              state: {
+                session: data.session,
+                question: questionId,
+                timestamp: Date.now(),
+              },
+            });
+          }
           break;
         case "no-existing":
           {

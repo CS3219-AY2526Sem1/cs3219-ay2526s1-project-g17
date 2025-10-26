@@ -80,12 +80,12 @@ export async function deleteQuestion(req, res) {
 
 export async function getRandomQuestionIdByDifficultyAndTopic(req, res) {
     try {
-        const { difficulty, topics } = req.body;
-
+        const { difficulty, topics } = req.query;
+        let topicsList = [topics]
         const data = await Question.aggregate()
             .match({
                 difficulty: difficulty,
-                topics: { $in: topics } // will return a list of matches as long as one of the topics in the request is present in the database
+                topics: { $in: topicsList } // will return a list of matches as long as one of the topics in the request is present in the database
             })
             .sample(1); // picks at random from matched list
 

@@ -1,0 +1,778 @@
+// import WebSocket from "ws";
+// import {
+//   afterAll,
+//   afterEach,
+//   beforeAll,
+//   describe,
+//   expect,
+//   jest,
+//   test,
+// } from "@jest/globals";
+// import {
+//   createWebSocketClient,
+//   waitForMessage,
+//   createMatchRequest,
+//   createMatchAck,
+//   closeClients,
+//   sendMessage,
+// } from "./websocket-utils.js";
+// import {
+//   RedisRepository,
+//   createRedisClient,
+// } from "../src/model/redis_repository.js";
+
+// /** @typedef {import("../src/types.js").MatchRequest} MatchRequest */
+// /** @typedef {import("../src/types.js").UserInstance} UserInstance */
+
+// /** @typedef {import("../src/types.js").Criteria} Criteria */
+
+// // Test configuration
+// const TEST_TIMEOUT = 150000;
+// function delay(ms) {
+//   return new Promise((resolve) => setTimeout(resolve, ms));
+// }
+
+// describe("WebSocket Matching Service Integration Tests", () => {
+//   let clientA, clientB, clientC;
+//   let redisRepository;
+
+//   beforeAll(async () => {
+//     // Increase Jest timeout for integration tests
+//     jest.setTimeout(TEST_TIMEOUT);
+
+//     // Initialize Redis repository only if available
+//     try {
+//       const client = createRedisClient("redis://localhost:6379");
+//       const subscriber = createRedisClient("redis://localhost:6379");
+//       redisRepository = new RedisRepository(client, subscriber);
+//       await redisRepository.connect();
+//     } catch (error) {
+//       console.log("Redis not available for tests - skipping Redis cleanup");
+//       redisRepository = null;
+//     }
+//   });
+
+//   afterAll(async () => {
+//     if (redisRepository) {
+//       await redisRepository.disconnect();
+//     }
+//   });
+
+//   afterEach(async () => {
+//     // Clean up WebSocket connections after each test
+//     closeClients(clientA, clientB, clientC);
+//     clientA = clientB = clientC = null;
+//     if (redisRepository) {
+//       try {
+//         await redisRepository.flushAll();
+//       } catch (error) {
+//         console.log(
+//           "Redis cleanup failed - this is expected in some test environments"
+//         );
+//       }
+//     }
+//   });
+
+//   describe("Matching Logic Tests", () => {
+//     test("should match two clients with identical criteria", async () => {
+//       // Test Case 1: Two clients with identical matching criteria should be matched
+//       /** @type {Criteria} */
+//       const criteria = {
+//         difficulty: "easy",
+//         type: "criteria",
+//         language: "JavaScript",
+//         topic: "Array",
+//       };
+
+//       // Create and connect both clients
+//       clientA = await createWebSocketClient();
+//       clientB = await createWebSocketClient();
+
+//       // Send match requests simultaneously
+//       const matchRequestA = createMatchRequest(criteria);
+//       await delay(1000);
+//       const matchRequestB = createMatchRequest(criteria);
+
+//       sendMessage(clientA, matchRequestA);
+//       sendMessage(clientB, matchRequestB);
+
+//       // Wait for both clients to receive match notifications
+//       const [matchNotificationA, matchNotificationB] = await Promise.all([
+//         waitForMessage(clientA, "matchFound"),
+//         waitForMessage(clientB, "matchFound"),
+//       ]);
+
+//       console.log(matchNotificationA);
+//       console.log(matchNotificationB);
+
+//       // Verify both clients received match notifications
+//       expect(matchNotificationA.type).toBe("matchFound");
+//       expect(matchNotificationA.criteria).toEqual(criteria);
+//       expect(matchNotificationB.type).toBe("matchFound");
+//       expect(matchNotificationB.criteria).toEqual(criteria);
+//     });
+
+//     test("should not match clients with different criteria", async () => {
+//       // Test Case: Clients with different criteria should not be matched
+//       /** @type {Criteria} */
+//       const criteriaA = {
+//         type: "criteria",
+//         difficulty: "easy",
+//         language: "JavaScript",
+//         topic: "Array",
+//       };
+
+//       /** @type {Criteria} */
+//       const criteriaB = {
+//         type: "criteria",
+//         difficulty: "hard",
+//         language: "Python",
+//         topic: "Dynamic Programming",
+//       };
+
+//       clientA = await createWebSocketClient();
+//       clientB = await createWebSocketClient();
+
+//       // Send different match requests
+//       sendMessage(clientA, createMatchRequest(criteriaA));
+//       sendMessage(clientB, createMatchRequest(criteriaB));
+
+//       // Wait briefly to ensure no match occurs
+//       await new Promise((resolve) => setTimeout(resolve, 2000));
+
+//       // Verify no match notifications were sent
+//       let matchFoundA = false;
+//       let matchFoundB = false;
+
+//       clientA.on("message", (data) => {
+//         const message = JSON.parse(data.toString());
+//         if (message.type === "matchFound") {
+//           matchFoundA = true;
+//         }
+//       });
+
+//       clientB.on("message", (data) => {
+//         const message = JSON.parse(data.toString());
+//         if (message.type === "matchFound") {
+//           matchFoundB = true;
+//         }
+//       });
+
+//       expect(matchFoundA).toBe(false);
+//       expect(matchFoundB).toBe(false);
+//     });
+//   });
+
+//   describe("Match Acceptance Tests", () => {
+//     test("should create session when both clients accept match", async () => {
+//       // Test Case: When both clients accept, a session should be created
+//       /** @type {Criteria} */
+//       const criteria = {
+//         type: "criteria",
+//         difficulty: "medium",
+//         language: "Python",
+//         topic: "Binary Tree",
+//       };
+
+//       clientA = await createWebSocketClient();
+//       clientB = await createWebSocketClient();
+
+//       // Send match requests
+//       sendMessage(clientA, createMatchRequest(criteria));
+//       sendMessage(clientB, createMatchRequest(criteria));
+
+//       // Wait for match notifications
+//       await Promise.all([
+//         waitForMessage(clientA, "matchFound"),
+//         waitForMessage(clientB, "matchFound"),
+//       ]);
+
+//       // Both clients accept the match
+//       sendMessage(clientA, createMatchAck("accept"));
+//       sendMessage(clientB, createMatchAck("accept"));
+
+//       // Wait for session creation or match outcome
+//       const sessionPromises = [];
+
+//       const sessionPromiseA = new Promise((resolve) => {
+//         clientA.on("message", (data) => {
+//           const message = JSON.parse(data.toString());
+//           if (
+//             message.type === "sessionCreated" ||
+//             message.session ||
+//             message.type === "matchOutcome"
+//           ) {
+//             resolve(message);
+//           }
+//         });
+//       });
+
+//       const sessionPromiseB = new Promise((resolve) => {
+//         clientB.on("message", (data) => {
+//           const message = JSON.parse(data.toString());
+//           if (
+//             message.type === "sessionCreated" ||
+//             message.session ||
+//             message.type === "matchOutcome"
+//           ) {
+//             resolve(message);
+//           }
+//         });
+//       });
+
+//       const [sessionA, sessionB] = await Promise.race([
+//         Promise.all([sessionPromiseA, sessionPromiseB]),
+//         new Promise((_, reject) =>
+//           setTimeout(() => reject(new Error("Session creation timeout")), 5000)
+//         ),
+//       ]);
+
+//       // Verify session was created for both clients
+//       expect(sessionA).toBeDefined();
+//       expect(sessionB).toBeDefined();
+//     }, 10000);
+
+//     test("should handle rejection gracefully and resume matchmaking", async () => {
+//       // Test Case: When one client rejects, the other should resume matchmaking
+//       /** @type {Criteria} */
+//       const criteria = {
+//         type: "criteria",
+//         difficulty: "hard",
+//         language: "Java",
+//         topic: "Graph",
+//       };
+
+//       clientA = await createWebSocketClient();
+//       clientB = await createWebSocketClient();
+//       clientC = await createWebSocketClient();
+
+//       // First, match clientA and clientB
+//       sendMessage(clientA, createMatchRequest(criteria));
+//       sendMessage(clientB, createMatchRequest(criteria));
+
+//       // Wait for match notifications
+//       await Promise.all([
+//         waitForMessage(clientA, "matchFound"),
+//         waitForMessage(clientB, "matchFound"),
+//       ]);
+
+//       // ClientA accepts, ClientB rejects
+//       sendMessage(clientA, createMatchAck("accept"));
+//       sendMessage(clientB, createMatchAck("reject"));
+
+//       // Add clientC to the matching pool
+//       sendMessage(clientC, createMatchRequest(criteria));
+
+//       // Monitor for timeout notifications or new matches
+//       const timeoutPromise = new Promise((resolve) => {
+//         clientA.on("message", (data) => {
+//           const message = JSON.parse(data.toString());
+//           if (
+//             message.reason ||
+//             message.type === "matchTimeout" ||
+//             message.type === "matchFound"
+//           ) {
+//             resolve(message);
+//           }
+//         });
+//       });
+
+//       const newMatchPromise = new Promise((resolve) => {
+//         clientC.on("message", (data) => {
+//           const message = JSON.parse(data.toString());
+//           if (message.type === "matchFound") {
+//             resolve(message);
+//           }
+//         });
+//       });
+
+//       // Wait for either timeout notification or new match
+//       const result = await Promise.race([
+//         timeoutPromise,
+//         newMatchPromise,
+//         new Promise((_, reject) =>
+//           setTimeout(() => reject(new Error("Test timeout")), 8000)
+//         ),
+//       ]);
+
+//       expect(result).toBeDefined();
+//     });
+
+//     test("should disconnect non-accepting client after timeout", async () => {
+//       // Test Case: Client that doesn't respond should be disconnected
+//       /** @type {Criteria} */
+//       const criteria = {
+//         type: "criteria",
+//         difficulty: "easy",
+//         language: "C++",
+//         topic: "Sorting",
+//       };
+
+//       clientA = await createWebSocketClient();
+//       clientB = await createWebSocketClient();
+
+//       // Send match requests
+//       sendMessage(clientA, createMatchRequest(criteria));
+//       sendMessage(clientB, createMatchRequest(criteria));
+
+//       // Wait for match notifications
+//       await Promise.all([
+//         waitForMessage(clientA, "matchFound"),
+//         waitForMessage(clientB, "matchFound"),
+//       ]);
+
+//       // Only clientA accepts, clientB doesn't respond
+//       sendMessage(clientA, createMatchAck("accept"));
+//       // ClientB doesn't send any response (simulating timeout)
+
+//       // Wait for timeout notification
+//       const timeoutNotification = await new Promise((resolve, reject) => {
+//         const timeout = setTimeout(() => {
+//           reject(new Error("Timeout waiting for timeout notification"));
+//         }, 8000);
+
+//         clientA.on("message", (data) => {
+//           const message = JSON.parse(data.toString());
+//           if (message.reason || message.type === "matchTimeout") {
+//             clearTimeout(timeout);
+//             resolve(message);
+//           }
+//         });
+
+//         // Also listen for disconnection
+//         clientB.on("close", () => {
+//           clearTimeout(timeout);
+//           resolve({ type: "disconnected" });
+//         });
+//       });
+
+//       expect(timeoutNotification).toBeDefined();
+//     });
+//   });
+
+//   describe("Edge Cases and Error Handling", () => {
+//     test("should handle client disconnection during matching", async () => {
+//       /** @type {Criteria} */
+//       const criteria = {
+//         type: "criteria",
+//         difficulty: "medium",
+//         language: "TypeScript",
+//         topic: "Hash Table",
+//       };
+
+//       clientA = await createWebSocketClient();
+//       clientB = await createWebSocketClient();
+
+//       // Send match request from clientA
+//       sendMessage(clientA, createMatchRequest(criteria));
+
+//       // ClientB connects and sends request, then immediately disconnects
+//       sendMessage(clientB, createMatchRequest(criteria));
+
+//       // Wait briefly for processing
+//       await new Promise((resolve) => setTimeout(resolve, 200));
+
+//       // Disconnect clientB
+//       clientB.close();
+
+//       // ClientC joins later with same criteria
+//       clientC = await createWebSocketClient();
+//       sendMessage(clientC, createMatchRequest(criteria));
+
+//       // ClientA should eventually match with ClientC
+//       const matchNotification = await waitForMessage(
+//         clientA,
+//         "matchFound",
+//         8000
+//       );
+//       expect(matchNotification.type).toBe("matchFound");
+//     });
+
+//     test("should handle invalid message formats gracefully", async () => {
+//       clientA = await createWebSocketClient();
+
+//       // Send invalid message
+//       clientA.send("invalid json");
+
+//       // Send message with wrong typename
+//       sendMessage(clientA, { typename: "invalidType", data: "test" });
+
+//       // Server should still be responsive
+//       const validRequest = createMatchRequest({
+//         type: "criteria",
+//         difficulty: "easy",
+//         language: "JavaScript",
+//         topic: "Array",
+//       });
+//       sendMessage(clientA, validRequest);
+
+//       // Should not crash and should handle subsequent valid requests
+//       expect(clientA.readyState).toBe(WebSocket.OPEN);
+//     });
+//   });
+
+//   describe("Multiple Client Scenarios", () => {
+//     test("should handle multiple clients with same criteria (first-come-first-served)", async () => {
+//       /** @type {Criteria} */
+//       const criteria = {
+//         type: "criteria",
+//         difficulty: "hard",
+//         language: "Python",
+//         topic: "Dynamic Programming",
+//       };
+
+//       // Create three clients
+//       clientA = await createWebSocketClient();
+//       clientB = await createWebSocketClient();
+//       clientC = await createWebSocketClient();
+
+//       // All send the same match request
+//       sendMessage(clientA, createMatchRequest(criteria));
+//       sendMessage(clientB, createMatchRequest(criteria));
+//       sendMessage(clientC, createMatchRequest(criteria));
+
+//       // Two should match, one should remain waiting
+//       const matchNotifications = await Promise.allSettled([
+//         waitForMessage(clientA, "matchFound", 5000),
+//         waitForMessage(clientB, "matchFound", 5000),
+//         waitForMessage(clientC, "matchFound", 5000),
+//       ]);
+
+//       // Exactly two should succeed (get matched)
+//       const successful = matchNotifications.filter(
+//         (result) => result.status === "fulfilled"
+//       );
+//       const failed = matchNotifications.filter(
+//         (result) => result.status === "rejected"
+//       );
+
+//       expect(successful.length).toBe(2);
+//       expect(failed.length).toBe(1);
+//     });
+//   });
+
+//   // Race Condition Tests
+//   describe("Race Condition Tests", () => {
+//     test("Simultaneous identical match requests - should handle race conditions properly", async () => {
+//       // Create 4 clients with identical criteria sent at the same time
+//       const [c1, c2, c3, c4] = await Promise.all([
+//         createWebSocketClient(),
+//         createWebSocketClient(),
+//         createWebSocketClient(),
+//         createWebSocketClient(),
+//       ]);
+
+//       /** @type {Criteria} */
+//       const criteria = {
+//         type: "criteria",
+//         difficulty: "medium",
+//         language: "JavaScript",
+//         topic: "arrays",
+//       };
+//       const matchRequest = createMatchRequest(criteria);
+
+//       // Send all match requests simultaneously
+//       const sendPromises = [c1, c2, c3, c4].map((client) =>
+//         Promise.resolve(sendMessage(client, matchRequest))
+//       );
+//       await Promise.all(sendPromises);
+
+//       // Wait for match found messages - exactly 2 pairs should be formed
+//       const matchPromises = [c1, c2, c3, c4].map((client) =>
+//         waitForMessage(client, "matchFound", 5000).catch(() => null)
+//       );
+
+//       const results = await Promise.all(matchPromises);
+//       const validMatches = results.filter((result) => result !== null);
+
+//       // Should have exactly 4 match notifications (2 pairs)
+//       expect(validMatches).toHaveLength(4);
+
+//       // Verify all matches have unique session IDs (no double-matching)
+//       const sessionIds = validMatches.map((match) => match.sessionId);
+//       const uniqueSessionIds = [...new Set(sessionIds)];
+//       expect(uniqueSessionIds).toHaveLength(2); // Should be exactly 2 unique sessions
+
+//       closeClients(c1, c2, c3, c4);
+//     });
+
+//     test("Concurrent acceptance race condition - prevent double acceptance", async () => {
+//       // Setup two clients with matching criteria
+//       const [c1, c2, c3] = await Promise.all([
+//         createWebSocketClient(),
+//         createWebSocketClient(),
+//         createWebSocketClient(),
+//       ]);
+
+//       /** @type {Criteria} */
+//       const criteria = {
+//         type: "criteria",
+//         difficulty: "hard",
+//         language: "JavaScript",
+//         topic: "dynamic-programming",
+//       };
+
+//       // Send match requests for first pair
+//       sendMessage(c1, createMatchRequest(criteria));
+//       sendMessage(c2, createMatchRequest(criteria));
+
+//       // Wait for match found
+//       const [match1, match2] = await Promise.all([
+//         waitForMessage(c1, "matchFound"),
+//         waitForMessage(c2, "matchFound"),
+//       ]);
+
+//       expect(match1.sessionId).toBe(match2.sessionId);
+//       const sessionId = match1.sessionId;
+
+//       // Now send third client to create a new pending match
+//       sendMessage(c3, createMatchRequest(criteria));
+
+//       // Simulate race condition: both original clients try to accept simultaneously
+//       const acceptMessage = createMatchAck("accept");
+//       sendMessage(c1, acceptMessage);
+//       sendMessage(c2, acceptMessage);
+
+//       // Wait for acceptance responses
+//       const [response1, response2] = await Promise.all([
+//         waitForMessage(c1, "matchAccepted"),
+//         waitForMessage(c2, "matchAccepted"),
+//       ]);
+
+//       // Both should receive acceptance confirmation for the same session
+//       expect(response1.sessionId).toBe(sessionId);
+//       expect(response2.sessionId).toBe(sessionId);
+
+//       // Third client should still be waiting (no cross-contamination)
+//       const thirdClientMessages = [];
+//       c3.on("message", (data) => {
+//         thirdClientMessages.push(JSON.parse(data.toString()));
+//       });
+
+//       // Wait a bit to ensure no erroneous match notifications
+//       await new Promise((resolve) => setTimeout(resolve, 1000));
+
+//       // Third client should not have received any match with the completed session
+//       const thirdClientMatches = thirdClientMessages.filter(
+//         (msg) => msg.type === "matchFound" && msg.sessionId === sessionId
+//       );
+//       expect(thirdClientMatches).toHaveLength(0);
+
+//       closeClients(c1, c2, c3);
+//     });
+
+//     test("Rapid connection/disconnection race conditions", async () => {
+//       const clients = [];
+//       /** @type {Criteria} */
+//       const criteria = {
+//         type: "criteria",
+//         difficulty: "easy",
+//         language: "JavaScript",
+//         topic: "strings",
+//       };
+
+//       // Create and immediately disconnect some clients while others send requests
+//       for (let i = 0; i < 6; i++) {
+//         const client = await createWebSocketClient();
+//         clients.push(client);
+
+//         if (i % 2 === 0) {
+//           // Send match request immediately
+//           sendMessage(client, createMatchRequest(criteria));
+//         } else {
+//           // Disconnect immediately after connecting
+//           setTimeout(() => client.close(), 10);
+//         }
+//       }
+
+//       // Wait for any matches to form from the remaining connected clients
+//       await new Promise((resolve) => setTimeout(resolve, 2000));
+
+//       // Check that system is still functional after rapid disconnections
+//       const [stableClient1, stableClient2] = await Promise.all([
+//         createWebSocketClient(),
+//         createWebSocketClient(),
+//       ]);
+
+//       sendMessage(stableClient1, createMatchRequest(criteria));
+//       sendMessage(stableClient2, createMatchRequest(criteria));
+
+//       const [match1, match2] = await Promise.all([
+//         waitForMessage(stableClient1, "matchFound"),
+//         waitForMessage(stableClient2, "matchFound"),
+//       ]);
+
+//       expect(match1.sessionId).toBe(match2.sessionId);
+
+//       closeClients(...clients, stableClient1, stableClient2);
+//     });
+
+//     test("Match expiration during acceptance race condition", async () => {
+//       // Mock shorter timeout for this test by checking the actual behavior
+//       const [c1, c2, c3, c4] = await Promise.all([
+//         createWebSocketClient(),
+//         createWebSocketClient(),
+//         createWebSocketClient(),
+//         createWebSocketClient(),
+//       ]);
+
+//       /** @type {Criteria} */
+//       const criteria = {
+//         type: "criteria",
+//         difficulty: "medium",
+//         language: "JavaScript",
+//         topic: "graphs",
+//       };
+
+//       // Create first match pair
+//       sendMessage(c1, createMatchRequest(criteria));
+//       sendMessage(c2, createMatchRequest(criteria));
+
+//       const [match1, match2] = await Promise.all([
+//         waitForMessage(c1, "matchFound"),
+//         waitForMessage(c2, "matchFound"),
+//       ]);
+
+//       const sessionId = match1.sessionId;
+
+//       // Create second pair for later
+//       sendMessage(c3, createMatchRequest(criteria));
+//       sendMessage(c4, createMatchRequest(criteria));
+
+//       // Wait for potential timeout (this tests the system's timeout handling)
+//       // In a real scenario, we'd wait longer, but for testing we'll simulate by waiting
+//       await new Promise((resolve) => setTimeout(resolve, 1000));
+
+//       // Try to accept after delay
+//       sendMessage(c1, createMatchAck("accept"));
+
+//       // The system should either:
+//       // 1. Accept the match if still valid
+//       // 2. Send a timeout notification if expired
+//       // 3. Handle gracefully without crashing
+
+//       try {
+//         const response = await waitForMessage(c1, "matchAccepted", 3000);
+//         expect(response.sessionId).toBe(sessionId);
+//       } catch (error) {
+//         // If timeout occurred, that's also valid behavior
+//         console.log("Match acceptance timed out as expected");
+//       }
+
+//       closeClients(c1, c2, c3, c4);
+//     });
+
+//     test("High concurrency stress test - multiple simultaneous operations", async () => {
+//       const numClients = 8;
+//       const clients = [];
+
+//       // Create multiple clients
+//       for (let i = 0; i < numClients; i++) {
+//         clients.push(await createWebSocketClient());
+//       }
+
+//       /** @type {Criteria} */
+//       const criteria1 = {
+//         type: "criteria",
+//         difficulty: "easy",
+//         language: "JavaScript",
+//         topic: "arrays",
+//       };
+//       /** @type {Criteria} */
+//       const criteria2 = {
+//         type: "criteria",
+//         difficulty: "medium",
+//         language: "JavaScript",
+//         topic: "trees",
+//       };
+
+//       // Send match requests with mixed criteria simultaneously
+//       const sendPromises = clients.map((client, index) => {
+//         const criteria = index % 2 === 0 ? criteria1 : criteria2;
+//         return Promise.resolve(
+//           sendMessage(client, createMatchRequest(criteria))
+//         );
+//       });
+
+//       await Promise.all(sendPromises);
+
+//       // Collect all match found messages
+//       const matchPromises = clients.map((client) =>
+//         waitForMessage(client, "matchFound", 5000).catch(() => null)
+//       );
+
+//       const matches = await Promise.all(matchPromises);
+//       const validMatches = matches.filter((match) => match !== null);
+
+//       // Should have matches but no duplicates or invalid states
+//       expect(validMatches.length).toBeGreaterThan(0);
+//       expect(validMatches.length).toBeLessThanOrEqual(numClients);
+
+//       // Verify session IDs are properly formed and no duplicates exist inappropriately
+//       const sessionIds = validMatches.map((match) => match.sessionId);
+//       const sessionGroups = {};
+//       sessionIds.forEach((id) => {
+//         sessionGroups[id] = (sessionGroups[id] || 0) + 1;
+//       });
+
+//       // Each session should have exactly 2 participants
+//       Object.values(sessionGroups).forEach((count) => {
+//         expect(count).toBe(2);
+//       });
+
+//       closeClients(...clients);
+//     });
+
+//     test("State consistency under concurrent operations", async () => {
+//       const [c1, c2, c3, c4] = await Promise.all([
+//         createWebSocketClient(),
+//         createWebSocketClient(),
+//         createWebSocketClient(),
+//         createWebSocketClient(),
+//       ]);
+
+//       /** @type {Criteria} */
+//       const criteria = {
+//         type: "criteria",
+//         difficulty: "hard",
+//         language: "JavaScript",
+//         topic: "algorithms",
+//       };
+
+//       // Create first match
+//       sendMessage(c1, createMatchRequest(criteria));
+//       sendMessage(c2, createMatchRequest(criteria));
+
+//       const [match1, match2] = await Promise.all([
+//         waitForMessage(c1, "matchFound"),
+//         waitForMessage(c2, "matchFound"),
+//       ]);
+
+//       // Simultaneously send new requests and accept existing match
+//       const simultaneousOperations = [
+//         Promise.resolve(sendMessage(c3, createMatchRequest(criteria))),
+//         Promise.resolve(sendMessage(c4, createMatchRequest(criteria))),
+//         Promise.resolve(sendMessage(c1, createMatchAck("accept"))),
+//         Promise.resolve(sendMessage(c2, createMatchAck("accept"))),
+//       ];
+
+//       await Promise.all(simultaneousOperations);
+
+//       // Wait for all operations to complete
+//       const [acceptance1, acceptance2, newMatch3, newMatch4] =
+//         await Promise.all([
+//           waitForMessage(c1, "matchAccepted"),
+//           waitForMessage(c2, "matchAccepted"),
+//           waitForMessage(c3, "matchFound"),
+//           waitForMessage(c4, "matchFound"),
+//         ]);
+
+//       // Verify state consistency
+//       expect(acceptance1.sessionId).toBe(acceptance2.sessionId);
+//       expect(newMatch3.sessionId).toBe(newMatch4.sessionId);
+//       expect(acceptance1.sessionId).not.toBe(newMatch3.sessionId);
+
+//       closeClients(c1, c2, c3, c4);
+//     });
+//   });
+// });

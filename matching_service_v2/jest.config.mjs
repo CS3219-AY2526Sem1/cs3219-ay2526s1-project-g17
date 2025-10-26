@@ -42,7 +42,7 @@ const config = {
   //   "clover"
   // ],
   silent: false,
-  verbose: true,
+  verbose: false,
 
   // An object that configures minimum threshold enforcement for coverage results
   // coverageThreshold: undefined,
