@@ -248,3 +248,77 @@ body,
     font-weight: 700;
     border: 1px solid rgba(255,255,255,.15);
 }
+
+/* ----------------------------------
+ * 5. OUTPUT PANEL
+ * ---------------------------------- */
+.output-panel {
+    background: #1b1b1b;
+    border-top: 1px solid var(--border, #2a2a2a);
+    padding: 10px 12px;
+    color: var(--text, #e5e5e5);
+}
+
+.output-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+    font-size: 13px;
+    color: var(--muted, #9aa0a6);
+}
+
+.output-header .status-pill {
+    padding: 2px 8px;
+    border-radius: 999px;
+    border: 1px solid #333;
+    background: #222;
+    color: #ddd;
+    font-size: 12px;
+}
+
+.output-actions {
+    margin-left: auto;
+    display: flex;
+    gap: 8px;
+}
+
+.output-actions button {
+    background: #2b2b2b;
+    color: #e5e5e5;
+    border: 1px solid #2a2a2a;
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 12px;
+}
+
+.output-grid {
+    display: grid;
+    gap: 10px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.output-box {
+    background: #111;
+    border: 1px solid #2a2a2a;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.output-box header {
+    padding: 6px 10px;
+    border-bottom: 1px solid #2a2a2a;
+    font-size: 12px;
+    color: #9aa0a6;
+}
+
+.output-box pre {
+    margin: 0;
+    padding: 8px 10px;
+    max-height: 180px;
+    overflow: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-size: 13px;
+    line-height: 1.35;
+}
