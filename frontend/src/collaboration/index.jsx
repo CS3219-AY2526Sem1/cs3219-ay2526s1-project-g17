@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import CollabEditor from "./CollabEditor";
 import QuestionPanel from "./QuestionPanel"; 
 import ChatPanel from "./ChatPanel";
-import { runCode } from "./executionClient";
+import { runCode } from "./ExecutionClient";
 import "./collab.css";
 
 export default function CollabPage() {
