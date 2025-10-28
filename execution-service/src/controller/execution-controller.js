@@ -2,7 +2,7 @@ import {
     listLanguages as j0List,
     submitAndWait as j0Run,
     healthCheck as j0Health,
-} from "../judge0.service.js";
+} from "../judge0-service.js";
 import logger from "../utils/logger.js";
 
 const LANGUAGE_MAP = {
