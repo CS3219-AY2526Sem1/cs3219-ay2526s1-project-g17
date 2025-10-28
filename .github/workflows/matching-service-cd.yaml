@@ -51,7 +51,7 @@ jobs:
       - name: Deploy to Cloud Run
         uses: google-github-actions/deploy-cloudrun@v1
         with:
-          service: ${{ secrets.CLOUD_RUN_SERVICE | default('matching-service') }}
+          service: matching-sevice
           image: ${{secrets.REGION}}-docker.pkg.dev/${{secrets.MATCHING_SERVICE_GCP_PROJECT}}/cs3219/matching-service:latest 
           region: ${{ secrets.REGION }}
           allow_unauthenticated: true
