@@ -1,0 +1,63 @@
+name: CD - matching_service_v2
+
+on:
+  push:
+    branches: [ "master" ]
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: matching-service-cd
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.MATCHING_SERVICE_SA_KEY }}
+
+      - name: Set up gcloud CLI
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: ${{ secrets.MATCHING_SERVICE_GCP_PROJECT }}
+          service_account_key: ${{ secrets.MATCHING_SERVICE_SA_KEY }}
+          export_default_credentials: true
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Configure Docker to use gcloud as credential helper
+        run: |
+          gcloud --quiet auth configure-docker
+
+      - name: Build and push container image
+        uses: docker/build-push-action@v4
+        with:
+          context: matching_service_v2
+          file: matching_service_v2/Dockerfile
+          push: true
+          tags: ${{secrets.REGION}}-docker.pkg.dev/${{secrets.MATCHING_SERVICE_GCP_PROJECT}}/cs3219/matching-service:latest 
+
+      - name: Deploy to Cloud Run
+        uses: google-github-actions/deploy-cloudrun@v1
+        with:
+          service: ${{ secrets.CLOUD_RUN_SERVICE | default('matching-service') }}
+          image: ${{secrets.REGION}}-docker.pkg.dev/${{secrets.MATCHING_SERVICE_GCP_PROJECT}}/cs3219/matching-service:latest 
+          region: ${{ secrets.REGION }}
+          allow_unauthenticated: true
+
+      - name: Output Cloud Run URL
+        run: |
+          echo "Deployed image: ${{secrets.REGION}}-docker.pkg.dev/${{secrets.MATCHING_SERVICE_GCP_PROJECT}}/cs3219/matching-service:latest "
+          gcloud run services describe matching-service --region=${{ secrets.REGION }} --format="value(status.url)"
+
