@@ -2,7 +2,7 @@ import fetch from "node-fetch";
 import axios from "axios";
 import config from "./utils/config.js";
 import logger from "./utils/logger.js";
-import CircuitBreaker from "./Circuitbreaker.js";
+import CircuitBreaker from "./circuit-breaker.js";
 
 const selfCircuitBreaker = new CircuitBreaker("self-hosted", {
     failureThreshold: 5,

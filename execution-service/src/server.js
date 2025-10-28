@@ -2,8 +2,8 @@ import express from "express";
 import cors from "cors";
 import config, { validateConfig } from "./utils/config.js";
 import logger from "./utils/logger.js";
-import router from "./routes/execution.routes.js";
-import { errorHandler, notFoundHandler } from "./middleware/errorHandler.js";
+import router from "./routes/execution-routes.js";
+import { errorHandler, notFoundHandler } from "./middleware/error-handler.js";
 
 // Validate configuration on startup
 try {
