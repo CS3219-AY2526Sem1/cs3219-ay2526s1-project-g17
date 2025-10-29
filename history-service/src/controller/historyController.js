@@ -3,10 +3,15 @@ import { QuestionAttempt } from "../models/Attempt.js";
 /**
  * GET /history/:userId
  * Fetches all question attempts for the specified user.
+ * Requires the access token from the user
  */
 export async function getUsersHistory(req, res) {
   try {
     const { userId } = req.params;
+
+    if (req.params.userId !== req.auth.payload.sub) {
+      return res.status(403).json({ message: "Forbidden" });
+    }
 
     // Optional: pagination
     const limit = parseInt(req.query.limit) || 10;
@@ -41,12 +46,12 @@ export async function getUsersHistory(req, res) {
 export async function createAttempt(req, res) {
   try {
     const { userId, questionId, submissionCode } = req.body;
-    const newAttempt = new QuestionAttempt( {userId, questionId, submissionCode} )
+    const newAttempt = new QuestionAttempt({ userId, questionId, submissionCode })
     const savedAttempt = await newAttempt.save();
-    res.status(201).json({savedAttempt})
+    res.status(201).json({ savedAttempt })
   } catch (error) {
     console.error("Error in createAttempt controller: ", error);
-    res.status(500).json({message: "Internal server error"});
+    res.status(500).json({ message: "Internal server error" });
   }
 }
 
@@ -64,11 +69,11 @@ export async function updateAttempt(req, res) {
     )
 
     if (!editedAttempt) {
-      return res.status(404).json({message: "Attempt not found"})
+      return res.status(404).json({ message: "Attempt not found" })
     }
     res.status(200).json(editedAttempt)
   } catch (error) {
     console.error("Error in updateAttempt controller: ", error);
-    res.status(500).json({message: "Internal server error"});
+    res.status(500).json({ message: "Internal server error" });
   }
 }

@@ -1,13 +1,11 @@
 import express from "express";
-import historyRoutes from "./routes/historyRoutes.js"
+import historyRoutes from "./routes/historyRoutes.js";
 import { connectDB } from "./config/db.js";
-import dotenv from "dotenv"
+import "./config/env.js";
 import rateLimiter from "./middleware/rateLimiter.js";
 import cors from "cors";
 import { errorHandler } from "./middleware/error.middleware.js";
 import { error } from "console";
-
-dotenv.config()
 
 const app = express();
 const PORT = process.env.PORT || 3004
