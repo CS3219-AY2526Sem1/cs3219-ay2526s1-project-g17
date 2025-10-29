@@ -4,6 +4,8 @@ import { connectDB } from "./config/db.js";
 import dotenv from "dotenv"
 import rateLimiter from "./middleware/rateLimiter.js";
 import cors from "cors";
+import { errorHandler } from "./middleware/error.middleware.js";
+import { error } from "console";
 
 dotenv.config()
 
@@ -18,6 +20,8 @@ app.use(rateLimiter);
 app.use(cors());
 
 app.use("/history", historyRoutes)
+
+app.use(errorHandler);
 
 connectDB().then(() => {
   app.listen(PORT, () => {
