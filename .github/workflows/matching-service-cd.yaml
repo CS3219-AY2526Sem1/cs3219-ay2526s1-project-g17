@@ -2,7 +2,11 @@ name: CD - matching_service_v2
 
 on:
   push:
-    branches: [ "master" ]
+    branches:
+      - "master"
+    paths:
+      - 'matching_service_v2/**'
+      - '.github/workflows/matching-service-ci.yaml'
 
 permissions:
   contents: read
