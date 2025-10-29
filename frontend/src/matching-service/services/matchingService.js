@@ -6,7 +6,7 @@
 
 import axios from "axios";
 import { io } from "socket.io-client";
-import { MATCHING_SERVICE_URL } from "../constants";
+import { MATCHING_SERVICE_URL, QUESTION_SERVICE_URL } from "../constants";
 
 const WS_URL = MATCHING_SERVICE_URL;
 
@@ -165,7 +165,7 @@ export const getWebSocketService = () => socketService;
  */
 export const fetchTopics = async () => {
   try {
-    const res = await axios.get("http://localhost:5001/api/questions/topics");
+    const res = await axios.get(`${QUESTION_SERVICE_URL}/api/questions/topics`);
     return res.data;
   } catch (error) {
     console.error("Error fetching questions: ", error);
