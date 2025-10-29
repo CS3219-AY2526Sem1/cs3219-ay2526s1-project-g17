@@ -1,12 +1,12 @@
 frontend: 5173
 
-user-service: 3003
-
 matching-service: 3001
 
 question-service: 5001
 
 collaboration-service: 3002
+
+history-service: 3004
 
 to start entire application: docker compose up --build -d 
 
