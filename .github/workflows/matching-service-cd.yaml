@@ -4,6 +4,16 @@ on:
   push:
     branches:
       - master
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: false
+        default: 'production'
+        type: choice
+        options:
+          - production
+          - staging
 
 permissions:
   contents: read
@@ -40,6 +50,10 @@ jobs:
       - name: Configure Docker to use gcloud as credential helper
         run: |
           gcloud --quiet auth configure-docker
+      - name: print out tag
+        run:
+          echo ${{secrets.REGION}}-docker.pkg.dev/${{secrets.MATCHING_SERVICE_GCP_PROJECT}}/cs3219/matching-service:latest 
+
 
       - name: Build and push container image
         uses: docker/build-push-action@v4
@@ -48,9 +62,6 @@ jobs:
           file: matching_service_v2/Dockerfile
           push: true
           tags: ${{secrets.REGION}}-docker.pkg.dev/${{secrets.MATCHING_SERVICE_GCP_PROJECT}}/cs3219/matching-service:latest 
-          run:
-            echo ${{secrets.REGION}}-docker.pkg.dev/${{secrets.MATCHING_SERVICE_GCP_PROJECT}}/cs3219/matching-service:latest 
-        
 
       - name: Deploy to Cloud Run
         uses: google-github-actions/deploy-cloudrun@v1
