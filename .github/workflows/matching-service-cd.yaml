@@ -48,6 +48,9 @@ jobs:
           file: matching_service_v2/Dockerfile
           push: true
           tags: ${{secrets.REGION}}-docker.pkg.dev/${{secrets.MATCHING_SERVICE_GCP_PROJECT}}/cs3219/matching-service:latest 
+          run:
+            echo ${{secrets.REGION}}-docker.pkg.dev/${{secrets.MATCHING_SERVICE_GCP_PROJECT}}/cs3219/matching-service:latest 
+        
 
       - name: Deploy to Cloud Run
         uses: google-github-actions/deploy-cloudrun@v1
