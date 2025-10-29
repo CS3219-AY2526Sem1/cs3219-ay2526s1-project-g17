@@ -1,4 +1,4 @@
-name: deploy matching_service to cloud
+name: matching_service_cd
 env:
   SERVICE_NAME: matching-service
   PROJECT_ID: cs3219-476502
@@ -32,7 +32,7 @@ jobs:
 
       - name: Build and Push Docker Image
         run: |
-          docker build -t ${{ env.DOCKER_IMAGE_URL }}:latest -f matching_service_v2/Dockerfile matching_service_v2
+          docker build -t ${{ env.DOCKER_IMAGE_URL }}:latest -f matching_service/Dockerfile matching_service
           docker push ${{ env.DOCKER_IMAGE_URL }}:latest
 
       - name: Deploy to Cloud Run

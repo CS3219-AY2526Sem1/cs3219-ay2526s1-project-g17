@@ -9,6 +9,7 @@ import {
 } from "@jest/globals";
 import { MatchRequestService } from "../src/service/match_request_service.js";
 import { MATCH_REQUEST_PREFIX } from "../src/constants.js";
+import { delay } from "../src/utility/utility.js";
 import dotenv from "dotenv";
 import {
   createRedisClient,
@@ -40,13 +41,11 @@ describe("MatchRequestService", () => {
     redisRepository = new RedisRepository(redisClient, redisSubscriber);
     await redisRepository.connect();
 
-
     // Create the service instance
     matchRequestService = new MatchRequestService(
       redisRepository.client,
       redisRepository.subscriber
     );
-
   });
 
   afterAll(async () => {
@@ -137,7 +136,7 @@ describe("MatchRequestService", () => {
       /** @type {import("../src/types.js").MatchRequestEntity} */
       const updatedRequest = {
         ...testRequest,
-        status: "pending",
+        status: "waiting",
         time: Date.now() + 1000,
       };
 
@@ -145,7 +144,7 @@ describe("MatchRequestService", () => {
       expect(result).toBe(true);
 
       const stored = await matchRequestService.getUserRequest("test_user_2");
-      expect(stored.status).toBe("pending");
+      expect(stored.status).toBe("waiting");
     });
   });
 
@@ -214,8 +213,8 @@ describe("MatchRequestService", () => {
       await new Promise((resolve) => setTimeout(resolve, 100));
 
       const found = await matchRequestService.findOldestMatch(
-        criterias,
-        "different_user"
+        "different_user",
+        criterias
       );
       expect(found).toBeTruthy();
       expect(found.userId).toBe("test_user_5");
@@ -229,8 +228,8 @@ describe("MatchRequestService", () => {
       });
 
       const found = await matchRequestService.findOldestMatch(
-        criterias,
-        "test_user_6"
+        "test_user_6",
+        criterias
       );
       expect(found).toBeNull();
     });
@@ -253,8 +252,8 @@ describe("MatchRequestService", () => {
 
       // Should not find own request
       const found = await matchRequestService.findOldestMatch(
-        criterias,
-        "test_user_7"
+        "test_user_7",
+        criterias
       );
       expect(found).toBeNull();
     });
@@ -284,8 +283,8 @@ describe("MatchRequestService", () => {
       await new Promise((resolve) => setTimeout(resolve, 200));
 
       const found = await matchRequestService.findOldestMatch(
-        criterias,
-        "different_user"
+        "different_user",
+        criterias
       );
       expect(found).toBeTruthy();
       expect(found.userId).toBe("test_user_8"); // Should return the older one
@@ -300,24 +299,265 @@ describe("MatchRequestService", () => {
       await matchRequestService.storeUserRequest(testRequest);
 
       // Update status
-      await matchRequestService.updateUserRequest(
-        "test_user_10",
-        /** @type {'pending'} */ ("pending")
-      );
+      await matchRequestService.updateUserRequest("test_user_10", "matched");
 
       // Verify status was updated
       const updated = await matchRequestService.getUserRequest("test_user_10");
-      expect(updated.status).toBe("pending");
+      expect(updated.status).toBe("matched");
     });
 
     it("should handle updating non-existent user gracefully", async () => {
       // This should not throw an error, but might not update anything
       await expect(
-        matchRequestService.updateUserRequest(
-          "non_existent_user",
-          /** @type {'pending'} */ ("pending")
-        )
+        matchRequestService.updateUserRequest("non_existent_user", "matched")
       ).resolves.not.toThrow();
+    });
+  });
+
+  describe("atomicTransitionUsersState", () => {
+    beforeEach(async () => {
+      // Create test requests for atomic transition tests
+      const request1 = createTestMatchRequest("test_user_atomic_1", {
+        status: "waiting",
+      });
+      const request2 = createTestMatchRequest("test_user_atomic_2", {
+        status: "waiting",
+      });
+
+      await matchRequestService.storeUserRequest(request1);
+      await matchRequestService.storeUserRequest(request2);
+    });
+
+    it("should successfully transition both users from waiting to matched", async () => {
+      const result = await matchRequestService.atomicTransitionUsersState(
+        "test_user_atomic_1",
+        "test_user_atomic_2",
+        "waiting",
+        "matched"
+      );
+
+      expect(result).toBe(true);
+
+      // Verify both users have been updated
+      const user1 = await matchRequestService.getUserRequest(
+        "test_user_atomic_1"
+      );
+      const user2 = await matchRequestService.getUserRequest(
+        "test_user_atomic_2"
+      );
+
+      expect(user1.status).toBe("matched");
+      expect(user2.status).toBe("matched");
+    });
+
+    it("should fail when one user doesn't exist", async () => {
+      const result = await matchRequestService.atomicTransitionUsersState(
+        "test_user_atomic_1",
+        "non_existent_user",
+        "waiting",
+        "matched"
+      );
+
+      expect(result).toBe(false);
+
+      // Verify the existing user's status wasn't changed
+      const user1 = await matchRequestService.getUserRequest(
+        "test_user_atomic_1"
+      );
+      expect(user1.status).toBe("waiting");
+    });
+
+    it("should fail when initial status doesn't match", async () => {
+      // Update one user to matched status first
+      await matchRequestService.updateUserRequest(
+        "test_user_atomic_1",
+        "matched"
+      );
+
+      const result = await matchRequestService.atomicTransitionUsersState(
+        "test_user_atomic_1",
+        "test_user_atomic_2",
+        "waiting", // Expected status
+        "matched"
+      );
+
+      expect(result).toBe(false);
+
+      // Verify user2 status wasn't changed
+      const user2 = await matchRequestService.getUserRequest(
+        "test_user_atomic_2"
+      );
+      expect(user2.status).toBe("waiting");
+    });
+
+    it("should fail when both users have wrong initial status", async () => {
+      // Update both users to matched status first
+      await matchRequestService.updateUserRequest(
+        "test_user_atomic_1",
+        "matched"
+      );
+      await matchRequestService.updateUserRequest(
+        "test_user_atomic_2",
+        "matched"
+      );
+
+      const result = await matchRequestService.atomicTransitionUsersState(
+        "test_user_atomic_1",
+        "test_user_atomic_2",
+        "waiting", // Expected status
+        "matched"
+      );
+
+      expect(result).toBe(false);
+
+      // Verify both users remain in matched status
+      const user1 = await matchRequestService.getUserRequest(
+        "test_user_atomic_1"
+      );
+      const user2 = await matchRequestService.getUserRequest(
+        "test_user_atomic_2"
+      );
+      expect(user1.status).toBe("matched");
+      expect(user2.status).toBe("matched");
+    });
+
+    it("should successfully transition from matched back to waiting", async () => {
+      // First transition to matched
+      await matchRequestService.atomicTransitionUsersState(
+        "test_user_atomic_1",
+        "test_user_atomic_2",
+        "waiting",
+        "matched"
+      );
+
+      // Then transition back to waiting
+      const result = await matchRequestService.atomicTransitionUsersState(
+        "test_user_atomic_1",
+        "test_user_atomic_2",
+        "matched",
+        "waiting"
+      );
+
+      expect(result).toBe(true);
+
+      // Verify both users are back to waiting
+      const user1 = await matchRequestService.getUserRequest(
+        "test_user_atomic_1"
+      );
+      const user2 = await matchRequestService.getUserRequest(
+        "test_user_atomic_2"
+      );
+
+      expect(user1.status).toBe("waiting");
+      expect(user2.status).toBe("waiting");
+    });
+
+    it("should handle concurrent modifications gracefully", async () => {
+      // This test simulates concurrent modification by running two atomic transitions
+      const promises = [
+        matchRequestService.atomicTransitionUsersState(
+          "test_user_atomic_1",
+          "test_user_atomic_2",
+          "waiting",
+          "matched"
+        ),
+        // Simulate a concurrent update that might interfere
+        (async () => {
+          await delay(5); // Small delay to start slightly after first operation
+          try {
+            await matchRequestService.updateUserRequest(
+              "test_user_atomic_1",
+              "matched"
+            );
+          } catch (error) {
+            // Expected to potentially fail due to watched keys
+          }
+        })(),
+      ];
+
+      const results = await Promise.allSettled(promises);
+      const [atomicResult] = results;
+
+      // The atomic operation should either succeed or fail gracefully
+      if (atomicResult.status === "fulfilled") {
+        expect(typeof atomicResult.value).toBe("boolean");
+      } else {
+        // If rejected, it should be handled gracefully
+        expect(atomicResult.status).toBe("rejected");
+      }
+
+      // Verify the final state is consistent
+      const user1 = await matchRequestService.getUserRequest(
+        "test_user_atomic_1"
+      );
+      const user2 = await matchRequestService.getUserRequest(
+        "test_user_atomic_2"
+      );
+
+      // Both users should have the same status (either both waiting or both matched)
+      expect(user1.status).toBe(user2.status);
+    });
+
+    it("should preserve other fields while updating status", async () => {
+      // Get original requests to compare
+      const originalUser1 = await matchRequestService.getUserRequest(
+        "test_user_atomic_1"
+      );
+      const originalUser2 = await matchRequestService.getUserRequest(
+        "test_user_atomic_2"
+      );
+
+      const result = await matchRequestService.atomicTransitionUsersState(
+        "test_user_atomic_1",
+        "test_user_atomic_2",
+        "waiting",
+        "matched"
+      );
+
+      expect(result).toBe(true);
+
+      const updatedUser1 = await matchRequestService.getUserRequest(
+        "test_user_atomic_1"
+      );
+      const updatedUser2 = await matchRequestService.getUserRequest(
+        "test_user_atomic_2"
+      );
+
+      // Verify status was updated
+      expect(updatedUser1.status).toBe("matched");
+      expect(updatedUser2.status).toBe("matched");
+
+      // Verify other fields were preserved
+      expect(updatedUser1.userId).toBe(originalUser1.userId);
+      expect(updatedUser1.criterias).toEqual(originalUser1.criterias);
+      expect(updatedUser1.time).toBe(originalUser1.time);
+
+      expect(updatedUser2.userId).toBe(originalUser2.userId);
+      expect(updatedUser2.criterias).toEqual(originalUser2.criterias);
+      expect(updatedUser2.time).toBe(originalUser2.time);
+    });
+
+    it("should work with same user for both parameters", async () => {
+      // Edge case: transition the same user (though not typical usage)
+      const result = await matchRequestService.atomicTransitionUsersState(
+        "test_user_atomic_1",
+        "test_user_atomic_1",
+        "waiting",
+        "matched"
+      );
+
+      expect(result).toBe(true);
+
+      const user = await matchRequestService.getUserRequest(
+        "test_user_atomic_1"
+      );
+      expect(user.status).toBe("matched");
+    });
+
+    afterEach(async () => {
+      // Clean up atomic test users
+      await matchRequestService.removeUserRequest("test_user_atomic_1");
+      await matchRequestService.removeUserRequest("test_user_atomic_2");
     });
   });
 
@@ -338,8 +578,8 @@ describe("MatchRequestService", () => {
 
       // User 2 looks for a match
       const matchFound = await matchRequestService.findOldestMatch(
-        criterias,
-        "test_user_12"
+        "test_user_12",
+        criterias
       );
       expect(matchFound).toBeTruthy();
       expect(matchFound.userId).toBe("test_user_11");
@@ -363,6 +603,63 @@ describe("MatchRequestService", () => {
       // Clean up
       await matchRequestService.removeUserRequest("test_user_11");
       await matchRequestService.removeUserRequest("test_user_12");
+    });
+
+    it("should handle complete match flow with atomic transitions", async () => {
+      const criterias = createTestCriteria();
+
+      // User 1 and User 2 create match requests
+      const user1Request = createTestMatchRequest("test_user_13", {
+        criterias,
+        time: Date.now() - 1000,
+        status: /** @type {'waiting'} */ ("waiting"),
+      });
+
+      const user2Request = createTestMatchRequest("test_user_14", {
+        criterias,
+        time: Date.now(),
+        status: /** @type {'waiting'} */ ("waiting"),
+      });
+
+      await matchRequestService.storeUserRequest(user1Request);
+      await matchRequestService.storeUserRequest(user2Request);
+
+      // Wait for indexing
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      // User 2 looks for a match and finds User 1
+      const matchFound = await matchRequestService.findOldestMatch(
+        "test_user_14",
+        criterias
+      );
+      expect(matchFound).toBeTruthy();
+      expect(matchFound.userId).toBe("test_user_13");
+
+      // Atomically transition both users from waiting to matched
+      const transitionResult =
+        await matchRequestService.atomicTransitionUsersState(
+          "test_user_13",
+          "test_user_14",
+          "waiting",
+          "matched"
+        );
+
+      expect(transitionResult).toBe(true);
+
+      // Verify both users are now matched
+      const user1Updated = await matchRequestService.getUserRequest(
+        "test_user_13"
+      );
+      const user2Updated = await matchRequestService.getUserRequest(
+        "test_user_14"
+      );
+
+      expect(user1Updated.status).toBe("matched");
+      expect(user2Updated.status).toBe("matched");
+
+      // Clean up
+      await matchRequestService.removeUserRequest("test_user_13");
+      await matchRequestService.removeUserRequest("test_user_14");
     });
   });
 });

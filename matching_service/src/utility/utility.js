@@ -11,7 +11,7 @@ export function matchRequestToEntity(userInstance, request) {
   /** @type {MatchRequestEntity} */
   const matchRequestEntity = {
     userId: userInstance.id,
-    status: "initial",
+    status: "waiting",
     criterias: request.criterias,
     time: request.time,
   };

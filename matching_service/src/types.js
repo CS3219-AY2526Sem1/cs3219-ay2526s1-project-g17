@@ -1,4 +1,4 @@
-/** @typedef {import("ws").WebSocket} WebSocket*/
+/** @typedef {import("socket.io").Socket} SocketIOSocket*/
 
 /**
  * @typedef {"easy" | "medium" | "hard"} Difficulty
@@ -6,104 +6,66 @@
 
 /**
  * @typedef {Object} Criteria
+ * @property {"criteria"} type
  * @property {Difficulty} difficulty
  * @property {string} language
  * @property {string} topic
  */
 
 /**
+ * @typedef {MatchRequest | MatchCancelRequest} UserMessage
+ */
+
+/**
  * @typedef {Object} MatchRequest
- * @property {"matchRequest"} type
+ * @property {string} userId
+ * @property {"match-request"} type
  * @property {Array<Criteria>} criterias
  * @property {number} time
+ * @property {string} requestId
  */
 
 /**
- * @typedef {Object} MatchFoundNotification
- * @property {"matchFound"} type
- * @property {Criteria} criteria
- */
-
-/**
- * @typedef {"waiting" | "pending" | "matched" | "initial"} MatchRequestStatus
+ * @typedef {Object} MatchCancelRequest
+ * @property {"match-cancel"} type
+ * @property {string} requestId
  */
 
 /**
  * @typedef {Object} MatchRequestEntity
  * @property {string} userId
- * @property {MatchRequestStatus} status
+ * @property {"waiting" | "matched"} status
  * @property {Array<Criteria>} criterias
  * @property {number} time
  */
 
 /**
- * @typedef {MatchRequest | MatchFoundResponse} Message
- */
-
-/**
  * @typedef {Object} UserInstance
- * @property {WebSocket} ws
+ * @property {SocketIOSocket} ws
  * @property {string} id
  */
 
 /**
- * @typedef {Object} MatchFoundResponse
- * @property {"matchFoundResponse"} type
- * @property {"accept" | "reject"} response
- */
-
-/**
- * @typedef {import("crypto").UUID} UUID;
- */
-
-/**
- * @typedef {Object} AcceptanceTimeoutNotification
- * @property {String} reason
+ * @typedef {Object} CollaborationSession
+ * @property {Criteria} criteria
+ * @property {string} session
+ * @property {[string, string]} userIds
  */
 
 /**
  * @typedef {Object} MatchedDetails
- * @property {boolean} accepts
  * @property {string} partner
  * @property {Criteria} criteria
  */
 
 /**
- * @typedef {Object} CollaborationSession
- * @property {string} session
+ * @typedef {Object} MatchFound
+ * @property {"match-found"} type
+ * @property {CollaborationSession} session
  */
 
 /**
- * @typedef {Object} PartnerRequest
- * @property {"PARTNER-REQUEST"} type
- * @property {string} userId
+ * @typedef {MatchFound} ToUser
  */
-
-/**
- * @typedef {Object} PartnerRequestResponse
- * @property {"PARTNER-RESPONSE"} type
- * @property {boolean} isAccept
- */
-
-/**
- * @typedef {Object} PartnerRequestAck
- * @property {"PARTNER-ACK"} type
- * @property {string} userId
- */
-
-/**
- * @typedef {Object} CreateMatchDetailsCommand
- * @property {"CREATE-MATCH-DETAILS"} type
- * @property {string} partnerId
- */
-
-
-/**
- * @typedef {Object} CreateCollaborationCommand
- * @property {"CREATE-COLLABORATION"} type
- * @property {string} partnerId
- */
-
-
 
 export {};

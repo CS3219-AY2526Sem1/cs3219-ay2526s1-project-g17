@@ -1,30 +1,47 @@
 import http from "http";
 import index from "./index.js";
-import { WebSocketServer } from "ws";
-import { sendMessage } from "./utility/ws_util.js";
+import { Server } from "socket.io";
 import {} from "./types.js";
 import { MatchingService } from "./service/matching_service.js";
 import { initializeRedis } from "./model/redis_integration.js";
 
-import { randomUUID } from "crypto";
 import { MatchRequestService } from "./service/match_request_service.js";
+import { MatchedDetailsService } from "./service/matched_details_service.js";
+import { CollaborationService } from "./service/collaboration_service.js";
 
 /** @typedef {import("./types.js").MatchRequest} MatchRequest */
 /** @typedef {import("./types.js").UserInstance} UserInstance */
-/** @typedef {import("./types.js").MatchFoundResponse} MatchFoundResponse */
-/** @typedef {import("./types.js").Message} Message */
 /** @typedef {import("./types.js").Criteria} Criteria */
-/** @typedef {import("./types.js").AcceptanceTimeoutNotification} AcceptanceTimeoutNotification */
+/** @typedef {import("./types.js").UserMessage} UserMessage */
+/** @typedef {import("./types.js").MatchCancelRequest} MatchCancelRequest */
 
 const port = process.env.PORT || 3001;
 
 const server = http.createServer(index);
-const wss = new WebSocketServer({ server, clientTracking: true });
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"],
+  },
+});
 
-const redisRepository = await initializeRedis();
+export const redisRepository = await initializeRedis();
+
+console.log("=== Environment Configuration ===");
+console.log("NODE_ENV:", process.env.NODE_ENV || "not set");
+console.log("ENV:", process.env.ENV || "not set");
+console.log("PORT:", process.env.PORT || "not set");
+console.log("REDIS_URL:", process.env.REDIS_URL ? "✓ Set" : "✗ Not set");
+console.log("AUTH0_DOMAIN:", process.env.AUTH0_DOMAIN ? "✓ Set" : "✗ Not set");
+console.log(
+  "AUTH0_AUDIENCE:",
+  process.env.AUTH0_AUDIENCE ? "✓ Set" : "✗ Not set"
+);
+console.log("ACCEPTANCE_TIMEOUT:", process.env.ACCEPTANCE_TIMEOUT || "not set");
+console.log("=====================================");
 
 try {
-  await redisRepository.flushAll();
+  // await redisRepository.flushAll();
   server.listen(port);
   console.log("Matching service server listening on http://localhost:" + port);
 } catch (err) {
@@ -33,11 +50,22 @@ try {
   process.exit(1);
 }
 
-const matchRequestService = new MatchRequestService(
+export const matchRequestService = new MatchRequestService(
   redisRepository.client,
   redisRepository.subscriber
 );
-const matchingService = new MatchingService(redisRepository);
+export const matchedDetailsService = new MatchedDetailsService(
+  redisRepository.client
+);
+export const collaborationService = new CollaborationService(
+  redisRepository.client
+);
+export const matchingService = new MatchingService(
+  redisRepository,
+  matchRequestService,
+  matchedDetailsService,
+  collaborationService
+);
 
 process.on("SIGINT", () => {
   server.close(async () => {
@@ -45,61 +73,65 @@ process.on("SIGINT", () => {
   });
 });
 
-wss.on("connection", (ws, request) => {
-  // const url = new URL(request.url, `http://${request.headers.host}`);
-  // const userId = url.searchParams.get("userId");
-  // console.log("New WebSocket connection");
-  // /** @type {UserInstance} */
-  // const userInstance = { id: userId, ws: ws };
+io.on("connection", (socket) => {
+  const userId = Array.isArray(socket.handshake.query.userId)
+    ? socket.handshake.query.userId[0]
+    : socket.handshake.query.userId;
 
+  console.log("Socket.IO userId:", userId);
   /** @type {UserInstance} */
-  const userInstance = { id: randomUUID(), ws: ws };
-  console.log("New WebSocket connection");
+  const userInstance = { id: userId, ws: socket };
+  console.log("New Socket.IO connection");
 
-  ws.on("message", async (message) => {
+  socket.join(`user:${userId}`);
+
+  socket.on("match-request", async (data, callback) => {
     try {
-      // @ts-ignore
-      const data = JSON.parse(message);
-      console.log("Received message", data);
-      await handleMessage(userInstance, data);
+      /** @type {MatchRequest} */
+      data.time = Date.now();
+      await matchingService.addRequest(userInstance, data);
+
+      if (callback && typeof callback === "function") {
+        callback({
+          type: "ack",
+          requestId: data.requestId,
+          success: true,
+        });
+      }
     } catch (error) {
-      console.error("Error while parsing or handling message", message, error);
-      ws.send(
-        JSON.stringify({ type: "error", message: "Invalid JSON", e: error })
-      );
+      console.error("Error handling match-request:", error);
+      if (callback && typeof callback === "function") {
+        callback({
+          type: "error",
+          requestId: data.requestId,
+          success: false,
+          message: "Failed to process match request",
+          error: error.message,
+        });
+      }
     }
   });
 
-  ws.on("close", async () => {
-    await matchingService.disposeUser(userInstance.id);
+  socket.on("disconnect", async (reason) => {
+    console.log("Socket.IO disconnect event, reason:", reason);
+    switch (reason) {
+      case "transport error":
+      case "transport close":
+      case "parse error":
+      case "ping timeout":
+        break;
+
+      case "forced close":
+      case "server shutting down":
+      case "forced server close":
+      case "client namespace disconnect":
+      case "server namespace disconnect":
+        await matchingService.disposeUser(userInstance.id);
+        break;
+    }
   });
 
-  ws.on("error", (e) => {
-    console.error(e);
+  socket.on("error", (error) => {
+    console.error("Socket.IO error:", error);
   });
 });
-
-/**
- * @param {Message} message
- * @param {UserInstance} userInstance
- */
-async function handleMessage(userInstance, message) {
-  switch (message.type) {
-    case "matchRequest":
-      /** @type {MatchRequest} */
-      message;
-      message.time = Date.now();
-      await matchingService.addRequest(userInstance, message);
-      break;
-    case "matchFoundResponse":
-      /** @type {MatchFoundResponse} */
-      message;
-      await matchingService.handleUserMatchFoundResponse(
-        userInstance.id,
-        message
-      );
-      break;
-    default:
-      sendMessage(userInstance.ws, { message: "Invalid request typename" });
-  }
-}
