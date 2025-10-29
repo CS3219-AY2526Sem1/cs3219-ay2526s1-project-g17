@@ -6,8 +6,9 @@
 
 import axios from "axios";
 import { io } from "socket.io-client";
+import { MATCHING_SERVICE_URL } from "../constants";
 
-const WS_URL = "http://localhost:3001";
+const WS_URL = MATCHING_SERVICE_URL;
 
 /**
  * Socket.IO connection manager
