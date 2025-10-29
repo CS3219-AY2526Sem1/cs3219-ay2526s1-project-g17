@@ -35,7 +35,13 @@ jobs:
 
       - name: Build and Push Docker Image
         run: |
-          docker build -t ${{ env.DOCKER_IMAGE_URL }}:latest -f frontend/Dockerfile frontend
+          docker build \
+            --build-arg VITE_AUTH0_CALLBACK_URL="${{ secrets.AUTH0_CALLBACK_URL }}" \
+            --build-arg VITE_AUTH0_DOMAIN="${{ secrets.AUTH0_DOMAIN }}" \
+            --build-arg VITE_AUTH0_CLIENT_ID="${{ secrets.AUTH0_CLIENT_ID }}" \
+            --build-arg VITE_QUEUE_TIMEOUT="${{ secrets.MATCHING_QUEUE_TIMEOUT}}" \
+            --build-arg NODE_ENV=production \
+            -t ${{ env.DOCKER_IMAGE_URL }}:latest -f frontend/Dockerfile frontend
           docker push ${{ env.DOCKER_IMAGE_URL }}:latest
 
       - name: Deploy to Cloud Run
