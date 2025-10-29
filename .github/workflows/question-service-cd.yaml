@@ -9,7 +9,7 @@ on:
     branches:
       - master
     paths:
-      - 'question-service/**'
+      - 'question_service/**'
       - '.github/workflows/quesiton-service-cd.yaml'
 
 jobs:
