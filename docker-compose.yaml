@@ -16,7 +16,7 @@ services:
     ports:
       - 3004:3004
     env_file:
-      - ./history-servicee/.env
+      - ./history-service/.env
   matching_service:
     build: ./matching_service_v2
     ports:
