@@ -1,4 +1,4 @@
-import { isDEV } from "./server_config";
+import { isDEV } from "./server_config.js";
 
 export const MATCH_REQUEST_PREFIX = "MATCH_REQUEST";
 export const matchedPairKeyPrefix = "matched_pair:";
