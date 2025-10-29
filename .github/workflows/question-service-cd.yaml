@@ -1,13 +1,16 @@
-name: matching_service_cd
+name: question-service-cd
 env:
-  SERVICE_NAME: matching-service
+  SERVICE_NAME: question-service
   PROJECT_ID: cs3219-476502
-  DOCKER_IMAGE_URL: asia-southeast1-docker.pkg.dev/cs3219-476502/cs3219/matching-service
+  DOCKER_IMAGE_URL: asia-southeast1-docker.pkg.dev/cs3219-476502/cs3219/question-service
 
 on:
   push:
     branches:
       - master
+    paths:
+      - 'question_service/**'
+      - '.github/workflows/quesiton-service-cd.yaml'
 
 jobs:
   dockerize-and-deploy:
@@ -32,7 +35,7 @@ jobs:
 
       - name: Build and Push Docker Image
         run: |
-          docker build -t ${{ env.DOCKER_IMAGE_URL }}:latest -f matching_service/Dockerfile matching_service
+          docker build -t ${{ env.DOCKER_IMAGE_URL }}:latest -f quesiton_service/Dockerfile question_service
           docker push ${{ env.DOCKER_IMAGE_URL }}:latest
 
       - name: Deploy to Cloud Run
