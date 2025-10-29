@@ -5,7 +5,7 @@ on:
     branches:
       - master
     paths:
-      - 'matching_service_v2/**'
+      - 'matching_service/**'
       - '.github/workflows/matching-service-ci.yaml'
 
 jobs:
@@ -25,7 +25,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: ./matching_service_v2
+        working-directory: ./matching_service
   
     steps:
       - name: Checkout code
@@ -37,7 +37,7 @@ jobs:
           node-version: 22
 
       - name: Install dependencies
-        working-directory: matching_service_v2
+        working-directory: matching_service
         run: npm install
 
       - name: Verify environment variables

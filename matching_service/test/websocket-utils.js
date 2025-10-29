@@ -1,11 +1,9 @@
+import { randomUUID } from "crypto";
 import WebSocket from "ws";
 
 /** @typedef {import("../src/types.js").MatchRequest} MatchRequest */
 /** @typedef {import("../src/types.js").UserInstance} UserInstance */
-/** @typedef {import("../src/types.js").MatchFoundResponse} MatchFoundResponse */
-/** @typedef {import("../src/types.js").Message} Message */
 /** @typedef {import("../src/types.js").Criteria} Criteria */
-/** @typedef {import("../src/types.js").AcceptanceTimeoutNotification} AcceptanceTimeoutNotification */
 
 const WS_URL = "ws://localhost:3001";
 const CONNECTION_TIMEOUT = 10000;
@@ -75,23 +73,14 @@ function waitForMessage(ws, messageType, timeout = MESSAGE_TIMEOUT) {
  */
 function createMatchRequest(criteria) {
   return {
-    type: "matchRequest",
+    requestId: "dsfg",
+    userId: randomUUID(),
+    type: "match-request",
     criterias: [criteria],
     time: Date.now(),
   };
 }
 
-/**
- * Helper function to create a match acknowledgment
- * @param {"accept" | "reject"} response - "accept" or "reject"
- * @returns {MatchFoundResponse} Match acknowledgment object
- */
-function createMatchAck(response) {
-  return {
-    type: "matchFoundResponse",
-    response: response,
-  };
-}
 
 /**
  * Helper function to close WebSocket clients safely
@@ -118,7 +107,6 @@ export {
   createWebSocketClient,
   waitForMessage,
   createMatchRequest,
-  createMatchAck,
   closeClients,
   sendMessage,
   WS_URL,

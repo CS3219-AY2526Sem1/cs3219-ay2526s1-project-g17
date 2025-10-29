@@ -1,30 +1,34 @@
 /** @typedef {import("ws").WebSocket} WebSocket*/
+/** @typedef {import("socket.io").Socket} SocketIOSocket*/
 
 /**
- * @param {WebSocket} ws
+ * @param {SocketIOSocket} ws
  * @param {Object} jsonObject
  */
 export function sendMessage(ws, jsonObject) {
-  ws.send(JSON.stringify(jsonObject));
+  ws.emit("message", jsonObject);
 }
 
 /**
- * Sends match found notification to client with criteria as details
- * @param {WebSocket} ws
- * @param {import("../server").Criteria} criteria
+ * @param {SocketIOSocket} socket
+ * @param {string} eventName
+ * @param {Object} data
+ * @param {Function} [callback]
  */
-export function sendMatchNotification(ws, criteria) {
-  sendMessage(ws, {
-    type: "matchFound",
-    details: criteria,
-  });
+export function emitToSocket(socket, eventName, data, callback) {
+  if (callback) {
+    socket.emit(eventName, data, callback);
+  } else {
+    socket.emit(eventName, data);
+  }
 }
 
 /**
- * @param {import("../server").UserInstance} instance
- * @param {string} session
+ * @param {import("socket.io").Server} io
+ * @param {string} room
+ * @param {string} eventName
+ * @param {Object} data
  */
-export function sendSessionToUser(instance, session) {
-  sendMessage(instance.ws, { type: "matchOutcome", session: session });
-  console.log("Session sent to ", instance.id);
+export function emitToRoom(io, room, eventName, data) {
+  io.to(room).emit(eventName, data);
 }

@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 
 import matchingRoute from "./routes/matching_route.js";
+import { errorHandler } from "./middleware/error.middleware.js";
 
 const app = express();
 
@@ -61,5 +62,7 @@ app.use(
     });
   }
 );
+
+app.use(errorHandler);
 
 export default app;

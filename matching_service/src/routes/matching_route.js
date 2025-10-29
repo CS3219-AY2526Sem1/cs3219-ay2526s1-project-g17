@@ -1,16 +1,18 @@
 import express from "express";
-import redisRepository from "../model/redis_repository";
+import { collaborationService, matchedDetailsService } from "../server.js";
+import axios from "axios";
+import { COLLABORATION_URL } from "../constants.js";
+import { verifyAccessToken } from "../middleware/basic_access_control.js";
 
 const router = express.Router();
-
-router.get("/", (req, res) => {
-  res.status(200).json({ message: "Hello from matching service" });
-});
 
 router.delete("/endSession", async (req, res) => {
   const { userId1, userId2 } = req.body;
   try {
-    await redisRepository.removeCollaborationSession(userId1, userId2);
+    if (!userId1 || !userId2) {
+      throw new Error("bad request body");
+    }
+    await collaborationService.deleteCollaborationSession(userId1, userId2);
     console.log("Session close successful");
     res.status(200).send({ message: "Session closed" });
   } catch (error) {
@@ -19,20 +21,53 @@ router.delete("/endSession", async (req, res) => {
   }
 });
 
-router.get("/initiateMatch", async (req, res) => {
-  const { userId } = req.body;
+/**
+ * @param {string} sessionId
+ */
+async function fetchSession(sessionId) {
   try {
-    const matchedDetails = await redisRepository.getMatchedDetails(userId);
+    const url = `${COLLABORATION_URL}/sessions/${sessionId}`;
+    console.log(`GET ${url}`);
+    const res = await axios.get(url);
+    const data = res.data;
+    console.log("Session retrieved", data);
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch session", error);
+    return null;
+  }
+}
+
+router.get("/initiateMatch", verifyAccessToken, async (req, res) => {
+  const { userId } = req.query;
+  try {
+    const matchedDetails = await matchedDetailsService.getMatchedDetails(
+      userId.toString()
+    );
     if (matchedDetails) {
       const collaborationSession =
-        await redisRepository.getCollaborationSession(
-          userId,
+        await collaborationService.getCollaborationSession(
+          userId.toString(),
           matchedDetails.partner
         );
+      //TODO: Call collaboration service to check if there such session
+      const session = await fetchSession(collaborationSession.session);
+
       if (collaborationSession) {
-        res
-          .status(200)
-          .json({ code: "has-existing", session: collaborationSession });
+        console.log(
+          `Has existing session on matching service: ${collaborationSession.session}`
+        );
+        if (session) {
+          console.log(`${collaborationSession.session} is still active`);
+          res
+            .status(200)
+            .json({ code: "has-existing", session: collaborationSession });
+        } else {
+          await collaborationService.deleteCollaborationSession(
+            userId.toString(),
+            matchedDetails.partner
+          );
+        }
       } else {
         res.status(200).json({ code: "no-existing" });
       }
