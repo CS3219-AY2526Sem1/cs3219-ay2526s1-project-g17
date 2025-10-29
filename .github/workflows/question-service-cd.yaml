@@ -35,7 +35,7 @@ jobs:
 
       - name: Build and Push Docker Image
         run: |
-          docker build -t ${{ env.DOCKER_IMAGE_URL }}:latest -f quesiton_service/Dockerfile question_service
+          docker build -t ${{ env.DOCKER_IMAGE_URL }}:latest -f question_service/Dockerfile question_service
           docker push ${{ env.DOCKER_IMAGE_URL }}:latest
 
       - name: Deploy to Cloud Run
