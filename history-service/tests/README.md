@@ -4,6 +4,7 @@ This directory contains Jest-based unit tests that exercise the `history-service
 
 ## Files
 - `historyController.test.js` &mdash; covers the happy path and failure modes for `getUsersHistory`, `createAttempt`, and `updateAttempt`.
+- `basic-access-control.test.js` &mdash; verifies the Auth0 middleware loads environment variables through the shared bootstrap.
 
 ## Running the Tests
 From the `history-service` directory:

@@ -40,6 +40,7 @@ describe("historyController", () => {
       const req = {
         params: { userId },
         query: { limit: "5", skip: "0" },
+        auth: { payload: { sub: userId } },
       };
       const res = buildMockRes();
 
@@ -57,6 +58,21 @@ describe("historyController", () => {
       });
     });
 
+    it("returns 403 when token subject does not match requested userId", async () => {
+      const req = {
+        params: { userId },
+        query: {},
+        auth: { payload: { sub: "different-user" } },
+      };
+
+      const res = buildMockRes();
+
+      await getUsersHistory(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(403);
+      expect(res.json).toHaveBeenCalledWith({ message: "Forbidden" });
+    });
+
     it("returns 404 when no attempts are found", async () => {
       const mockQueryChain = {
         sort: jest.fn().mockReturnThis(),
@@ -68,7 +84,11 @@ describe("historyController", () => {
       jest.spyOn(QuestionAttempt, "find").mockReturnValue(mockQueryChain);
       const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 
-      const req = { params: { userId }, query: {} };
+      const req = {
+        params: { userId },
+        query: {},
+        auth: { payload: { sub: userId } },
+      };
       const res = buildMockRes();
 
       await getUsersHistory(req, res);
@@ -89,7 +109,11 @@ describe("historyController", () => {
       jest.spyOn(QuestionAttempt, "find").mockReturnValue(mockQueryChain);
       const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 
-      const req = { params: { userId }, query: {} };
+      const req = {
+        params: { userId },
+        query: {},
+        auth: { payload: { sub: userId } },
+      };
       const res = buildMockRes();
 
       await getUsersHistory(req, res);
