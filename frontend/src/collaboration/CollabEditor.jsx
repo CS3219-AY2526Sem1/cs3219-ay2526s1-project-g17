@@ -55,9 +55,7 @@ export default function CollabEditor({
         // });
 
         // Connect to Yjs WebSocket provider
-        const WS_BASE = import.meta.env.VITE_WS_BASE ||
-            "ws://localhost:3002" ||
-            "https://collaboration-service-226307456137.asia-southeast1.run.app";
+        const WS_BASE = import.meta.env.VITE_WS_BASE || "ws://localhost:3002";
         const wsUrl = `${WS_BASE}/collab?sessionId=${encodeURIComponent(sessionId)}`;
         const provider = new WebsocketProvider(wsUrl, sessionId, ydoc);
 

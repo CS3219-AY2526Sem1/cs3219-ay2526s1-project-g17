@@ -1,6 +1,4 @@
-const BASE = import.meta.env.VITE_EXEC_BASE ||
-    "http://localhost:4000" ||
-    "https://execution-service-226307456137.asia-southeast1.run.app";
+const BASE = import.meta.env.VITE_EXEC_BASE || "http://localhost:4000";
 
 export async function runCode({ language, source, stdin = "" }) {
     try {
