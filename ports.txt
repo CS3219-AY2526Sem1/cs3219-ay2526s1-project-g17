@@ -1,7 +1,5 @@
 frontend: 5173
 
-user-service: 3003
-
 matching-service: 3001
 
 question-service: 5001
