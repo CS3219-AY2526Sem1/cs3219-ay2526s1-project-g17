@@ -41,8 +41,6 @@ jobs:
         uses: google-github-actions/setup-gcloud@v1
         with:
           project_id: ${{ secrets.MATCHING_SERVICE_GCP_PROJECT }}
-          service_account_key: ${{ secrets.MATCHING_SERVICE_SA_KEY }}
-          export_default_credentials: true
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
@@ -50,10 +48,6 @@ jobs:
       - name: Configure Docker to use gcloud as credential helper
         run: |
           gcloud --quiet auth configure-docker
-      - name: print out tag
-        run:
-          echo ${{secrets.REGION}}-docker.pkg.dev/${{secrets.MATCHING_SERVICE_GCP_PROJECT}}/cs3219/matching-service:latest 
-
 
       - name: Build and push container image
         uses: docker/build-push-action@v4
@@ -61,18 +55,18 @@ jobs:
           context: matching_service_v2
           file: matching_service_v2/Dockerfile
           push: true
-          tags: ${{secrets.REGION}}-docker.pkg.dev/${{secrets.MATCHING_SERVICE_GCP_PROJECT}}/cs3219/matching-service:latest 
+          tags: ${{secrets.REGION}}-docker.pkg.dev/${{secrets.MATCHING_SERVICE_GCP_PROJECT}}/cs3219/matching-services:latest 
 
       - name: Deploy to Cloud Run
         uses: google-github-actions/deploy-cloudrun@v1
         with:
-          service: matching-sevice
-          image: ${{secrets.REGION}}-docker.pkg.dev/${{secrets.MATCHING_SERVICE_GCP_PROJECT}}/cs3219/matching-service:latest 
+          service: matching-service
+          image: ${{secrets.REGION}}-docker.pkg.dev/${{secrets.MATCHING_SERVICE_GCP_PROJECT}}/cs3219/matching-services:latest 
           region: ${{ secrets.REGION }}
           allow_unauthenticated: true
 
       - name: Output Cloud Run URL
         run: |
-          echo "Deployed image: ${{secrets.REGION}}-docker.pkg.dev/${{secrets.MATCHING_SERVICE_GCP_PROJECT}}/cs3219/matching-service:latest "
+          echo "Deployed image: ${{secrets.REGION}}-docker.pkg.dev/${{secrets.MATCHING_SERVICE_GCP_PROJECT}}/cs3219/matching-services:latest "
           gcloud run services describe matching-service --region=${{ secrets.REGION }} --format="value(status.url)"
 
