@@ -39,5 +39,5 @@ jobs:
         run: |
           echo SERVICE_NAME $SERVICE_NAME
           gcloud run deploy $SERVICE_NAME \
-            --image ${{ env.DOCKER_IMAGE_URL }}:latest
+            --image ${{ env.DOCKER_IMAGE_URL }}:latest \
             --region asia-southeast1
