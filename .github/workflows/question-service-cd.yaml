@@ -10,7 +10,7 @@ on:
       - master
     paths:
       - 'question_service/**'
-      - '.github/workflows/quesiton-service-cd.yaml'
+      - '.github/workflows/question-service-cd.yaml'
 
 jobs:
   dockerize-and-deploy:
