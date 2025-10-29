@@ -11,6 +11,7 @@ services:
       - matching_service
       - question_service
       - collaboration_service
+      - execution_service
   user_service:
     build: ./user-service
     ports:
@@ -35,3 +36,9 @@ services:
       - 3002:3002
     env_file:
       - ./collaboration-service/.env
+  execution_service:
+    build: ./execution-service
+    ports:
+      - 4000:4000
+    env_file:
+      - ./execution-service/.env
