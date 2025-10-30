@@ -2,9 +2,71 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { NavigationBar } from "../../components/NavigationBar/NavigationBar";
 import LoginButton from "../../components/Login/LoginButton";
 import LoadingSpinner from "../../components/Loading/LoadingSpinner";
+import { useCallback, useEffect, useMemo, useState } from "react";
+
+const PAGE_SIZE = 5;
+const HISTORY_SERVICE_BASE = "http://localhost:3004/history";
 
 export default function ProfilePage() {
-  const { isAuthenticated, isLoading, user } = useAuth0();
+  const { isAuthenticated, isLoading, user, getAccessTokenSilently, loginWithPopup } = useAuth0();
+  const [attempts, setAttempts] = useState([]);
+  const [page, setPage] = useState(0);
+  const [isFetching, setIsFetching] = useState(false);
+  const [error, setError] = useState(null);
+  const [hasNextPage, setHasNextPage] = useState(false);
+  const [authToken, setAuthToken] = useState(null);
+
+
+  const offset = useMemo(() => page * PAGE_SIZE, [page]);
+
+  const fetchAttempts = useCallback(async () => {
+    if (!isAuthenticated || !user?.sub) {
+      return;
+    }
+
+    setIsFetching(true);
+    setError(null);
+
+    try {
+      const token = await getAccessTokenSilently({
+        authorizationParams: { audience: "peerprep-api" },
+      });
+
+      const response = await axios.get(
+        `${HISTORY_SERVICE_BASE}/${encodeURIComponent(user.sub)}`,
+        {
+          params: { limit: PAGE_SIZE, skip: offset },
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      setAuthToken(token);
+      setAttempts(response.data?.attempts ?? []);
+      setHasNextPage((response.data?.attempts ?? []).length === PAGE_SIZE);
+    } catch (err) {
+      if (err?.response?.status === 404) {
+        setAttempts([]);
+        setHasNextPage(false);
+      } else if (err?.error === "login_required") {
+        await loginWithPopup();
+      } else {
+        setError(err);
+      }
+    } finally {
+      setIsFetching(false);
+    }
+  }, [
+    getAccessTokenSilently,
+    loginWithPopup,
+    isAuthenticated,
+    offset,
+    user?.sub,
+  ]);
+
+  useEffect(() => {
+    fetchAttempts();
+  }, [fetchAttempts]);
+
 
   if (isLoading) {
     return <LoadingSpinner text="Fetching your profile..." />;
@@ -60,7 +122,7 @@ export default function ProfilePage() {
           </div>
         </section>
 
-        
+
       </main>
     </div>
   );
