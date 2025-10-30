@@ -3,6 +3,7 @@ import { NavigationBar } from "../../components/NavigationBar/NavigationBar";
 import LoginButton from "../../components/Login/LoginButton";
 import LoadingSpinner from "../../components/Loading/LoadingSpinner";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import './ProfilePage.css'
 
 const PAGE_SIZE = 5;
 const HISTORY_SERVICE_BASE = "http://localhost:3004/history";
