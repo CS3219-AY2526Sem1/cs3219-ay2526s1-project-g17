@@ -3,6 +3,7 @@ import HomePage from './pages/HomePage/HomePage.jsx';
 import { Routes, Route } from 'react-router-dom';
 import CollabPage from './collaboration/index.jsx';
 import MatchingPage from './matching-service/pages/matching_page.jsx'
+import ProfilePage from './pages/ProfilePage/ProfilePage.jsx';
 
 function App()  {
     return (
@@ -11,6 +12,7 @@ function App()  {
                 <Route path="/" element={<HomePage />} />
                 <Route path="/collaboration/:sessionId" element={<CollabPage />} />
                 <Route path="/match" element={<MatchingPage />} />
+                <Route path="/profile" element={<ProfilePage />} />
             </Routes>
         </>
     );
