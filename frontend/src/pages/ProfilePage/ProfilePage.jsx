@@ -4,6 +4,8 @@ import LoginButton from "../../components/Login/LoginButton";
 import LoadingSpinner from "../../components/Loading/LoadingSpinner";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import './ProfilePage.css'
+import axios from "axios";
+import HistoryPanel from "./Components/HistoryPanel";
 
 const PAGE_SIZE = 5;
 const HISTORY_SERVICE_BASE = "http://localhost:3004/history";
@@ -19,6 +21,13 @@ export default function ProfilePage() {
 
 
   const offset = useMemo(() => page * PAGE_SIZE, [page]);
+
+  const handlePrev = () => setPage((prev) => Math.max(prev - 1, 0));
+  const handleNext = () => {
+    if (hasNextPage) {
+      setPage((prev) => prev + 1);
+    }
+  };
 
   const fetchAttempts = useCallback(async () => {
     if (!isAuthenticated || !user?.sub) {
@@ -122,7 +131,17 @@ export default function ProfilePage() {
             </dl>
           </div>
         </section>
-
+        
+        <HistoryPanel
+          attempts={attempts}
+          page={page}
+          isFetching={isFetching}
+          hasNextPage={hasNextPage}
+          error={error}
+          onPrev={handlePrev}
+          onNext={handleNext}
+          authToken={authToken}
+        />
 
       </main>
     </div>
