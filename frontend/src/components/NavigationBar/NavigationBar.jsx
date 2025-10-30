@@ -27,6 +27,13 @@ export function NavigationBar() {
               Join session
             </a>
           </li>
+          {isAuthenticated && (
+            <li className="navbar__item">
+              <a href="/profile" className="navbar__links">
+                Profile
+              </a>
+            </li>
+          )}
           <li className="navbar__btn">
             {isAuthenticated ? (
               <LogoutButton />
