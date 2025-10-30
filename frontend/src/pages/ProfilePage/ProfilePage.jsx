@@ -5,7 +5,7 @@ import LoadingSpinner from "../../components/Loading/LoadingSpinner";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import './ProfilePage.css'
 import axios from "axios";
-import HistoryPanel from "./Components/HistoryPanel";
+import HistoryPanel from "./components/HistoryPanel.jsx";
 
 const PAGE_SIZE = 5;
 const HISTORY_SERVICE_BASE = "http://localhost:3004/history";

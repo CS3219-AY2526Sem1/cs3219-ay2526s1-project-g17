@@ -1,17 +1,15 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import LoadingSpinner from "../../../components/Loading/LoadingSpinner.jsx";
 
-const QUESTION_SERVICE_BASE = "http://localhost:5001/api/questions";
+const QUESTION_SERVICE_BASE =
+  import.meta.env.VITE_QUESTION_SERVICE_URL ?? "http://localhost:5001/api/questions";
 
 const formatDateTime = (value) =>
   value ? new Date(value).toLocaleString() : "—";
 
-const truncate = (value, length = 220) => {
-  if (!value) return "";
-  if (value.length <= length) return value;
-  return `${value.slice(0, length)}…`;
-};
+const truncate = (value, length = 220) =>
+  value && value.length > length ? `${value.slice(0, length)}…` : value || "";
 
 export default function HistoryPanel({
   attempts = [],
@@ -23,59 +21,58 @@ export default function HistoryPanel({
   onNext,
   authToken,
 }) {
-  const [questionCache, setQuestionCache] = useState({});
-  const inflight = useRef(new Set());
+  const [questionDetails, setQuestionDetails] = useState({});
+  const [isLoadingQuestions, setIsLoadingQuestions] = useState(false);
 
   useEffect(() => {
-    const uniqueIds = Array.from(
-      new Set(attempts.map((attempt) => attempt.questionId).filter(Boolean))
-    );
+    if (!attempts.length) {
+      setQuestionDetails({});
+      return;
+    }
 
-    uniqueIds.forEach((id) => {
-      const current = questionCache[id];
-      if (current?.status === "success" || current?.status === "loading") {
+    let cancelled = false;
+
+    async function loadQuestions() {
+      const questionIds = [...new Set(attempts.map((a) => a.questionId).filter(Boolean))];
+      if (!questionIds.length) {
+        setQuestionDetails({});
         return;
       }
-      if (inflight.current.has(id)) {
-        return;
+
+      setIsLoadingQuestions(true);
+
+      try {
+        const results = await Promise.all(
+          questionIds.map(async (id) => {
+            try {
+              const res = await axios.get(`${QUESTION_SERVICE_BASE}/${id}`, {
+                headers: authToken ? { Authorization: `Bearer ${authToken}` } : undefined,
+              });
+              return [id, { data: res.data }];
+            } catch (requestError) {
+              return [id, { error: requestError }];
+            }
+          })
+        );
+
+        if (!cancelled) {
+          setQuestionDetails(Object.fromEntries(results));
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoadingQuestions(false);
+        }
       }
+    }
 
-      inflight.current.add(id);
-      setQuestionCache((prev) => ({
-        ...prev,
-        [id]: { status: "loading" },
-      }));
+    loadQuestions();
 
-      axios
-        .get(`${QUESTION_SERVICE_BASE}/${id}`, {
-          headers: authToken ? { Authorization: `Bearer ${authToken}` } : undefined,
-        })
-        .then((res) => {
-          setQuestionCache((prev) => ({
-            ...prev,
-            [id]: { status: "success", data: res.data },
-          }));
-        })
-        .catch((fetchError) => {
-          setQuestionCache((prev) => ({
-            ...prev,
-            [id]: { status: "error", error: fetchError },
-          }));
-        })
-        .finally(() => {
-          inflight.current.delete(id);
-        });
-    });
-  }, [attempts, authToken, questionCache]);
+    return () => {
+      cancelled = true;
+    };
+  }, [attempts, authToken]);
 
-  const attemptsWithQuestions = useMemo(
-    () =>
-      attempts.map((attempt) => ({
-        attempt,
-        question: questionCache[attempt.questionId],
-      })),
-    [attempts, questionCache]
-  );
+  const showLoadingState = isFetching || (isLoadingQuestions && attempts.length > 0);
 
   return (
     <section className="history-panel">
@@ -94,7 +91,7 @@ export default function HistoryPanel({
         </div>
       )}
 
-      {isFetching ? (
+      {showLoadingState ? (
         <div className="history-panel__spinner">
           <LoadingSpinner text="Loading attempts..." />
         </div>
@@ -105,37 +102,36 @@ export default function HistoryPanel({
         </div>
       ) : (
         <ul className="attempt-list">
-          {attemptsWithQuestions.map(({ attempt, question }) => {
-            const questionData = question?.data;
-            const isQuestionLoading = question?.status === "loading";
-            const questionError = question?.status === "error";
-            const difficulty = questionData?.difficulty;
-            const topics = questionData?.topics ?? [];
+          {attempts.map((attempt) => {
+            const details = questionDetails[attempt.questionId] || {};
+            const question = details.data;
+            const isQuestionLoading =
+              isLoadingQuestions && !details.data && !details.error;
+            const questionTitle =
+              (isQuestionLoading && "Fetching question details...") ||
+              (details.error && "Question not available") ||
+              question?.title ||
+              attempt.questionId;
 
             return (
               <li key={attempt._id} className="attempt-card">
                 <header className="attempt-card__header">
                   <span className="attempt-card__label">Question</span>
-                  <h3>
-                    {isQuestionLoading
-                      ? "Fetching question details..."
-                      : questionError
-                      ? "Question not available"
-                      : questionData?.title || attempt.questionId}
-                  </h3>
+                  <h3>{questionTitle}</h3>
                 </header>
 
                 <div className="attempt-card__question-meta">
-                  {difficulty && (
+                  {question?.difficulty && (
                     <span
-                      className={`badge badge--difficulty badge--${difficulty.toLowerCase()}`}
+                      className={`badge badge--difficulty badge--${question.difficulty.toLowerCase()}`}
                     >
-                      {difficulty}
+                      {question.difficulty}
                     </span>
                   )}
-                  {topics.length > 0 && (
+
+                  {Array.isArray(question?.topics) && question.topics.length > 0 && (
                     <div className="attempt-card__topics">
-                      {topics.map((topic) => (
+                      {question.topics.map((topic) => (
                         <span className="badge badge--topic" key={topic}>
                           {topic}
                         </span>
@@ -144,13 +140,13 @@ export default function HistoryPanel({
                   )}
                 </div>
 
-                {questionData?.question && !questionError && (
+                {question?.question && !details.error && (
                   <p className="attempt-card__question-blurb">
-                    {truncate(questionData.question)}
+                    {truncate(question.question)}
                   </p>
                 )}
 
-                {questionError && (
+                {details.error && (
                   <p className="attempt-card__question-error">
                     Unable to load question details. Please try again later.
                   </p>
