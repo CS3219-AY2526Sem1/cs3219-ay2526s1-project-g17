@@ -187,9 +187,6 @@ export default function HomePage() {
               </p>
 
               <div className="hero__actions">
-                <button className="btn" onClick={getAllQuestions}>Get questions</button>
-                <button className="btn btn--ghost" onClick={tryCreateQuestion}>Create question</button>
-                <button className="btn btn--ghost" onClick={tryDeleteQuestion}>Delete question</button>
                 <button className="btn btn--primary" onClick={() => navigate("/match")}>
                   Join a session
                 </button>
