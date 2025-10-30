@@ -206,7 +206,7 @@ export default function HomePage() {
     } else {
       return (
         <div className="homepage with-nav-offset">
-          <Header /> {/* if your Header is fixed, the with-nav-offset handles spacing */}
+          <NavigationBar />
 
           <main className="hero">
             <section className="hero__content">
