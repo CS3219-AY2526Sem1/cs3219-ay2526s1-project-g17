@@ -4,9 +4,9 @@ import MatchingTimer from "../components/MatchingTimer";
 
 import { getWebSocketService } from "../services/matchingService";
 import "./MatchingPage.css";
-import { NavigationBar } from "../../components/NavigationBar";
+import { NavigationBar } from "../../components/NavigationBar/NavigationBar";
 import { useAuth0 } from "@auth0/auth0-react";
-import LoadingSpinner from "../../components/LoadingSpinner";
+import LoadingSpinner from "../../components/Loading/LoadingSpinner";
 import { MATCH_CANCELLED, MATCH_FOUND, MATCH_TIMEOUT, ACK } from "../constants";
 import { useNavigate } from "react-router";
 import { formSectionUrl, getRandomQuestion } from "../util";

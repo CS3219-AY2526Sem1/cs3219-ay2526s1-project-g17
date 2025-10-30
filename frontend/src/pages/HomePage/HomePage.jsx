@@ -1,14 +1,14 @@
 import axios from 'axios';
 import { useAuth0 } from "@auth0/auth0-react";
-import LogoutButton from "../../components/LogoutButton";
+import LogoutButton from "../../components/Login/LogoutButton";
 import Profile from "../../components/Profile";
-import LoginButton from "../../components/LoginButton";
-import Header from "../../components/Header";
+import LoginButton from "../../components/Login/LoginButton";
+import Header from "../../components/Header/Header"
 import { useState } from "react";
 import { useNavigate } from "react-router-dom"; // Add this import
 import "./HomePage.css"
-import { NavigationBar } from '../../components/NavigationBar';
-import LoadingSpinner from '../../components/LoadingSpinner';
+import { NavigationBar } from '../../components/NavigationBar/NavigationBar';
+import LoadingSpinner from '../../components/Loading/LoadingSpinner';
 
 export default function HomePage() {
   const { isLoading, isAuthenticated, user,

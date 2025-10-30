@@ -1,6 +1,6 @@
 import { useAuth0 } from "@auth0/auth0-react";
-import LoginButton from "./LoginButton";
-import LogoutButton from "./LogoutButton";
+import LoginButton from "../Login/LoginButton";
+import LogoutButton from "../Login/LogoutButton";
 import { Link } from "react-router";
 import './Header.css';
 
