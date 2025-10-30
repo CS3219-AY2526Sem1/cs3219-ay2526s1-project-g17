@@ -1,4 +1,5 @@
 import { useAuth0 } from "@auth0/auth0-react";
+import { NavigationBar } from "../../components/NavigationBar/NavigationBar";
 
 export default function ProfilePage() {
   const { isAuthenticated } = useAuth0();
