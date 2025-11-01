@@ -8,7 +8,8 @@ import axios from "axios";
 import HistoryPanel from "./components/HistoryPanel.jsx";
 
 const PAGE_SIZE = 5;
-const HISTORY_SERVICE_BASE = "http://localhost:3004/history";
+const HISTORY_SERVICE_BASE =
+  import.meta.env.VITE_HISTORY_SERVICE_BASE || "http://localhost:3004/history";
 
 export default function ProfilePage() {
   const { isAuthenticated, isLoading, user, getAccessTokenSilently, loginWithPopup } = useAuth0();
