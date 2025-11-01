@@ -15,7 +15,7 @@ const PORT = process.env.PORT || 3004
 // middleware
 app.use(express.json());
 // app.use(rateLimiter);
-// app.use(cors());
+app.use(cors());
 
 app.use("/history", historyRoutes)
 
