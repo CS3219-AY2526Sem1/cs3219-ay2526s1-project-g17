@@ -1,4 +1,4 @@
-name: Build and Push collaboration service
+name: collaboration-service-ci
 
 on:
   push:

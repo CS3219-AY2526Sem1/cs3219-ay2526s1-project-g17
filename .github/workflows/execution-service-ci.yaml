@@ -1,4 +1,4 @@
-name: Build and Push execution service
+name: execution-service-ci
 
 on:
   push:
