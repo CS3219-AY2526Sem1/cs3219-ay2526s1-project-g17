@@ -1,0 +1,324 @@
+/* ----------------------------------
+ * 0. Global Styles
+ * ---------------------------------- */
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&display=swap');
+
+ html, 
+body, 
+#root {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    font-family: 'Fira Code', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+} 
+
+* { box-sizing: border-box; }
+/* 
+:root {
+    --bg: #1e1e1e;
+    --panel: #252526;
+    --border: #3b3a3a;
+    --highlight-border: #6b6b6b;
+    --text: #e5e5e5;
+    --muted: #9aa0a6;
+} */
+
+[data-theme="light"] {
+    --bg: #ffffff;
+    --panel: #f0f0f0;
+    --border: #dddddd;
+    --text: #111111;
+    --muted: #545454;
+}
+
+.error-message {
+    color: #ff4c4c;
+    font-weight: 500;
+    margin-top: 10px;
+    font-size: 0.9em;
+}
+
+/* ----------------------------------
+ * 1. COLLABPAGE.JSX / COLLAB-CONTAINER
+ * ---------------------------------- */
+.collab-page-layout{
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    background-color: var(--bg);
+    color: var(--text);
+    overflow: hidden;
+    border: var(--border);
+}
+
+.collab-header {
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: var(--panel);
+    border-bottom: 1px solid var(--border);
+}
+
+.collab-header h2 {
+    margin: 0;
+    font-size: 1.2em;
+    font-weight: 500;
+}
+
+.toolbar {
+    border-bottom: 1px solid var(--border);
+    padding: 6px 8px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.toolbar select,
+.toolbar button {
+    background: var(--panel);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 13px;
+}
+
+.collab-main-content {
+    display: flex;
+    flex: 1; /* Takes up all available height below the header */
+    overflow: hidden;
+}
+
+/* ----------------------------------
+ * 2. LEFT PANEL COLUMNS
+ * ---------------------------------- */
+.left-panel-column {
+    display: flex;
+    flex-direction: column;
+    width: 40%; /* Allocate space for the panels */
+    min-width: 350px;
+    border-right: 1px solid var(--border);
+    overflow: hidden;
+}
+
+.question-panel-area {
+    flex: 6; /* Takes up 60% of the left column's height */
+    padding: 15px;
+    border-bottom: 1px solid var(--border);
+    overflow-y: auto;
+    background-color: var(--bg);
+}
+
+.question-title {
+    margin-bottom: 8px;
+    color: var(--text);
+}
+
+.question-topic-text {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 0.9em;
+    color: var(--muted);
+}
+
+.question-description {
+    white-space: pre-wrap; /* Preserve whitespace and line breaks */
+    line-height: 1.4em;
+    font-size: 1em;
+    color: var(--text);
+    border-top: 1px solid var(--border);
+    padding-top: 10px;
+}
+
+.question-difficulty {
+    margin-left: 10px;
+    font-size: 0.8em;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background-color: var(--text);
+    color: var(--bg);
+}
+
+
+.chat-panel-area {
+    flex: 5; /* Takes up 50% of the left column's height */
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    background-color: var(--panel);
+    overflow: hidden;
+    border: var(--border);
+}
+
+.chat-container {
+    flex: 1;
+    overflow-y: auto;
+    border: 1px solid var(--highlight-border);
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    text-align: left;
+}
+
+.chat-input-box {
+    flex: 1;
+    padding: 8px;
+    margin-right: 8px;
+}
+
+.chat-submit-button {
+    padding: 8px 12px;
+}
+        
+
+.chat-panel-area input[type="text"] {
+    margin-top: auto; /* Push input to bottom */
+    padding: 8px;
+    border: 1px solid var(--border);
+    background-color: var(--bg);
+    color: var(--text);
+    border-radius: 4px;
+    width: 100vw;
+    box-sizing: border-box;
+}
+
+.chat-header {
+    margin: 0 0 10px;
+}
+
+.message{
+    margin-bottom: 8px;
+}
+
+.chat-user-id {
+    margin-right: 5px;
+    font-weight: 700;
+    font-size: 1.05em;
+    color: rgb(56, 189, 53); 
+}
+
+.chat-user-id.gemini {
+    color: #44a4d7; /* Distinct color for 'gemini' */
+}
+
+/* ----------------------------------
+ * 3. RIGHT PANEL (Monaco Editor)
+ * ---------------------------------- */
+.right-panel-column,
+.collab-editor {
+    flex: 1; /* Takes up all remaining width */
+    overflow: hidden; /* Contains the Monaco editor */
+}
+
+/* ----------------------------------
+ * 4. STATUS BAR & AVATARS
+ * ---------------------------------- */
+.statusbar {
+    border-top: 1px solid var(--border);
+    height: 26px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 0 10px;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.status-item {
+    opacity: .9;
+}
+
+.avatars {
+    display: flex;
+    gap: 6px;
+}
+
+.avatar {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    color: #111;
+    font-weight: 700;
+    border: 1px solid rgba(255,255,255,.15);
+}
+
+/* ----------------------------------
+ * 5. OUTPUT PANEL
+ * ---------------------------------- */
+.output-panel {
+    background: #1b1b1b;
+    border-top: 1px solid var(--border, #2a2a2a);
+    padding: 10px 12px;
+    color: var(--text, #e5e5e5);
+}
+
+.output-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+    font-size: 13px;
+    color: var(--muted, #9aa0a6);
+}
+
+.output-header .status-pill {
+    padding: 2px 8px;
+    border-radius: 999px;
+    border: 1px solid #333;
+    background: #222;
+    color: #ddd;
+    font-size: 12px;
+}
+
+.output-actions {
+    margin-left: auto;
+    display: flex;
+    gap: 8px;
+}
+
+.output-actions button {
+    background: #2b2b2b;
+    color: #e5e5e5;
+    border: 1px solid #2a2a2a;
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 12px;
+}
+
+.output-grid {
+    display: grid;
+    gap: 10px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.output-box {
+    background: #111;
+    border: 1px solid #2a2a2a;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.output-box header {
+    padding: 6px 10px;
+    border-bottom: 1px solid #2a2a2a;
+    font-size: 12px;
+    color: #9aa0a6;
+}
+
+.output-box pre {
+    margin: 0;
+    padding: 8px 10px;
+    max-height: 180px;
+    overflow: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-size: 13px;
+    line-height: 1.35;
+}

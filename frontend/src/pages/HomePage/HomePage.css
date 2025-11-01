@@ -1,0 +1,119 @@
+/* Push page content below fixed nav/header & center vertically */
+.with-nav-offset {
+  padding-top: var(--nav-height);
+  min-height: calc(100vh - var(--nav-height));
+  display: flex;
+  align-items: center;        /* vertically center */
+  justify-content: center;    /* horizontally center */
+}
+
+/* Hero layout */
+.hero {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 20px;
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 32px;
+  align-items: center;
+  justify-content: center;
+  text-align: center; /* optional; can use center if your text should be centered */
+}
+
+.hero__content {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.brand { color: var(--brand); }
+
+.hero__title {
+  font-size: clamp(28px, 4vw, 44px);
+  line-height: 1.15;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.hero__subtitle {
+  color: var(--muted);
+  font-size: clamp(16px, 2.2vw, 18px);
+  line-height: 1.6;
+  max-width: 56ch;
+}
+
+.hero__actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+/* Hero art / image */
+.hero__art {
+  display: grid;
+  place-items: center;
+}
+
+.hero__art img {
+  width: 100%;
+  max-width: 520px;
+  height: auto;
+  border-radius: 16px;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.35), inset 0 0 0 1px rgba(255,255,255,0.06);
+  background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+}
+
+/* Buttons */
+.btn {
+  appearance: none;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+  color: var(--text);
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-weight: 600;
+  letter-spacing: .2px;
+  cursor: pointer;
+  transition: transform .08s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+  border-color: rgba(255,255,255,0.24);
+}
+
+.btn:active { transform: translateY(0); }
+
+.btn--primary {
+  background: linear-gradient(180deg, rgba(110,168,254,0.9), rgba(110,168,254,0.75));
+  border-color: rgba(110,168,254,0.0);
+  color: #0b1220;
+}
+
+.btn--primary:hover {
+  background: linear-gradient(180deg, rgba(110,168,254,1), rgba(110,168,254,0.9));
+}
+
+.btn--ghost {
+  background: transparent;
+}
+
+/* Responsive: stack hero on small screens */
+@media (max-width: 900px) {
+  .hero {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding-top: 24px;
+  }
+  .hero__art img {
+    max-width: 460px;
+  }
+}
+
+
+
+
