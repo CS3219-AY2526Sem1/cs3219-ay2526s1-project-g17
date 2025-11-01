@@ -2,7 +2,9 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import LoadingSpinner from "../../../components/Loading/LoadingSpinner.jsx";
 
-const QUESTION_SERVICE_BASE = "http://localhost:5001/api/questions";
+const QUESTION_SERVICE_BASE =
+  import.meta.env.VITE_QUESTION_SERVICE_BASE ||
+  "http://localhost:5001/api/questions";
 
 const formatDateTime = (value) =>
   value ? new Date(value).toLocaleString() : "—";
