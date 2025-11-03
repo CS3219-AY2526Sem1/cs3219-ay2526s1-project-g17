@@ -7,6 +7,7 @@ import app from './server.js';
 import Session from './model/session-model.js';
 import { LeveldbPersistence } from 'y-leveldb';
 import { GoogleGenAI } from "@google/genai";
+import { saveSessionToHistory } from './utils/history-utils.js';
 import * as Y from 'yjs';
 
 dotenv.config();
@@ -17,7 +18,6 @@ const SESSION_IDLE_TIMEOUT = 30_000; // 30 seconds
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 const server = http.createServer(app);
-
 
 // const ydoc = new Y.Doc()
 // ydoc.getArray('arr').insert(0, [1, 2, 3])
@@ -207,11 +207,16 @@ let history = []; // Declared in the outer scope, as fixed before
   });
 
   socket.on('terminateSession', async ({ sessionId }) => {
-    await Session.findOneAndUpdate(
+    const session = await Session.findOneAndUpdate(
       { sessionId },
       { isActive: false, endedAt: new Date() },
       { new: true }
     );
+
+    if (session) {
+        await saveSessionToHistory(session);
+    }
+
     io.to(sessionId).emit('sessionTerminated');
     io.in(sessionId).socketsLeave(sessionId);
   });
@@ -225,11 +230,16 @@ let history = []; // Declared in the outer scope, as fixed before
       const sockets = await io.in(sessionId).fetchSockets();
       if (sockets.length === 0) {
         console.log(`Auto-terminating idle session: ${sessionId}`);
-        await Session.findOneAndUpdate(
+        const session = await Session.findOneAndUpdate(
           { sessionId },
           { isActive: false, endedAt: new Date() },
           { new: true }
         );
+
+        if (session) {
+            await saveSessionToHistory(session);
+        }
+
         io.to(sessionId).emit('sessionTerminated');
       }
     }, SESSION_IDLE_TIMEOUT);
