@@ -1,4 +1,5 @@
 import { createSession, joinSession, terminateSession, getSession } from '../model/repository.js';
+import { saveSessionToHistory } from '../utils/history-utils.js';
 
 export const createSessionHandler = async (req, res) => {
   const { sessionId, users, questionId } = req.body;
@@ -33,10 +34,20 @@ export const deleteSessionHandler = async (req, res) => {
 
 export const terminateSessionHandler = async (req, res) => {
   const { sessionId } = req.params;
+
   try {
     const session = await terminateSession(sessionId);
+    console.log('Session terminated:', session);
+
+    if (session) {
+      await saveSessionToHistory(session);
+    } else {
+      console.log('No session found');
+    }
+
     res.status(200).json(session);
   } catch (err) {
+    console.error('Error in terminateSessionHandler:', err);
     res.status(500).json({ error: err.message });
   }
 };
