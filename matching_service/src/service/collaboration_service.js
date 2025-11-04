@@ -2,7 +2,11 @@
 /** @typedef {import("../types.js").Criteria} Criteria */
 /** @typedef {import("redis").RedisClientType} RedisClientType*/
 
-import { COLLABORATION_SESSION_PREFIX } from "../constants.js";
+import axios from "axios";
+import {
+  COLLABORATION_SESSION_PREFIX,
+  COLLABORATION_URL,
+} from "../constants.js";
 import { randomUUID } from "crypto";
 
 export class CollaborationService {
@@ -74,11 +78,18 @@ export class CollaborationService {
    */
   async #fetchSessionId() {
     try {
-      // TODO: Replace with actual HTTP call to external service
-      // For now, return a random UUID
-      const sessionId = randomUUID();
-      console.log(`🔗 Generated session ID: ${sessionId}`);
-      return sessionId;
+      const url = `${COLLABORATION_URL}/server/sessions`;
+      console.log(`POST ${url}`);
+      const res = await axios.post(url);
+      console.log(res);
+      if (res.status === 201) {
+        const sessionId = res.data.sessionId;
+        console.log(`🔗 Generated session ID: ${sessionId}`);
+        return sessionId;
+      } else {
+        console.error(res.data.error);
+        return null;
+      }
     } catch (error) {
       console.error(`❌ Error creating session ID:`, error);
       return null;

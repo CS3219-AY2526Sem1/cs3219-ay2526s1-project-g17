@@ -95,7 +95,7 @@ export default function MatchingPage() {
     // Start the matching process
     setIsMatching(true);
 
-    // Close the dialog (this is already handled in the dialog component)
+    // Close the dialog
     setIsDialogOpen(false);
   };
 

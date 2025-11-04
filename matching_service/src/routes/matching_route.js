@@ -26,7 +26,7 @@ router.delete("/endSession", async (req, res) => {
  */
 async function fetchSession(sessionId) {
   try {
-    const url = `${COLLABORATION_URL}/sessions/${sessionId}`;
+    const url = `${COLLABORATION_URL}/server/sessions/${sessionId}`;
     console.log(`GET ${url}`);
     const res = await axios.get(url);
     const data = res.data;
@@ -50,13 +50,14 @@ router.get("/initiateMatch", verifyAccessToken, async (req, res) => {
           userId.toString(),
           matchedDetails.partner
         );
-      //TODO: Call collaboration service to check if there such session
-      const session = await fetchSession(collaborationSession.session);
 
       if (collaborationSession) {
         console.log(
           `Has existing session on matching service: ${collaborationSession.session}`
         );
+        //TODO: Call collaboration service to check if there such session
+        const session = await fetchSession(collaborationSession.session);
+        console.log(`Received from collaboration: ${session}`);
         if (session) {
           console.log(`${collaborationSession.session} is still active`);
           res
@@ -67,6 +68,7 @@ router.get("/initiateMatch", verifyAccessToken, async (req, res) => {
             userId.toString(),
             matchedDetails.partner
           );
+          res.status(200).json({ code: "no-existing" });
         }
       } else {
         res.status(200).json({ code: "no-existing" });
