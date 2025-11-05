@@ -13,7 +13,7 @@ import * as Y from 'yjs';
 dotenv.config();
 
 const PORT = process.env.PORT || 3002;
-const DB_URI = process.env.DB_LOCAL_URI;
+const DB_URI = process.env.DB_CLOUD_URI;
 const SESSION_IDLE_TIMEOUT = 30_000; // 30 seconds
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
