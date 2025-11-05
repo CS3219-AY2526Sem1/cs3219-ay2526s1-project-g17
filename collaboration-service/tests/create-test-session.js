@@ -2,7 +2,6 @@
 import mongoose from 'mongoose';
 import Session from '../model/session-model.js';
 import dotenv from 'dotenv';
-import * as Y from 'yjs';
 
 dotenv.config({ path: './.env' });
 
