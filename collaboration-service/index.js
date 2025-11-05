@@ -3,12 +3,13 @@ import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import http from 'http';
 import { Server as SocketIOServer } from 'socket.io';
+import { MongodbPersistence } from 'y-mongodb';
 import app from './server.js';
 import Session from './model/session-model.js';
 import { LeveldbPersistence } from 'y-leveldb';
 import { GoogleGenAI } from "@google/genai";
 import { saveSessionToHistory } from './utils/history-utils.js';
-import * as Y from 'yjs';
+
 
 dotenv.config();
 
@@ -250,12 +251,13 @@ let history = []; // Declared in the outer scope, as fixed before
 // ====== 2. Yjs WebSocket for collaborative editing (/collab) ======
 const { WebSocketServer } = await import('ws');
 import { setupWSConnection } from '@y/websocket-server/utils';
-const ldbPersistence = new LeveldbPersistence('./yjs-docs'); // Local LevelDB persistence
+// const ldbPersistence = new LeveldbPersistence('./yjs-docs'); // Local LevelDB persistence
+const persistence = new MongodbPersistence(DB_URI); // MongoDB persistence
 
 
 export async function getSessionYDoc(sessionId) {
   // Returns the persisted Y.Doc if exists, otherwise creates new
-  const ydoc = await ldbPersistence.getYDoc(sessionId);
+  const ydoc = await persistence.getYDoc(sessionId);
   return ydoc;
 }
 
@@ -269,7 +271,7 @@ server.on('upgrade', (req, socket, head) => {
     yjsWSS.handleUpgrade(req, socket, head, (ws) => {
       setupWSConnection(ws, req, {
         docName: new URL(req.url, 'http://localhost').searchParams.get('sessionId'),
-        persistence: ldbPersistence
+        persistence: persistence
       });
     });
   } else {
@@ -296,8 +298,7 @@ yjsWSS.on('connection', (ws, req) => {
     setupWSConnection(ws, req, {
       docName: sessionId,
       gc: true, // garbage collect deleted content
-      persistence: ldbPersistence // Use LevelDB persistence
-      // Add `persistence: new MongodbPersistence(DB_URI)` later if needed
+      persistence: persistence // Use MongoDB persistence
     });
   } catch (err) {
     console.error('Yjs connection error:', err);

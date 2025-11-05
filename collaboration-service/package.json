@@ -18,6 +18,7 @@
     "socket.io": "^4.7.2",
     "socket.io-client": "^4.8.1",
     "y-leveldb": "^0.2.0",
+    "y-mongodb": "^0.1.11",
     "y-websocket": "^3.0.0",
     "yjs": "^13.6.27"
   },
