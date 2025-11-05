@@ -81,7 +81,6 @@ export async function deleteQuestion(req, res) {
 export async function getRandomQuestionIdByDifficultyAndTopic(req, res) {
     try {
         const { difficulty, topics } = req.query;
-        console.log(req.query)
         let topicsList = [topics]
         const data = await Question.aggregate()
             .match({
