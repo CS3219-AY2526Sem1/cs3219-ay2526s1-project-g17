@@ -3,6 +3,97 @@
 /** @typedef {import("../types").MatchRequestEntity} MatchRequestEntity */
 /** @typedef {import("../types").Criteria} Criteria */
 
+import axios from "axios";
+import {
+  COLLABORATION_SERVICE_URL,
+  QUESTION_SERVICE_URL,
+} from "../constants.js";
+
+/**
+ * @param {Criteria} criteria
+ */
+export async function getRandomQuestion(criteria) {
+  console.log("Random question crietria:", criteria);
+  try {
+    const params = {
+      difficulty: criteria["difficulty"],
+      topics: criteria["topic"],
+    };
+    console.log(params);
+    const res = await axios.get(
+      `${QUESTION_SERVICE_URL}/api/questions/randomQuestion`,
+      {
+        params,
+        timeout: 5000,
+      }
+    );
+    if (res.status === 200) {
+      console.log("Question found!", res.data);
+      return res.data;
+    } else if (res.status === 404) {
+      console.log("No question matching the criteria", criteria);
+      return null;
+    } else if (res.status === 500) {
+      console.log(res.data.message);
+      return null;
+    } else {
+      console.log("Unaccounted state: ", res.status);
+      return null;
+    }
+  } catch (error) {
+    console.error("Failed to fetch question", error);
+    return null;
+  }
+}
+
+/**
+ * @param {import("../types").CollaborationSession} session
+ */
+export async function createServerSession(session) {
+  console.log("Create session:", session);
+  try {
+    const res = await axios.post(
+      `${COLLABORATION_SERVICE_URL}/api/collaboration/server/sessions`,
+      {
+        sessionId: session.sessionId,
+        questionId: session.questionId,
+        users: session.userIds,
+        timeout: 5000,
+      }
+    );
+    if (res.status === 200) {
+      console.log("Collaboration server created session", res.data);
+      return res.data;
+    } else if (res.status === 500) {
+      console.log(res.data.message);
+      return null;
+    } else {
+      console.log("Unaccounted state: ", res.status);
+      return null;
+    }
+  } catch (error) {
+    console.error("Failed to fetch question", error);
+    return null;
+  }
+}
+
+/**
+ * @param {string} sessionId
+ */
+export async function fetchExistingSession(sessionId) {
+  try {
+    const url = `${COLLABORATION_SERVICE_URL}/api/collaboration/server/sessions/${sessionId}`;
+    console.log(`GET ${url}`);
+    const res = await axios.get(url);
+    const data = res.data;
+    console.log("Session retrieved", data);
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch session", error);
+    return null;
+  }
+}
+
 /**
  * @param {MatchRequest} request
  * @param {UserInstance} userInstance
@@ -58,4 +149,3 @@ export function findMatchingCriteria(criterias, otherCriterias) {
 export async function delay(milliseconds) {
   return new Promise((resolve) => setTimeout(resolve, milliseconds));
 }
-

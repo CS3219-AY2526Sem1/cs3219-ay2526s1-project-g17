@@ -165,6 +165,7 @@ export const getWebSocketService = () => socketService;
  */
 export const fetchTopics = async () => {
   try {
+    console.log(QUESTION_SERVICE_URL);
     const res = await axios.get(`${QUESTION_SERVICE_URL}/api/questions/topics`);
     return res.data;
   } catch (error) {

@@ -2,7 +2,11 @@
 /** @typedef {import("../types.js").Criteria} Criteria */
 /** @typedef {import("redis").RedisClientType} RedisClientType*/
 
-import { COLLABORATION_SESSION_PREFIX } from "../constants.js";
+import axios from "axios";
+import {
+  COLLABORATION_SESSION_PREFIX,
+  COLLABORATION_SERVICE_URL,
+} from "../constants.js";
 import { randomUUID } from "crypto";
 
 export class CollaborationService {
@@ -22,45 +26,24 @@ export class CollaborationService {
 
   /**
    * Create a collaboration session
-   * @param {string} userId1
-   * @param {string} userId2
-   * @param {Criteria} criteria - Match criteria for the session
-   * @returns {Promise<CollaborationSession>} - Session ID if successful, null otherwise
+   * @param {CollaborationSession} collaborationSession
+   * @returns {Promise<CollaborationSession>}
    */
-  async createCollaborationSession(userId1, userId2, criteria) {
+  async createCollaborationSession(collaborationSession) {
     try {
-      // Validate input parameters
-      if (!userId1 || !userId2 || !criteria) {
-        console.log(
-          `❌ Invalid parameters: userId1=${userId1}, userId2=${userId2}, criteria=${criteria}`
-        );
-        return null;
-      }
-
-      // Get session ID from external service
-      const sessionId = await this.#fetchSessionId();
-      if (!sessionId) {
-        console.log(`❌ Failed to get session ID from external service`);
-        return null;
-      }
-
-      /** @type {CollaborationSession} */
-      const collaborationSession = {
-        session: sessionId,
-        userIds: [userId1, userId2],
-        criteria,
-      };
-
+      const [userId1, userId2] = collaborationSession.userIds;
       const key = this.formulateKey(userId1, userId2);
       const result = await this.client.json.set(key, "$", collaborationSession);
 
       if (result === "OK") {
         console.log(
-          `✅ Created collaboration session ${sessionId} for ${key}}]`
+          `✅ Created collaboration session ${collaborationSession.sessionId} ${key}}]`
         );
         return collaborationSession;
       } else {
-        console.log(`❌ Failed to store collaboration session ${sessionId}`);
+        console.log(
+          `❌ Failed to store collaboration session ${collaborationSession.sessionId}`
+        );
         return null;
       }
     } catch (error) {
@@ -74,11 +57,22 @@ export class CollaborationService {
    */
   async #fetchSessionId() {
     try {
-      // TODO: Replace with actual HTTP call to external service
-      // For now, return a random UUID
-      const sessionId = randomUUID();
-      console.log(`🔗 Generated session ID: ${sessionId}`);
-      return sessionId;
+      const url = `${COLLABORATION_SERVICE_URL}/server/sessions`;
+      console.log(`POST ${url}`);
+      const res = await axios.post(url, {
+        sessionId: 123,
+        users: [1, 2],
+        questionId: 123,
+      });
+      console.log(res);
+      if (res.status === 201) {
+        const sessionId = res.data.sessionId;
+        console.log(`🔗 Generated session ID: ${sessionId}`);
+        return sessionId;
+      } else {
+        console.error(res.data.error);
+        return null;
+      }
     } catch (error) {
       console.error(`❌ Error creating session ID:`, error);
       return null;

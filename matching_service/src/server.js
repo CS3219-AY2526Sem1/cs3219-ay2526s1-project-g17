@@ -66,6 +66,7 @@ export const matchingService = new MatchingService(
   matchedDetailsService,
   collaborationService
 );
+await matchingService.initializeSessionStreams();
 
 process.on("SIGINT", () => {
   server.close(async () => {
