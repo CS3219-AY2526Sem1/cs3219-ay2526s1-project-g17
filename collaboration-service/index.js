@@ -13,7 +13,7 @@ import * as Y from 'yjs';
 dotenv.config();
 
 const PORT = process.env.PORT || 3002;
-const DB_URI = process.env.DB_CLOUD_URI;
+const DB_URI = process.env.DB_LOCAL_URI;
 const SESSION_IDLE_TIMEOUT = 30_000; // 30 seconds
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
@@ -154,9 +154,8 @@ let history = []; // Declared in the outer scope, as fixed before
         return;
     }
 
-    // Broadcast to all others in the session
-    socket.to(sessionId).emit('receiveMessage', payload);
-    // Also echo to sender (optional)
+
+    // Just emit locally for immediate response (optional)
     socket.emit('receiveMessage', payload);
 
     // Check for AI trigger words
@@ -321,3 +320,39 @@ mongoose.connect(DB_URI)
   });
 
 export { server };
+
+// ====== MongoDB Change Stream to sync chat messages ======
+mongoose.connection.once('open', () => {
+  console.log('🔄 MongoDB change stream started');
+
+  const changeStream = Session.watch([
+    { $match: { 'operationType': 'update' } }
+  ]);
+
+  changeStream.on('change', async (change) => {
+    try {
+      const sessionId = change.documentKey._id;
+      const updatedFields = change.updateDescription.updatedFields;
+
+      // Only react if chatHistory changed
+      if (updatedFields && Object.keys(updatedFields).some(k => k.startsWith('chatHistory'))) {
+        const session = await Session.findById(sessionId);
+        if (!session) return;
+
+        // Get the last message (most recent one)
+        const lastMessage = session.chatHistory[session.chatHistory.length - 1];
+
+        // Broadcast to everyone in that session
+        io.to(session.sessionId).emit('receiveMessage', lastMessage);
+        console.log(`🛰️ Synced new message in session ${session.sessionId}`);
+      }
+    } catch (err) {
+      console.error('Error in MongoDB change stream handler:', err);
+    }
+  });
+
+  changeStream.on('error', (err) => {
+    console.error('Change stream error:', err);
+  });
+});
+
