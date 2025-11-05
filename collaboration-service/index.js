@@ -9,7 +9,7 @@ import Session from './model/session-model.js';
 import { LeveldbPersistence } from 'y-leveldb';
 import { GoogleGenAI } from "@google/genai";
 import { saveSessionToHistory } from './utils/history-utils.js';
-import * as Y from 'yjs';
+
 
 dotenv.config();
 
