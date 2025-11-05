@@ -2,6 +2,7 @@ import { randomUUID } from "crypto";
 import { MATCH_REQUEST_PREFIX } from "../constants.js";
 import { RedisRepository } from "../model/redis_repository.js";
 import {
+  createServerSession,
   delay,
   findMatchingCriteria,
   getRandomQuestion,
@@ -153,6 +154,7 @@ export class MatchingService {
         sessionId: sessionId,
       };
       await this.collaborationService.createCollaborationSession(collaboration);
+      await createServerSession(collaboration);
       console.log("Collaboration Service server request", collaboration);
       await this.redisRepository.publishSessionCreatedEvent(collaboration);
     } catch (error) {

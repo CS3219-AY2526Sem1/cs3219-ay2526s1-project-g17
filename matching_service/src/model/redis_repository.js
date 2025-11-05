@@ -309,7 +309,7 @@ export class RedisRepository extends EventEmitter {
           userId1: collaboration.userIds[0],
           userId2: collaboration.userIds[1],
           sessionId: collaboration.sessionId,
-          questionId: collaboration.sessionId,
+          questionId: collaboration.questionId,
           criteria: JSON.stringify(collaboration.criteria),
           timestamp: Date.now().toString(),
         }

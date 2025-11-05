@@ -5,7 +5,7 @@
 import axios from "axios";
 import {
   COLLABORATION_SESSION_PREFIX,
-  COLLABORATION_URL,
+  COLLABORATION_SERVICE_URL,
 } from "../constants.js";
 import { randomUUID } from "crypto";
 
@@ -57,7 +57,7 @@ export class CollaborationService {
    */
   async #fetchSessionId() {
     try {
-      const url = `${COLLABORATION_URL}/server/sessions`;
+      const url = `${COLLABORATION_SERVICE_URL}/server/sessions`;
       console.log(`POST ${url}`);
       const res = await axios.post(url, {
         sessionId: 123,

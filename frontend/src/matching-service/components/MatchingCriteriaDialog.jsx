@@ -9,7 +9,7 @@ import axios from "axios";
 import { useAuth0 } from "@auth0/auth0-react";
 import { MATCHING_SERVICE_URL, QUEUE_TIMEOUT } from "../constants";
 import { useNavigate } from "react-router";
-import { formSectionUrl, getRandomQuestion } from "../util";
+import { formSectionUrl } from "../util";
 
 /**
  * @typedef {import("../types").MatchRequest} MatchRequest
@@ -145,10 +145,8 @@ const MatchingCriteriaDialog = ({ isOpen, onClose, onSubmit }) => {
           {
             /** @type {import("../types").MatchExists} */
             data;
-            const sessionId = data.session.session;
-            const criteria = data.session.criteria;
-            // get question from question service
-            const questionId = await getRandomQuestion(criteria);
+            const sessionId = data.session.sessionId;
+            const questionId = data.session.questionId;
             navigate(formSectionUrl(sessionId, questionId), {
               state: {
                 session: data.session,
