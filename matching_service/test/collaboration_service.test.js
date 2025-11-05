@@ -108,8 +108,8 @@ describe("CollaborationService", () => {
         );
 
       expect(collaborationSession).not.toBeNull();
-      expect(collaborationSession.session).toBeDefined();
-      expect(typeof collaborationSession.session).toBe("string");
+      expect(collaborationSession.sessionId).toBeDefined();
+      expect(typeof collaborationSession.sessionId).toBe("string");
       expect(collaborationSession.userIds).toEqual(testData.userIds);
       expect(collaborationSession.criteria).toEqual(testData.criteria);
 
@@ -209,8 +209,8 @@ describe("CollaborationService", () => {
 
       expect(collaborationSession1).not.toBeNull();
       expect(collaborationSession2).not.toBeNull();
-      expect(collaborationSession1.session).not.toBe(
-        collaborationSession2.session
+      expect(collaborationSession1.sessionId).not.toBe(
+        collaborationSession2.sessionId
       );
 
       // Both sessions should exist independently
@@ -260,7 +260,7 @@ describe("CollaborationService", () => {
         testData.userIds[0],
         testData.userIds[1]
       );
-      expect(stored.session).toBe(collaborationSession2.session);
+      expect(stored.sessionId).toBe(collaborationSession2.sessionId);
       expect(stored.criteria.language).toBe("java");
     });
   });
@@ -284,7 +284,7 @@ describe("CollaborationService", () => {
       );
 
       expect(retrieved).not.toBeNull();
-      expect(retrieved.session).toBe(collaborationSession.session);
+      expect(retrieved.sessionId).toBe(collaborationSession.sessionId);
       expect(retrieved.userIds).toEqual(testData.userIds);
       expect(retrieved.criteria).toEqual(testData.criteria);
     });
@@ -448,7 +448,7 @@ describe("CollaborationService", () => {
 
       expect(collaborationSession).not.toBeNull();
       expect(typeof collaborationSession).toBe("object");
-      expect(typeof collaborationSession.session).toBe("string");
+      expect(typeof collaborationSession.sessionId).toBe("string");
 
       // 2. Session should be retrievable
       const retrieved = await collaborationService.getCollaborationSession(
@@ -456,7 +456,7 @@ describe("CollaborationService", () => {
         testData.userIds[1]
       );
       expect(retrieved).not.toBeNull();
-      expect(retrieved.session).toBe(collaborationSession.session);
+      expect(retrieved.sessionId).toBe(collaborationSession.sessionId);
 
       // 3. Delete session
       const deleteResult =
@@ -515,7 +515,7 @@ describe("CollaborationService", () => {
           session.userIds[1]
         );
         expect(retrieved).not.toBeNull();
-        expect(retrieved.session).toBe(collaborationSession.session);
+        expect(retrieved.sessionId).toBe(collaborationSession.sessionId);
         expect(retrieved.userIds).toEqual(session.userIds);
       }
 

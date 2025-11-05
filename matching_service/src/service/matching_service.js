@@ -1,8 +1,10 @@
+import { randomUUID } from "crypto";
 import { MATCH_REQUEST_PREFIX } from "../constants.js";
 import { RedisRepository } from "../model/redis_repository.js";
 import {
   delay,
   findMatchingCriteria,
+  getRandomQuestion,
   matchRequestToEntity,
 } from "../utility/utility.js";
 
@@ -58,6 +60,151 @@ export class MatchingService {
   }
 
   /**
+   * Initialize session stream processing
+   */
+  async initializeSessionStreams() {
+    // Start listening to session created events (broadcast)
+    await this.redisRepository.startListeningToSessionEvents(
+      this.handleSessionCreatedEvent.bind(this)
+    );
+    console.log("1");
+
+    // Start processing create session messages (single consumer)
+    await this.redisRepository.startProcessingCreateSession(
+      this.handleCreateSessionMessage.bind(this)
+    );
+    console.log("2");
+
+    // Start processing matched events (single consumer)
+    await this.redisRepository.startProcessingMatchedEvents(
+      this.handleMatchedEvent.bind(this)
+    );
+    console.log("3");
+
+    console.log("🎯 Session streams initialized");
+  }
+
+  /**
+   * Handle session created event (broadcast to all connected users)
+   * @param {object} eventData - Session event data
+   */
+  async handleSessionCreatedEvent(eventData) {
+    console.log("Handling session created event");
+    let { userId1, userId2, sessionId, questionId, criteria } = eventData;
+
+    // Check if either user is connected to this service instance
+    const user1 = this.userService.getUser(userId1);
+    const user2 = this.userService.getUser(userId2);
+
+    if (typeof criteria === "string") {
+      criteria = JSON.parse(criteria);
+    }
+    /** @type {CollaborationSession} */
+    const collaborationSession = {
+      userIds: [userId1, userId2],
+      criteria: criteria,
+      questionId: questionId,
+      sessionId: sessionId,
+    };
+
+    /** @type {MatchFound} */
+    const matchFoundMessage = {
+      type: "match-found",
+      session: collaborationSession,
+    };
+
+    if (user1) {
+      sendMessage(user1.ws, matchFoundMessage);
+      console.log(`📢 Sent session created event to user ${userId1}`);
+      await this.disposeUser(user1.id);
+    }
+
+    if (user2) {
+      sendMessage(user2.ws, matchFoundMessage);
+      console.log(`📢 Sent session created event to user ${userId2}`);
+      await this.disposeUser(user2.id);
+    }
+  }
+
+  /**
+   * Handle create session message (single consumer processing)
+   * @param {object} messageData - Create session message data
+   */
+  async handleCreateSessionMessage(messageData) {
+    let { userId1, userId2, criteria } = messageData;
+
+    console.log(
+      `🔧 Processing create session message for users ${userId1}, ${userId2}`
+    );
+    console.log("Message received", messageData);
+
+    try {
+      if (typeof criteria === "string") {
+        criteria = JSON.parse(criteria);
+      }
+      const sessionId = randomUUID();
+      const questionId = await getRandomQuestion(criteria);
+
+      /** @type {CollaborationSession} */
+      const collaboration = {
+        userIds: [userId1, userId2],
+        criteria: criteria,
+        questionId: questionId,
+        sessionId: sessionId,
+      };
+      await this.collaborationService.createCollaborationSession(collaboration);
+      console.log("Collaboration Service server request", collaboration);
+      await this.redisRepository.publishSessionCreatedEvent(collaboration);
+    } catch (error) {
+      console.error(error);
+    }
+    console.log(
+      `✅ Create session processing completed for users: ${userId1}, ${userId2}`
+    );
+  }
+
+  /**
+   * Handle matched event (single consumer processing)
+   * @param {object} eventData - Matched event data
+   */
+  async handleMatchedEvent(eventData) {
+    const { userId1, userId2, criteria, matchedAt } = eventData;
+
+    console.log(
+      `📊 Processing matched event for users ${userId1}, ${userId2} at ${matchedAt}`
+    );
+
+    try {
+      this.matchedDetailsService.storeMatchedDetails(
+        userId1,
+        userId2,
+        criteria
+      );
+      this.matchedDetailsService.storeMatchedDetails(
+        userId2,
+        userId1,
+        criteria
+      );
+
+      await this.redisRepository.addCreateSessionMessage({
+        userId1,
+        userId2,
+        criteria,
+      });
+
+      console.log(
+        `✅ Matched event processing completed for users ${userId1}, ${userId2}`
+      );
+    } catch (error) {
+      console.error(
+        `❌ Error processing matched event for users ${userId1}, ${userId2}:`,
+        error
+      );
+      throw error;
+    }
+  }
+
+  /**
    * @param {string} userId
    */
   async disposeUser(userId) {
@@ -101,13 +248,6 @@ export class MatchingService {
       requestKey,
       async (change) => {
         switch (change.operation) {
-          case "json.set":
-            try {
-              await this.#onRequestSet(requestKey);
-            } catch (error) {
-              console.error(error);
-            }
-            break;
           case "json.del":
             {
               await this.disposeUser(requestKey);
@@ -123,115 +263,130 @@ export class MatchingService {
   }
 
   /**
-   * @param {string} requestKey
+   * Publishes a matched event to the matched event stream
+   * @param {string} userId1 - First user ID
+   * @param {string} userId2 - Second user ID
+   * @param {Criteria} criteria - Session ID
+   * @private
    */
-  async #onRequestSet(requestKey) {
-    console.log(requestKey);
-    const userId = requestKey.replace(`${MATCH_REQUEST_PREFIX}:`, "");
-    const requestData = await this.matchRequestService.getUserRequest(userId);
-    console.log(`On Set: ${requestKey}: ${requestData.status}`);
-    switch (requestData.status) {
-      case "matched":
-        await this.handleMatched(userId);
-        break;
-      case "waiting":
-        break;
-      default:
-        throw new Error(`Unrecognized status: ${requestData.status}`);
+  async publishMatchedEvent(userId1, userId2, criteria) {
+    try {
+      await this.redisRepository.addMatchedEvent({
+        userId1: userId1,
+        userId2: userId2,
+        criteria: criteria,
+        matchedAt: Date.now().toString(),
+      });
+
+      console.log(
+        `🎯 Published matched event for users ${userId1}, ${userId2}`
+      );
+    } catch (error) {
+      console.error("❌ Error publishing matched event:", error);
+      // Don't throw - we don't want to break the matching flow
     }
   }
 
+  // /**
+  //  * @param {string} userId
+  //  * @private
+  //  */
+  // async searchUser(userId) {
+  //   const backoffList = [500, 1000, 1500, 2000, 2500, 3000, 5000];
+  //   let backoffStage = 0;
+  //   while (true) {
+  //     const backoffTime = backoffList[backoffStage];
+  //     console.log(
+  //       `Back off time: ${backoffTime}, back off stage: ${backoffStage}`
+  //     );
+  //     await delay(backoffTime);
+  //     if (backoffStage < backoffList.length - 1) {
+  //       backoffStage += 1;
+  //     }
+  //     const matchRequestEntity = await this.matchRequestService.getUserRequest(
+  //       userId
+  //     );
+
+  //     if (!matchRequestEntity || matchRequestEntity.status === "matched") {
+  //       break;
+  //     }
+
+  //     const existingMatch = await this.matchRequestService.findOldestMatch(
+  //       userId,
+  //       matchRequestEntity.criterias
+  //     );
+
+  //     if (!existingMatch) {
+  //       continue;
+  //     }
+
+  //     console.log(`${userId} found existing match`);
+
+  //     const isSuccess =
+  //       await this.matchRequestService.atomicTransitionUsersState(
+  //         userId,
+  //         existingMatch.userId,
+  //         "waiting",
+  //         "matched"
+  //       );
+
+  //     if (isSuccess) {
+  //       const criteria = findMatchingCriteria(
+  //         matchRequestEntity.criterias,
+  //         existingMatch.criterias
+  //       );
+  //       console.log("Similar criteria", criteria);
+
+  //       // Publish matched event to the stream
+  //       await this.publishMatchedEvent(userId, existingMatch.userId, criteria);
+
+  //       break;
+  //     } else {
+  //       continue;
+  //     }
+  //   }
+  // }
+
   /**
-   * @param {string} userId
-   */
-  async handleMatched(userId) {
-    // to wait till matched Details is created
-    await delay(1000);
-    const userInstance = this.userService.getUser(userId);
-    const matchedDetails = await this.matchedDetailsService.getMatchedDetails(
+  //  * @param {string} userId
+  //  * @private
+  //  */
+  async searchUser(userId) {
+    const matchRequestEntity = await this.matchRequestService.getUserRequest(
       userId
     );
-    const partner = matchedDetails.partner;
-    const collaborationSession =
-      await this.collaborationService.createCollaborationSession(
-        userId,
-        partner,
-        matchedDetails.criteria
+
+    if (!matchRequestEntity || matchRequestEntity.status === "matched") {
+      return;
+    }
+
+    const existingMatch = await this.matchRequestService.findOldestMatch(
+      userId,
+      matchRequestEntity.criterias
+    );
+
+    if (!existingMatch) {
+      return;
+    }
+
+    console.log(`${userId} found existing match`);
+
+    const isSuccess = await this.matchRequestService.atomicTransitionUsersState(
+      userId,
+      existingMatch.userId,
+      "waiting",
+      "matched"
+    );
+
+    if (isSuccess) {
+      const criteria = findMatchingCriteria(
+        matchRequestEntity.criterias,
+        existingMatch.criterias
       );
-    /** @type {MatchFound} */
-    const matchFoundMessage = {
-      type: "match-found",
-      session: collaborationSession,
-    };
-    console.log("Sent message", matchFoundMessage);
-    sendMessage(userInstance.ws, matchFoundMessage);
+      console.log("Similar criteria", criteria);
 
-    await this.disposeUser(userId);
-  }
-
-  /**
-   * @param {string} userId
-   * @private
-   */
-  async searchUser(userId) {
-    const backoffList = [500, 1000, 1500, 2000, 2500, 3000, 5000];
-    let backoffStage = 0;
-    while (true) {
-      const backoffTime = backoffList[backoffStage];
-      console.log(
-        `Back off time: ${backoffTime}, back off stage: ${backoffStage}`
-      );
-      await delay(backoffTime);
-      if (backoffStage < backoffList.length - 1) {
-        backoffStage += 1;
-      }
-      const matchRequestEntity = await this.matchRequestService.getUserRequest(
-        userId
-      );
-
-      if (!matchRequestEntity || matchRequestEntity.status === "matched") {
-        break;
-      }
-
-      const existingMatch = await this.matchRequestService.findOldestMatch(
-        userId,
-        matchRequestEntity.criterias
-      );
-
-      if (!existingMatch) {
-        continue;
-      }
-
-      console.log(`${userId} found existing match`);
-
-      const isSuccess =
-        await this.matchRequestService.atomicTransitionUsersState(
-          userId,
-          existingMatch.userId,
-          "waiting",
-          "matched"
-        );
-
-      if (isSuccess) {
-        const criteria = findMatchingCriteria(
-          matchRequestEntity.criterias,
-          existingMatch.criterias
-        );
-        console.log("Similar criteria", criteria);
-        this.matchedDetailsService.storeMatchedDetails(
-          userId,
-          existingMatch.userId,
-          criteria
-        );
-        this.matchedDetailsService.storeMatchedDetails(
-          existingMatch.userId,
-          userId,
-          criteria
-        );
-        break;
-      } else {
-        continue;
-      }
+      // Publish matched event to the stream
+      await this.publishMatchedEvent(userId, existingMatch.userId, criteria);
     }
   }
 }

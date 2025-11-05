@@ -26,45 +26,24 @@ export class CollaborationService {
 
   /**
    * Create a collaboration session
-   * @param {string} userId1
-   * @param {string} userId2
-   * @param {Criteria} criteria - Match criteria for the session
-   * @returns {Promise<CollaborationSession>} - Session ID if successful, null otherwise
+   * @param {CollaborationSession} collaborationSession
+   * @returns {Promise<CollaborationSession>}
    */
-  async createCollaborationSession(userId1, userId2, criteria) {
+  async createCollaborationSession(collaborationSession) {
     try {
-      // Validate input parameters
-      if (!userId1 || !userId2 || !criteria) {
-        console.log(
-          `❌ Invalid parameters: userId1=${userId1}, userId2=${userId2}, criteria=${criteria}`
-        );
-        return null;
-      }
-
-      // Get session ID from external service
-      const sessionId = await this.#fetchSessionId();
-      if (!sessionId) {
-        console.log(`❌ Failed to get session ID from external service`);
-        return null;
-      }
-
-      /** @type {CollaborationSession} */
-      const collaborationSession = {
-        session: sessionId,
-        userIds: [userId1, userId2],
-        criteria,
-      };
-
+      const [userId1, userId2] = collaborationSession.userIds;
       const key = this.formulateKey(userId1, userId2);
       const result = await this.client.json.set(key, "$", collaborationSession);
 
       if (result === "OK") {
         console.log(
-          `✅ Created collaboration session ${sessionId} for ${key}}]`
+          `✅ Created collaboration session ${collaborationSession.sessionId} ${key}}]`
         );
         return collaborationSession;
       } else {
-        console.log(`❌ Failed to store collaboration session ${sessionId}`);
+        console.log(
+          `❌ Failed to store collaboration session ${collaborationSession.sessionId}`
+        );
         return null;
       }
     } catch (error) {
@@ -80,7 +59,11 @@ export class CollaborationService {
     try {
       const url = `${COLLABORATION_URL}/server/sessions`;
       console.log(`POST ${url}`);
-      const res = await axios.post(url);
+      const res = await axios.post(url, {
+        sessionId: 123,
+        users: [1, 2],
+        questionId: 123,
+      });
       console.log(res);
       if (res.status === 201) {
         const sessionId = res.data.sessionId;

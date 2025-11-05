@@ -53,13 +53,13 @@ router.get("/initiateMatch", verifyAccessToken, async (req, res) => {
 
       if (collaborationSession) {
         console.log(
-          `Has existing session on matching service: ${collaborationSession.session}`
+          `Has existing session on matching service: ${collaborationSession.sessionId}`
         );
         //TODO: Call collaboration service to check if there such session
-        const session = await fetchSession(collaborationSession.session);
+        const session = await fetchSession(collaborationSession.sessionId);
         console.log(`Received from collaboration: ${session}`);
         if (session) {
-          console.log(`${collaborationSession.session} is still active`);
+          console.log(`${collaborationSession.sessionId} is still active`);
           res
             .status(200)
             .json({ code: "has-existing", session: collaborationSession });

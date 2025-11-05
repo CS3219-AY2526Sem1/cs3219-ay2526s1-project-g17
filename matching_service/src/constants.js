@@ -9,3 +9,6 @@ export const MATCHED_DETAILS_PREFIX = "MATCHED_DETAILS";
 export const COLLABORATION_URL = isDEV
   ? "http://localhost:3002/api/collaboration"
   : "https://collaboration-service-226307456137.asia-southeast1.run.app";
+export const QUESTION_SERVICE_URL = isDEV
+  ? "http://localhost:5001"
+  : "https://question-service-226307456137.asia-southeast1.run.app";
