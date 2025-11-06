@@ -24,8 +24,8 @@ export default function ChatPanel({ sessionId, userId }) {
 
     socket.on("connect", () => {
         console.log("Connected to Socket.IO server");
-        // socket.emit("joinSession", { sessionId, userId });
-        socket.emit("joinSession", { sessionId, userId: testUserId1 });
+        socket.emit("joinSession", { sessionId, userId });
+        // socket.emit("joinSession", { sessionId, userId: testUserId1 });
     });
 
     socket.on("disconnect", () => {
