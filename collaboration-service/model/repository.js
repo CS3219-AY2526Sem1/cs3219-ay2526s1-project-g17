@@ -1,7 +1,7 @@
 import Session from './session-model.js';
 
 export const createSession = async (sessionId, users, questionId) => {
-  const session = new Session({ sessionId, users, questionId });
+  const session = new Session({ sessionId, users, questionId, isActive: true, createdAt: new Date() });
   return await session.save();
 };
 
