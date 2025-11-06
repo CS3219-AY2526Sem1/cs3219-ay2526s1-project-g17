@@ -13,7 +13,6 @@ import { sendMessage } from "../utility/ws_util.js";
 import { CollaborationService } from "./collaboration_service.js";
 import { MatchRequestService } from "./match_request_service.js";
 import { MatchedDetailsService } from "./matched_details_service.js";
-import { TimeoutService } from "./timeout_service.js";
 import { UserService } from "./user_service.js";
 
 /** @typedef {import("ws").WebSocket} WebSocket*/
@@ -37,8 +36,6 @@ export class MatchingService {
     this.userService = new UserService();
     /** @private */
     this.redisRepository;
-    /** @private */
-    this.acceptanceTimeout = new TimeoutService();
     /** @private */
     this.activeListeners = new Map();
     /**
@@ -71,14 +68,14 @@ export class MatchingService {
     console.log("1");
 
     // Start processing create session messages (single consumer)
-    await this.redisRepository.startProcessingCreateSession(
+    await this.redisRepository.startProcessingCreateSessionMessage(
       this.handleCreateSessionMessage.bind(this)
     );
     console.log("2");
 
-    // Start processing matched events (single consumer)
-    await this.redisRepository.startProcessingMatchedEvents(
-      this.handleMatchedEvent.bind(this)
+    // Start processing matched message (single consumer)
+    await this.redisRepository.startProcessingMatchedMessage(
+      this.handleMatchedMessage.bind(this)
     );
     console.log("3");
 
@@ -169,7 +166,7 @@ export class MatchingService {
    * Handle matched event (single consumer processing)
    * @param {object} eventData - Matched event data
    */
-  async handleMatchedEvent(eventData) {
+  async handleMatchedMessage(eventData) {
     const { userId1, userId2, criteria, matchedAt } = eventData;
 
     console.log(
@@ -288,66 +285,6 @@ export class MatchingService {
       // Don't throw - we don't want to break the matching flow
     }
   }
-
-  // /**
-  //  * @param {string} userId
-  //  * @private
-  //  */
-  // async searchUser(userId) {
-  //   const backoffList = [500, 1000, 1500, 2000, 2500, 3000, 5000];
-  //   let backoffStage = 0;
-  //   while (true) {
-  //     const backoffTime = backoffList[backoffStage];
-  //     console.log(
-  //       `Back off time: ${backoffTime}, back off stage: ${backoffStage}`
-  //     );
-  //     await delay(backoffTime);
-  //     if (backoffStage < backoffList.length - 1) {
-  //       backoffStage += 1;
-  //     }
-  //     const matchRequestEntity = await this.matchRequestService.getUserRequest(
-  //       userId
-  //     );
-
-  //     if (!matchRequestEntity || matchRequestEntity.status === "matched") {
-  //       break;
-  //     }
-
-  //     const existingMatch = await this.matchRequestService.findOldestMatch(
-  //       userId,
-  //       matchRequestEntity.criterias
-  //     );
-
-  //     if (!existingMatch) {
-  //       continue;
-  //     }
-
-  //     console.log(`${userId} found existing match`);
-
-  //     const isSuccess =
-  //       await this.matchRequestService.atomicTransitionUsersState(
-  //         userId,
-  //         existingMatch.userId,
-  //         "waiting",
-  //         "matched"
-  //       );
-
-  //     if (isSuccess) {
-  //       const criteria = findMatchingCriteria(
-  //         matchRequestEntity.criterias,
-  //         existingMatch.criterias
-  //       );
-  //       console.log("Similar criteria", criteria);
-
-  //       // Publish matched event to the stream
-  //       await this.publishMatchedEvent(userId, existingMatch.userId, criteria);
-
-  //       break;
-  //     } else {
-  //       continue;
-  //     }
-  //   }
-  // }
 
   /**
   //  * @param {string} userId
