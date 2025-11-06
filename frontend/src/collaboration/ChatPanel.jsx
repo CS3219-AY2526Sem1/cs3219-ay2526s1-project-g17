@@ -6,6 +6,8 @@ export default function ChatPanel({ sessionId, userId }) {
   const [input, setInput] = useState('');
   const messagesEndRef = useRef(null);
   const socketRef = useRef(null);
+  const testUserId1 = 'user-4256';
+  const testUserId2 = 'user-567';
 
   // Auto-scroll to bottom
   useEffect(() => {
@@ -22,7 +24,8 @@ export default function ChatPanel({ sessionId, userId }) {
 
     socket.on("connect", () => {
         console.log("Connected to Socket.IO server");
-        socket.emit("joinSession", { sessionId, userId: `user-chat-${Math.floor(Math.random() * 1000)}` });
+        // socket.emit("joinSession", { sessionId, userId });
+        socket.emit("joinSession", { sessionId, userId: testUserId1 });
     });
 
     socket.on("disconnect", () => {
