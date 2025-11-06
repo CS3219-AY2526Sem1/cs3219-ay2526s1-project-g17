@@ -6,7 +6,8 @@ import dotenv from 'dotenv';
 dotenv.config({ path: './.env' });
 
 const sessionId = 'test-session';
-const userId = 'user-456';
+const userId1 = 'user-456';
+const userId2 = 'user-567';
 const questionId = 'q-789'; // can be any string for testing
 
 async function createTestSession() {
@@ -33,7 +34,7 @@ async function createTestSession() {
 
     const session = new Session({
       sessionId,
-      users: [userId],
+      users: [userId1, userId2],
       chatHistory: dummyChatHistory,
       questionId,
       createdAt: new Date(),
