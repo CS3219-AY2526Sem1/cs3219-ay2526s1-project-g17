@@ -270,6 +270,28 @@ socket.on('disconnect', async () => {
     clearTimeout(sessionTimeouts.get(sessionId));
   }
 
+
+  const endSession = async (userId1, userId2) => {
+    try {
+      const response = await fetch("/api/matching/endSession", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ userId1, userId2 }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        console.log("Session closed successfully:", data);
+      } else {
+        console.error("Failed to close session:", data);
+      }
+    } catch (err) {
+      console.error("Error calling endSession API:", err);
+    }
+  };
+
   // Schedule auto-termination after grace period
   const timeoutId = setTimeout(async () => {
     try {
@@ -285,8 +307,10 @@ socket.on('disconnect', async () => {
 
         io.to(sessionId).emit('sessionTerminated');
         io.in(sessionId).socketsLeave(sessionId);
-
+        
+        endSession(checkSession.users[0], checkSession.users[1]);
         console.log(`🕒 Session ${sessionId} terminated after grace period.`);
+
       }
     } catch (err) {
       console.error('Error during session termination:', err);
