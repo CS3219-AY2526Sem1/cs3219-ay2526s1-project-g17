@@ -15,8 +15,12 @@ dotenv.config();
 
 const PORT = process.env.PORT || 3002;
 const DB_URI = process.env.DB_CLOUD_URI;
-const SESSION_IDLE_TIMEOUT = 30_000; // 30 seconds
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+
+// Track pending timeouts for sessions
+const sessionTimeouts = new Map();
+const SESSION_GRACE_PERIOD = 30_000; // 30 seconds grace before ending session
+
 
 const server = http.createServer(app);
 
@@ -32,11 +36,11 @@ const io = new SocketIOServer(server, {
   cors: { origin: '*', methods: ['GET', 'POST'] }
 });
 
-// Track pending auto-close timeouts per session
-const sessionTimeouts = new Map();
 
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
+  
+
 
   socket.onAny((event, ...args) => {
     console.log(`Socket.IO event: ${event}`, ...args);
@@ -46,11 +50,23 @@ io.on('connection', (socket) => {
     socket.join(sessionId);
     socket.data.sessionId = sessionId;
     socket.data.userId = userId;
-
+    
     // const ydoc = await getSessionYDoc(sessionId);
     // socket.emit('initialDoc', Y.encodeStateAsUpdate(ydoc));
 
     const session = await Session.findOne({ sessionId });
+      // Only allow if user is in the authorized list
+      if (!session.users.includes(userId)){
+        console.warn('User not authorized for this session');
+        socket.emit('error', 'User not authorized for this session');
+        return;
+      };
+
+      // Add to active users if not already there
+      if (!session.activeUsers.includes(userId)) {
+        session.activeUsers.push(userId);
+        await session.save();
+      }
       
       // 💥 LOAD AND SEND CHAT HISTORY 💥
       if (session && session.chatHistory) {
@@ -61,14 +77,18 @@ io.on('connection', (socket) => {
           })));
       }
 
-    // Cancel any pending auto-close for this session
-    if (sessionTimeouts.has(sessionId)) {
-      clearTimeout(sessionTimeouts.get(sessionId));
-      sessionTimeouts.delete(sessionId);
-    }
+      // Cancel pending termination if user rejoins
+      if (sessionTimeouts.has(sessionId)) {
+        clearTimeout(sessionTimeouts.get(sessionId));
+        sessionTimeouts.delete(sessionId);
+        console.log(`⏳ Cancelled termination timeout for session ${sessionId} (user rejoined).`);
+      }
+
 
     // Notify others in session
+  
     socket.to(sessionId).emit('userJoined', { userId });
+    console.log(`👥 Active users for ${sessionId}:`, session.activeUsers);
   });
 
   // Message: Handle chat messages
@@ -89,7 +109,13 @@ let history = []; // Declared in the outer scope, as fixed before
     const session = await Session.findOne({ sessionId });
 
     if (session) {
+      if (!session.users.includes(userId)) {
+        console.warn('User not authorized for this session');
+        socket.emit('error', 'User not authorized for this session');
+        return;
+      }
       console.log('Session found:', sessionId);
+
 
       // 1. Combine the current message with the history from the DB
       const fullConversation = [
@@ -206,46 +232,97 @@ let history = []; // Declared in the outer scope, as fixed before
     }
   });
 
-  socket.on('terminateSession', async ({ sessionId }) => {
-    const session = await Session.findOneAndUpdate(
-      { sessionId },
-      { isActive: false, endedAt: new Date() },
-      { new: true }
-    );
+socket.on('terminateSession', async ({ sessionId }) => {
+  const session = await Session.findOneAndUpdate(
+    { sessionId },
+    { isActive: false, endedAt: new Date() },
+    { new: true }
+  );
 
-    if (session) {
-        await saveSessionToHistory(session);
+  if (session) {
+    await saveSessionToHistory(session);
+  }
+
+  io.to(sessionId).emit('sessionTerminated');
+  io.in(sessionId).socketsLeave(sessionId);
+});
+
+socket.on('disconnect', async () => {
+  const { userId, sessionId } = socket.data || {};
+  if (!userId || !sessionId) return;
+
+  const session = await Session.findOne({ sessionId });
+  if (!session) return;
+  if (!session.activeUsers.includes(userId)) return;
+
+  // Remove user from active list
+  session.activeUsers = session.activeUsers.filter(id => id !== userId);
+  await session.save();
+
+  console.log(`User ${userId} disconnected from session ${sessionId}`);
+  console.log(`👥 Active users for ${sessionId}:`, session.activeUsers);
+
+  // If session still has active users, do nothing
+  if (session.activeUsers.length > 0) return;
+
+  // If already has a timeout scheduled, clear and reset
+  if (sessionTimeouts.has(sessionId)) {
+    clearTimeout(sessionTimeouts.get(sessionId));
+  }
+
+
+  const endSession = async (userId1, userId2) => {
+    try {
+      const response = await fetch("/api/matching/endSession", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ userId1, userId2 }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        console.log("Session closed successfully:", data);
+      } else {
+        console.error("Failed to close session:", data);
+      }
+    } catch (err) {
+      console.error("Error calling endSession API:", err);
     }
+  };
 
-    io.to(sessionId).emit('sessionTerminated');
-    io.in(sessionId).socketsLeave(sessionId);
-  });
+  // Schedule auto-termination after grace period
+  const timeoutId = setTimeout(async () => {
+    try {
+      const checkSession = await Session.findOne({ sessionId });
+      if (!checkSession) return;
 
-  socket.on('disconnecting', () => {
-    const sessionId = socket.data?.sessionId;
-    if (!sessionId) return;
-
-    // Schedule auto-termination after timeout if room becomes empty
-    const timeoutId = setTimeout(async () => {
-      const sockets = await io.in(sessionId).fetchSockets();
-      if (sockets.length === 0) {
-        console.log(`Auto-terminating idle session: ${sessionId}`);
-        const session = await Session.findOneAndUpdate(
-          { sessionId },
-          { isActive: false, endedAt: new Date() },
-          { new: true }
-        );
-
-        if (session) {
-            await saveSessionToHistory(session);
-        }
+      // Double-check no one rejoined in the meantime
+      if (checkSession.activeUsers.length === 0) {
+        checkSession.isActive = false;
+        checkSession.endedAt = new Date();
+        await checkSession.save();
+        await saveSessionToHistory(checkSession);
 
         io.to(sessionId).emit('sessionTerminated');
-      }
-    }, SESSION_IDLE_TIMEOUT);
+        io.in(sessionId).socketsLeave(sessionId);
+        
+        endSession(checkSession.users[0], checkSession.users[1]);
+        console.log(`🕒 Session ${sessionId} terminated after grace period.`);
 
-    sessionTimeouts.set(sessionId, timeoutId);
-  });
+      }
+    } catch (err) {
+      console.error('Error during session termination:', err);
+    } finally {
+      sessionTimeouts.delete(sessionId);
+    }
+  }, SESSION_GRACE_PERIOD);
+
+  sessionTimeouts.set(sessionId, timeoutId);
+});
+
+
 });
 
 // ====== 2. Yjs WebSocket for collaborative editing (/collab) ======
