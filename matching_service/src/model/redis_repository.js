@@ -379,8 +379,7 @@ export class RedisRepository extends EventEmitter {
               },
             ],
             {
-              COUNT: 10,
-              BLOCK: 1000,
+              COUNT: 1,
             }
           );
 
