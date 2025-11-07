@@ -5,7 +5,6 @@ This microservice allows users and other services to maintain a user's history t
 ## Prerequisites
 - Node.js 18+ and npm
 - Accessible MongoDB connection string
-- Upstash Redis REST URL and token (used by the rate limiter)
 
 ## Installation & Local Development
 1. Install dependencies:
