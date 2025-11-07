@@ -2,12 +2,9 @@
 /** @typedef {import("../types.js").Criteria} Criteria */
 /** @typedef {import("redis").RedisClientType} RedisClientType*/
 
-import axios from "axios";
 import {
   COLLABORATION_SESSION_PREFIX,
-  COLLABORATION_SERVICE_URL,
 } from "../constants.js";
-import { randomUUID } from "crypto";
 
 export class CollaborationService {
   constructor(/** @type {RedisClientType} */ redisClient) {
@@ -31,6 +28,21 @@ export class CollaborationService {
    */
   async createCollaborationSession(collaborationSession) {
     try {
+      // Validate input parameters
+      if (
+        !collaborationSession ||
+        !collaborationSession.userIds ||
+        !collaborationSession.userIds[0] ||
+        !collaborationSession.userIds[1]
+      ) {
+        console.log(
+          `❌ Invalid collaboration session or userIds: ${JSON.stringify(
+            collaborationSession
+          )}`
+        );
+        return null;
+      }
+
       const [userId1, userId2] = collaborationSession.userIds;
       const key = this.formulateKey(userId1, userId2);
       const result = await this.client.json.set(key, "$", collaborationSession);
@@ -48,33 +60,6 @@ export class CollaborationService {
       }
     } catch (error) {
       console.error(`❌ Error creating collaboration session:`, error);
-      return null;
-    }
-  }
-
-  /**
-   * @returns {Promise<string | null>}
-   */
-  async #fetchSessionId() {
-    try {
-      const url = `${COLLABORATION_SERVICE_URL}/server/sessions`;
-      console.log(`POST ${url}`);
-      const res = await axios.post(url, {
-        sessionId: 123,
-        users: [1, 2],
-        questionId: 123,
-      });
-      console.log(res);
-      if (res.status === 201) {
-        const sessionId = res.data.sessionId;
-        console.log(`🔗 Generated session ID: ${sessionId}`);
-        return sessionId;
-      } else {
-        console.error(res.data.error);
-        return null;
-      }
-    } catch (error) {
-      console.error(`❌ Error creating session ID:`, error);
       return null;
     }
   }

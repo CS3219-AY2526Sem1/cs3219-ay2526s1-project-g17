@@ -1,8 +1,6 @@
 import { EventEmitter } from "events";
 import { createClient, SCHEMA_FIELD_TYPE } from "redis";
 import { MATCH_REQUEST_PREFIX, MATCH_REQUEST_IDX } from "../constants.js";
-import * as types from "../types.js";
-import { UserService } from "../service/user_service.js";
 
 /** @typedef {import("redis").RedisClientType} RedisClientType */
 /** @typedef {import("../types.js").CollaborationSession} CollaborationSession */
@@ -381,8 +379,7 @@ export class RedisRepository extends EventEmitter {
               },
             ],
             {
-              COUNT: 10,
-              BLOCK: 1000,
+              COUNT: 1,
             }
           );
 
@@ -446,7 +443,7 @@ export class RedisRepository extends EventEmitter {
    * Start processing CreateSessionMessageStream with single-consumer guarantee
    * @param {function} messageHandler - Handler function for create session messages
    */
-  async startProcessingCreateSession(messageHandler) {
+  async startProcessingCreateSessionMessage(messageHandler) {
     this.isProcessing = true;
     console.log(
       `🎯 Starting create session processing with consumer: ${this.consumerName}`
@@ -555,10 +552,10 @@ export class RedisRepository extends EventEmitter {
   }
 
   /**
-   * Start processing MatchedEventStream with single-consumer guarantee
+   * Start processing MatchedEventMessage with single-consumer guarantee
    * @param {function} eventHandler - Handler function for matched events
    */
-  async startProcessingMatchedEvents(eventHandler) {
+  async startProcessingMatchedMessage(eventHandler) {
     console.log(
       `🎯 Starting matched events processing with consumer: ${this.consumerName}`
     );
