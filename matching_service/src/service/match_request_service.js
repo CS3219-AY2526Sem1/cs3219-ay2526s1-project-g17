@@ -24,6 +24,7 @@ export class MatchRequestService {
   }
 
   /**
+   * AI enhanced function
    * Queries the Redis index to find the single oldest matching document.
    * @param {string} userId
    * @param {Criteria[]} criterias
@@ -63,7 +64,6 @@ export class MatchRequestService {
   }
 
   /**
-   * Store a match request
    * @param {string} userId - User ID
    * @param {"waiting" | "matched"} status
    */
@@ -132,6 +132,7 @@ export class MatchRequestService {
   }
 
   /**
+   * AI Enhanced function
    * Atomically transition two users from one status to another
    * @param {string} userId1
    * @param {string} userId2

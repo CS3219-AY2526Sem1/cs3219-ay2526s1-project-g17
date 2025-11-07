@@ -2,6 +2,8 @@ import { EventEmitter } from "events";
 import { createClient, SCHEMA_FIELD_TYPE } from "redis";
 import { MATCH_REQUEST_PREFIX, MATCH_REQUEST_IDX } from "../constants.js";
 
+// AI Generated file, only some are modified by me
+
 /** @typedef {import("redis").RedisClientType} RedisClientType */
 /** @typedef {import("../types.js").CollaborationSession} CollaborationSession */
 /** @typedef {import("../types.js").MatchRequestEntity} MatchRequestEntity */

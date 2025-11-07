@@ -2,6 +2,8 @@
 /** @typedef {import("../types.js").Criteria} Criteria */
 /** @typedef {import("redis").RedisClientType} RedisClientType*/
 
+// AI generated file
+
 import {
   COLLABORATION_SESSION_PREFIX,
 } from "../constants.js";
