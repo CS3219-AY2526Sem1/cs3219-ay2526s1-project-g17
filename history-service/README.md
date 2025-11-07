@@ -1,6 +1,6 @@
 # History Service
 
-Lightweight Express service that persists users' coding attempts and exposes them via a REST API. Data is stored in MongoDB using Mongoose models.
+This microservice allows users and other services to maintain a user's history to allow them to reflect on past attempts
 
 ## Prerequisites
 - Node.js 18+ and npm
