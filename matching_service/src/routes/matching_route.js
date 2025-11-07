@@ -1,7 +1,5 @@
 import express from "express";
 import { collaborationService, matchedDetailsService } from "../server.js";
-import axios from "axios";
-import { COLLABORATION_SERVICE_URL } from "../constants.js";
 import { verifyAccessToken } from "../middleware/basic_access_control.js";
 import { fetchExistingSession } from "../utility/utility.js";
 
@@ -22,8 +20,6 @@ router.delete("/endSession", async (req, res) => {
   }
 });
 
-
-
 router.get("/initiateMatch", verifyAccessToken, async (req, res) => {
   const { userId } = req.query;
   try {
@@ -39,13 +35,11 @@ router.get("/initiateMatch", verifyAccessToken, async (req, res) => {
         );
 
       if (collaborationSession) {
-        console.log(
-          `Has existing session on matching service: ${collaborationSession.sessionId}`
+        const session = await fetchExistingSession(
+          collaborationSession.sessionId
         );
-        //TODO: Call collaboration service to check if there such session
-        const session = await fetchExistingSession(collaborationSession.sessionId);
-        console.log(`Received from collaboration: ${session}`);
-        if (session) {
+        console.log("Session from collaboration service", session)
+        if (session && session.isActive) {
           console.log(`${collaborationSession.sessionId} is still active`);
           res
             .status(200)
@@ -64,7 +58,7 @@ router.get("/initiateMatch", verifyAccessToken, async (req, res) => {
       res.status(200).json({ code: "no-existing" });
     }
   } catch (error) {
-    console.error("Session close error", error);
+    console.error("Initiate match error", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 });
