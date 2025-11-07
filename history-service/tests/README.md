@@ -1,21 +1,15 @@
 # History Service Tests
 
-This directory contains Jest-based unit tests that exercise the `history-service` controllers without requiring a live MongoDB instance.
+This testing uses jest to test the history service. A live MongoDB connection is not required for this testing.
 
 ## Files
-- `historyController.test.js` &mdash; covers the happy path and failure modes for `getUsersHistory`, `createAttempt`, and `updateAttempt`.
-- `basic-access-control.test.js` &mdash; verifies the Auth0 middleware loads environment variables through the shared bootstrap.
+- `historyController.test.js` : covers the happy path and failure modes for `getUsersHistory`, `createAttempt`, and `updateAttempt`.
+- `basic-access-control.test.js` : verifies the Auth0 middleware loads environment variables properly
 
 ## Running the Tests
-From the `history-service` directory:
 
 ```bash
-npm install          # first time only, installs jest + cross-env
+cd history-service
+npm install          
 npm test
 ```
-
-The `test` script ensures Jest runs in ESM mode (`NODE_OPTIONS=--experimental-vm-modules`) so it can import the service's ES modules.
-
-## Implementation Notes
-- Mongoose model methods are mocked, allowing the controllers to be tested in isolation.
-- Console errors are suppressed in failure-path assertions to keep the test output readable.
