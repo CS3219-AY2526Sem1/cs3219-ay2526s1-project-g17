@@ -1,6 +1,6 @@
 # History Service
 
-Lightweight Express service that persists users' coding attempts and exposes them via a REST API. Data is stored in MongoDB using Mongoose models, and request throttling is enforced with Upstash Redis.
+Lightweight Express service that persists users' coding attempts and exposes them via a REST API. Data is stored in MongoDB using Mongoose models.
 
 ## Prerequisites
 - Node.js 18+ and npm
@@ -41,6 +41,10 @@ All endpoints are prefixed with `/history`. Responses use JSON.
 - **Query params (optional):**
   - `limit` (number, defaults to `10`) — max results to return.
   - `skip` (number, defaults to `0`) — number of records to skip for pagination.
+- **Headers:**
+  - Required: Authorization: Bearer <JWT_ACCESS_TOKEN>
+  - Auth Rules: 
+      - User: Can receive their own data
 - **Responses:**
   - `200 OK` with:
     ```json
@@ -106,5 +110,4 @@ Attempts are stored using the `QuestionAttempt` schema (`src/models/Attempt.js`)
 - Indexed fields support fast lookups by user, question, and recency.
 
 ## Additional Notes
-- All routes are protected by a rate limiter powered by Upstash Redis (`src/middleware/rateLimiter.js`).
 - Cross-origin requests are allowed via the `cors` middleware by default.
