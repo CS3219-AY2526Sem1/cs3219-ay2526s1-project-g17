@@ -26,12 +26,17 @@ export async function submitAttempt({ userId, questionId, submissionCode }) {
     }
 }
 
-export async function terminateSession(sessionId) {
+export async function terminateSession(sessionId, getAccessTokenSilently) {
     try {
+        const token = await getAccessTokenSilently({
+            authorizationParams: { audience: "peerprep-api" }
+        });
+
         const response = await fetch(`${COLLABORATION_SERVICE_URL}/api/collaboration/sessions/${sessionId}/terminate`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             }
         });
 
