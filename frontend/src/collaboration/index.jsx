@@ -1,5 +1,6 @@
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { useMemo, useState } from "react";
+import {useAuth0} from "@auth0/auth0-react";
 import CollabEditor from "./CollabEditor";
 import QuestionPanel from "./QuestionPanel";
 import ChatPanel from "./ChatPanel";
@@ -12,6 +13,7 @@ export default function CollabPage() {
     const location = useLocation();
     const { sessionId } = useParams();
     const questionId = new URLSearchParams(location.search).get('questionId');
+    const { getAccessTokenSilently } = useAuth0();
     const [theme, setTheme] = useState("vs-dark");
     const [lang, setLang] = useState("javascript");
     const [peers, setPeers] = useState([]);
@@ -67,7 +69,7 @@ export default function CollabPage() {
             });
 
             // terminate the session
-            await terminateSession(sessionId);
+            await terminateSession(sessionId, getAccessTokenSilently);
 
             alert("Code submitted successfully!");
 
