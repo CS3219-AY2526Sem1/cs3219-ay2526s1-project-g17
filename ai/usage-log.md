@@ -172,6 +172,36 @@ Most of the pub/sub functions are removed and only the necessary functions are k
 
 
 # Question Service
+##### Date/Time:
+2025-10-16
+##### Tool:
+Gemini 2.5 Pro
+##### Prompt/Command:
+Prompted Gemini to generate new questions to populate the question service databse
+##### Output Summary:
+Gemini created new questions and formartted them as a .json object
+##### Action Taken:
+- [ ] Accepted as-is
+- [x] Modified
+- [ ] Rejected
+##### Author Notes:
+Checked for validity of each question and appended it to the original json file containing the 20 example questions
+
+
+##### Date/Time:
+2025-10-24
+##### Tool:
+GitHub Copilot GPT-4.1
+##### Prompt/Command:
+Prompted Copilot to create unit tests for the question Service and implement testing using Jest
+##### Output Summary:
+Copilot created unit tests under the question_service/tests folder
+##### Action Taken:
+- [ ] Accepted as-is
+- [x] Modified
+- [ ] Rejected
+##### Author Notes:
+Appended my own test cases using the same format that was provided by Copilot on top of what was initially already created
 
 # Collaboration Service
 
