@@ -8,7 +8,6 @@ import app from './server.js';
 import Session from './model/session-model.js';
 import { LeveldbPersistence } from 'y-leveldb';
 import { GoogleGenAI } from "@google/genai";
-import { saveSessionToHistory } from './utils/history-utils.js';
 
 
 dotenv.config();
@@ -239,10 +238,6 @@ socket.on('terminateSession', async ({ sessionId }) => {
     { new: true }
   );
 
-  if (session) {
-    await saveSessionToHistory(session);
-  }
-
   io.to(sessionId).emit('sessionTerminated');
   io.in(sessionId).socketsLeave(sessionId);
 });
@@ -303,7 +298,6 @@ socket.on('disconnect', async () => {
         checkSession.isActive = false;
         checkSession.endedAt = new Date();
         await checkSession.save();
-        await saveSessionToHistory(checkSession);
 
         io.to(sessionId).emit('sessionTerminated');
         io.in(sessionId).socketsLeave(sessionId);
