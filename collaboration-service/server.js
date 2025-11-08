@@ -1,5 +1,6 @@
 import 'dotenv/config'
 import express from 'express';
+import cors from 'cors';
 import collaborationRoutes from './routes/collaboration-routes.js';
 import { errorHandler } from './middleware/error.middleware.js';
 
