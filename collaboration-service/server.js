@@ -6,7 +6,7 @@ import { errorHandler } from './middleware/error.middleware.js';
 const app = express();
 
 app.use(cors({
-    origin: 'https://frontend-226307456137.asia-southeast1.run.app',
+    origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
