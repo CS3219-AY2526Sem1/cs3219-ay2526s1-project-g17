@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-const QUESTION_SERVICE_BASE_URL = 'http://localhost:5001/api/questions';
+const QUESTION_SERVICE_BASE_URL = 'https://question-service-226307456137.asia-southeast1.run.app/api/questions';
 
 export default function QuestionPanel({ questionId }) { 
     const [question, setQuestion] = useState(null);
