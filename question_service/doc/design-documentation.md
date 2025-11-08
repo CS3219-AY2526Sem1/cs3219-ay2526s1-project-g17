@@ -80,7 +80,6 @@ Database (MongoDB Atlas)
   question: String (required),
   difficulty: String (required, enum: ['Beginner', 'Intermediate', 'Advanced']),
   topics: [String] (required),
-  link: String (optional),
   testCases: [String] (optional),
   constraints: String (optional),
   hints: String (optional),
