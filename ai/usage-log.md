@@ -173,6 +173,21 @@ Most of the pub/sub functions are removed and only the necessary functions are k
 
 # Question Service
 
+##### Date/Time:
+2025-10-24
+##### Tool:
+GitHub Copilot GPT-4.1
+##### Prompt/Command:
+Prompted Copilot to create unit tests for the question Service and implement testing using Jest
+##### Output Summary:
+Copilot created unit tests under the question_service/tests folder
+##### Action Taken:
+- [ ] Accepted as-is
+- [x] Modified
+- [ ] Rejected
+##### Author Notes:
+Appended my own test cases using the same format that was provided by Copilot on top of what was initially already created
+
 # Collaboration Service
 
 # History Service
