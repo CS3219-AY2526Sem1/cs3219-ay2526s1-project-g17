@@ -116,20 +116,11 @@ export default function ProfilePage() {
             <h1>{user.name || user.nickname}</h1>
             <p className="profile-hero__subtitle">
               Track your coding journey, revisit past challenges, and keep honing your
-              skills. We show five attempts at a time so you can focus on your most
-              recent work.
+              skills. Remember to switch up the topics and keep increasing the difficulty so
+              you can keep improving!
             </p>
 
-            <dl className="profile-hero__meta">
-              <div>
-                <dt>Member since</dt>
-                <dd>
-                  {user.updated_at
-                    ? new Date(user.updated_at).toLocaleDateString()
-                    : "—"}
-                </dd>
-              </div>
-            </dl>
+            
           </div>
         </section>
         

@@ -39,12 +39,6 @@ export const terminateSessionHandler = async (req, res) => {
     const session = await terminateSession(sessionId);
     console.log('Session terminated:', session);
 
-    if (session) {
-      await saveSessionToHistory(session);
-    } else {
-      console.log('No session found');
-    }
-
     res.status(200).json(session);
   } catch (err) {
     console.error('Error in terminateSessionHandler:', err);

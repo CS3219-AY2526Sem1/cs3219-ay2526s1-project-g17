@@ -1,6 +1,8 @@
 import { randomUUID } from "crypto";
 import WebSocket from "ws";
 
+// AI Generated File
+
 /** @typedef {import("../src/types.js").MatchRequest} MatchRequest */
 /** @typedef {import("../src/types.js").UserInstance} UserInstance */
 /** @typedef {import("../src/types.js").Criteria} Criteria */

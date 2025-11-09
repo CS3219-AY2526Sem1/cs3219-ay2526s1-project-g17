@@ -15,6 +15,8 @@ const LANGUAGE_MAP = {
     ts: 74,
     javascript: 63,
     js: 63,
+    go: 60,
+    rust: 73
 };
 
 function toLanguageId(languageOrId) {

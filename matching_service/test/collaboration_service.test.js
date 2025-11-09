@@ -15,6 +15,8 @@ import {
   RedisRepository,
 } from "../src/model/redis_repository.js";
 
+// AI Generated File
+
 // Load environment variables
 dotenv.config();
 
@@ -81,6 +83,28 @@ describe("CollaborationService", () => {
   /**
    * Helper function to create test collaboration session data
    * @param {object} overrides
+   * @returns {import("../src/types.js").CollaborationSession}
+   */
+  function createTestCollaborationSession(overrides = {}) {
+    return {
+      sessionId: `session_${Date.now()}_${Math.random()
+        .toString(36)
+        .substr(2, 9)}`,
+      userIds: ["test_user_1", "test_user_2"],
+      criteria: {
+        type: "criteria",
+        difficulty: "medium",
+        language: "javascript",
+        topic: "algorithms",
+      },
+      questionId: "test_question_id",
+      ...overrides,
+    };
+  }
+
+  /**
+   * Helper function to create test collaboration criteria data
+   * @param {object} overrides
    * @returns {object}
    */
   function createTestCollaborationData(overrides = {}) {
@@ -98,31 +122,28 @@ describe("CollaborationService", () => {
 
   describe("createCollaborationSession", () => {
     it("should create a collaboration session successfully", async () => {
-      const testData = createTestCollaborationData();
+      const sessionData = createTestCollaborationSession();
 
       const collaborationSession =
-        await collaborationService.createCollaborationSession(
-          testData.userIds[0],
-          testData.userIds[1],
-          testData.criteria
-        );
+        await collaborationService.createCollaborationSession(sessionData);
 
       expect(collaborationSession).not.toBeNull();
-      expect(collaborationSession.session).toBeDefined();
-      expect(typeof collaborationSession.session).toBe("string");
-      expect(collaborationSession.userIds).toEqual(testData.userIds);
-      expect(collaborationSession.criteria).toEqual(testData.criteria);
+      expect(collaborationSession.sessionId).toBeDefined();
+      expect(typeof collaborationSession.sessionId).toBe("string");
+      expect(collaborationSession.userIds).toEqual(sessionData.userIds);
+      expect(collaborationSession.criteria).toEqual(sessionData.criteria);
+      expect(collaborationSession.questionId).toEqual(sessionData.questionId);
 
       // Verify the session was stored correctly
       const stored = await collaborationService.getCollaborationSession(
-        testData.userIds[0],
-        testData.userIds[1]
+        sessionData.userIds[0],
+        sessionData.userIds[1]
       );
       expect(stored).toEqual(collaborationSession);
     });
 
     it("should create sessions with different criteria", async () => {
-      const testData = createTestCollaborationData({
+      const sessionData = createTestCollaborationSession({
         criteria: {
           type: "criteria",
           difficulty: "hard",
@@ -132,11 +153,7 @@ describe("CollaborationService", () => {
       });
 
       const collaborationSession =
-        await collaborationService.createCollaborationSession(
-          testData.userIds[0],
-          testData.userIds[1],
-          testData.criteria
-        );
+        await collaborationService.createCollaborationSession(sessionData);
 
       expect(collaborationSession).not.toBeNull();
       expect(collaborationSession.criteria.difficulty).toBe("hard");
@@ -144,8 +161,8 @@ describe("CollaborationService", () => {
       expect(collaborationSession.criteria.topic).toBe("data-structures");
 
       const stored = await collaborationService.getCollaborationSession(
-        testData.userIds[0],
-        testData.userIds[1]
+        sessionData.userIds[0],
+        sessionData.userIds[1]
       );
       expect(stored.criteria.difficulty).toBe("hard");
       expect(stored.criteria.language).toBe("python");
@@ -153,16 +170,10 @@ describe("CollaborationService", () => {
     });
 
     it("should fail when criteria is null or undefined", async () => {
-      const testData = createTestCollaborationData();
-
       const result1 = await collaborationService.createCollaborationSession(
-        testData.userIds[0],
-        testData.userIds[1],
         null
       );
       const result2 = await collaborationService.createCollaborationSession(
-        testData.userIds[0],
-        testData.userIds[1],
         undefined
       );
 
@@ -171,17 +182,18 @@ describe("CollaborationService", () => {
     });
 
     it("should fail when userId is null or undefined", async () => {
-      const testData = createTestCollaborationData();
+      const sessionWithNullUserId1 = createTestCollaborationSession({
+        userIds: [null, "user2"],
+      });
+      const sessionWithNullUserId2 = createTestCollaborationSession({
+        userIds: ["user1", undefined],
+      });
 
       const result1 = await collaborationService.createCollaborationSession(
-        null,
-        testData.userIds[1],
-        testData.criteria
+        sessionWithNullUserId1
       );
       const result2 = await collaborationService.createCollaborationSession(
-        testData.userIds[0],
-        undefined,
-        testData.criteria
+        sessionWithNullUserId2
       );
 
       expect(result1).toBeNull();
@@ -189,104 +201,89 @@ describe("CollaborationService", () => {
     });
 
     it("should generate unique session IDs for different user pairs", async () => {
-      const testData1 = createTestCollaborationData();
-      const testData2 = createTestCollaborationData({
+      const sessionData1 = createTestCollaborationSession();
+      const sessionData2 = createTestCollaborationSession({
         userIds: ["user3", "user4"],
       });
 
       const collaborationSession1 =
-        await collaborationService.createCollaborationSession(
-          testData1.userIds[0],
-          testData1.userIds[1],
-          testData1.criteria
-        );
+        await collaborationService.createCollaborationSession(sessionData1);
       const collaborationSession2 =
-        await collaborationService.createCollaborationSession(
-          testData2.userIds[0],
-          testData2.userIds[1],
-          testData2.criteria
-        );
+        await collaborationService.createCollaborationSession(sessionData2);
 
       expect(collaborationSession1).not.toBeNull();
       expect(collaborationSession2).not.toBeNull();
-      expect(collaborationSession1.session).not.toBe(
-        collaborationSession2.session
+      expect(collaborationSession1.sessionId).not.toBe(
+        collaborationSession2.sessionId
       );
 
       // Both sessions should exist independently
       const stored1 = await collaborationService.getCollaborationSession(
-        testData1.userIds[0],
-        testData1.userIds[1]
+        sessionData1.userIds[0],
+        sessionData1.userIds[1]
       );
       const stored2 = await collaborationService.getCollaborationSession(
-        testData2.userIds[0],
-        testData2.userIds[1]
+        sessionData2.userIds[0],
+        sessionData2.userIds[1]
       );
 
-      expect(stored1.userIds).toEqual(testData1.userIds);
-      expect(stored2.userIds).toEqual(testData2.userIds);
+      expect(stored1.userIds).toEqual(sessionData1.userIds);
+      expect(stored2.userIds).toEqual(sessionData2.userIds);
     });
 
     it("should overwrite existing session for same user pair", async () => {
-      const testData = createTestCollaborationData();
+      const sessionData = createTestCollaborationSession();
 
       // Create first session
       const collaborationSession1 =
-        await collaborationService.createCollaborationSession(
-          testData.userIds[0],
-          testData.userIds[1],
-          testData.criteria
-        );
+        await collaborationService.createCollaborationSession(sessionData);
       expect(collaborationSession1).not.toBeNull();
 
       // Create second session with same user pair but different criteria
-      /** @type {import("../src/types.js").Criteria} */
-      const newCriteria = {
-        type: "criteria",
-        difficulty: "easy",
-        language: "java",
-        topic: "sorting",
-      };
+      const sessionData2 = createTestCollaborationSession({
+        userIds: sessionData.userIds, // same user pair
+        criteria: {
+          type: "criteria",
+          difficulty: "easy",
+          language: "java",
+          topic: "sorting",
+        },
+        questionId: "different_question_id",
+      });
+
       const collaborationSession2 =
-        await collaborationService.createCollaborationSession(
-          testData.userIds[0],
-          testData.userIds[1],
-          newCriteria
-        );
+        await collaborationService.createCollaborationSession(sessionData2);
       expect(collaborationSession2).not.toBeNull();
 
       // Verify the session was overwritten
       const stored = await collaborationService.getCollaborationSession(
-        testData.userIds[0],
-        testData.userIds[1]
+        sessionData.userIds[0],
+        sessionData.userIds[1]
       );
-      expect(stored.session).toBe(collaborationSession2.session);
+      expect(stored.sessionId).toBe(collaborationSession2.sessionId);
       expect(stored.criteria.language).toBe("java");
+      expect(stored.questionId).toBe("different_question_id");
     });
   });
 
   describe("getCollaborationSession", () => {
     it("should retrieve an existing collaboration session", async () => {
-      const testData = createTestCollaborationData();
+      const sessionData = createTestCollaborationSession();
 
       // Create the session first
       const collaborationSession =
-        await collaborationService.createCollaborationSession(
-          testData.userIds[0],
-          testData.userIds[1],
-          testData.criteria
-        );
+        await collaborationService.createCollaborationSession(sessionData);
 
       // Retrieve the session
       const retrieved = await collaborationService.getCollaborationSession(
-        testData.userIds[0],
-        testData.userIds[1]
+        sessionData.userIds[0],
+        sessionData.userIds[1]
       );
 
       expect(retrieved).not.toBeNull();
-      expect(retrieved.session).toBe(collaborationSession.session);
-      expect(retrieved.userIds).toEqual(testData.userIds);
-      expect(retrieved.criteria).toEqual(testData.criteria);
+      expect(retrieved.sessionId).toBe(collaborationSession.sessionId);
+      expect(retrieved.userIds).toEqual(sessionData.userIds);
+      expect(retrieved.criteria).toEqual(sessionData.criteria);
     });
 
     it("should return null for non-existent session", async () => {
@@ -338,35 +335,31 @@ describe("CollaborationService", () => {
 
   describe("deleteCollaborationSession", () => {
     it("should delete an existing collaboration session", async () => {
-      const testData = createTestCollaborationData();
+      const sessionData = createTestCollaborationSession();
 
       // Create the session first
       const collaborationSession =
-        await collaborationService.createCollaborationSession(
-          testData.userIds[0],
-          testData.userIds[1],
-          testData.criteria
-        );
+        await collaborationService.createCollaborationSession(sessionData);
 
       // Verify it exists
       const beforeDelete = await collaborationService.getCollaborationSession(
-        testData.userIds[0],
-        testData.userIds[1]
+        sessionData.userIds[0],
+        sessionData.userIds[1]
       );
       expect(beforeDelete).not.toBeNull();
 
       // Delete the session
       const deleteResult =
         await collaborationService.deleteCollaborationSession(
-          testData.userIds[0],
-          testData.userIds[1]
+          sessionData.userIds[0],
+          sessionData.userIds[1]
         );
       expect(deleteResult).toBe(true);
 
       // Verify it's gone
       const afterDelete = await collaborationService.getCollaborationSession(
-        testData.userIds[0],
-        testData.userIds[1]
+        sessionData.userIds[0],
+        sessionData.userIds[1]
       );
       expect(afterDelete).toBeNull();
     });
@@ -436,51 +429,47 @@ describe("CollaborationService", () => {
 
   describe("Integration Tests", () => {
     it("should handle complete collaboration session lifecycle", async () => {
-      const testData = createTestCollaborationData();
+      const sessionData = createTestCollaborationSession();
 
       // 1. Create session
       const collaborationSession =
-        await collaborationService.createCollaborationSession(
-          testData.userIds[0],
-          testData.userIds[1],
-          testData.criteria
-        );
+        await collaborationService.createCollaborationSession(sessionData);
 
       expect(collaborationSession).not.toBeNull();
       expect(typeof collaborationSession).toBe("object");
-      expect(typeof collaborationSession.session).toBe("string");
+      expect(typeof collaborationSession.sessionId).toBe("string");
 
       // 2. Session should be retrievable
       const retrieved = await collaborationService.getCollaborationSession(
-        testData.userIds[0],
-        testData.userIds[1]
+        sessionData.userIds[0],
+        sessionData.userIds[1]
       );
       expect(retrieved).not.toBeNull();
-      expect(retrieved.session).toBe(collaborationSession.session);
+      expect(retrieved.sessionId).toBe(collaborationSession.sessionId);
 
       // 3. Delete session
       const deleteResult =
         await collaborationService.deleteCollaborationSession(
-          testData.userIds[0],
-          testData.userIds[1]
+          sessionData.userIds[0],
+          sessionData.userIds[1]
         );
       expect(deleteResult).toBe(true);
 
       // 4. Session should no longer exist
       const afterDelete = await collaborationService.getCollaborationSession(
-        testData.userIds[0],
-        testData.userIds[1]
+        sessionData.userIds[0],
+        sessionData.userIds[1]
       );
       expect(afterDelete).toBeNull();
     });
 
     it("should handle multiple concurrent sessions for different user pairs", async () => {
       const sessions = [
-        createTestCollaborationData(),
-        createTestCollaborationData({
+        createTestCollaborationSession(),
+        createTestCollaborationSession({
           userIds: ["user3", "user4"],
         }),
-        createTestCollaborationData({
+        createTestCollaborationSession({
           userIds: ["user5", "user6"],
           criteria: {
             type: "criteria",
@@ -488,19 +477,16 @@ describe("CollaborationService", () => {
             language: "python",
             topic: "arrays",
           },
+          questionId: "different_question",
         }),
       ];
 
       const collaborationSessions = [];
 
       // Create all sessions
-      for (const session of sessions) {
+      for (const sessionData of sessions) {
         const collaborationSession =
-          await collaborationService.createCollaborationSession(
-            session.userIds[0],
-            session.userIds[1],
-            session.criteria
-          );
+          await collaborationService.createCollaborationSession(sessionData);
         expect(collaborationSession).not.toBeNull();
         collaborationSessions.push(collaborationSession);
       }
@@ -508,15 +494,15 @@ describe("CollaborationService", () => {
       // Verify all sessions exist and are retrievable
       for (let i = 0; i < collaborationSessions.length; i++) {
         const collaborationSession = collaborationSessions[i];
-        const session = sessions[i];
+        const sessionData = sessions[i];
 
         const retrieved = await collaborationService.getCollaborationSession(
-          session.userIds[0],
-          session.userIds[1]
+          sessionData.userIds[0],
+          sessionData.userIds[1]
         );
         expect(retrieved).not.toBeNull();
-        expect(retrieved.session).toBe(collaborationSession.session);
-        expect(retrieved.userIds).toEqual(session.userIds);
+        expect(retrieved.sessionId).toBe(collaborationSession.sessionId);
+        expect(retrieved.userIds).toEqual(sessionData.userIds);
       }
 
       // Delete middle session

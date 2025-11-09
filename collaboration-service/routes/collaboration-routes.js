@@ -18,6 +18,9 @@ const router = express.Router();
 // Define a POST route for creating a new session
 router.post('/sessions', verifyAccessToken, createSessionHandler);
 
+// Define a POST route for creating a new session called by server
+router.post('/server/sessions', createSessionHandler);
+
 // Define a POST route for joining an existing session
 router.post('/sessions/:sessionId/join', verifyAccessToken, joinSessionHandler);
 
@@ -26,6 +29,9 @@ router.post('/sessions/:sessionId/terminate', verifyAccessToken, terminateSessio
 
 // Define a GET route for retrieving session details by sessionId
 router.get('/sessions/:sessionId', verifyAccessToken, getSessionHandler);
+
+// Define a GET route for retrieving session details by sessionId by another server
+router.get('/server/sessions/:sessionId', getSessionHandler);
 
 // Define a DELETE route for deleting a session by sessionId
 router.delete('/sessions/:sessionId', verifyAccessToken, deleteSessionHandler);

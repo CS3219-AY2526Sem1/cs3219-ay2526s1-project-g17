@@ -48,8 +48,9 @@
 /**
  * @typedef {Object} CollaborationSession
  * @property {Criteria} criteria
- * @property {string} session
+ * @property {string} sessionId
  * @property {[string, string]} userIds
+ * @property {string} questionId
  */
 
 /**

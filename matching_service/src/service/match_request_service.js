@@ -24,17 +24,16 @@ export class MatchRequestService {
   }
 
   /**
+   * AI enhanced function
    * Queries the Redis index to find the single oldest matching document.
    * @param {string} userId
    * @param {Criteria[]} criterias
    */
   async findOldestMatch(userId, criterias) {
-    console.log("Finding oldest match");
-    // 1. Format the OR clause for topics: {Stack | Queue | Binary Tree}
     const topicFilter = criterias.map((c) => c.topic).join("|");
     const language = criterias[0].language;
     const difficulty = criterias[0].difficulty;
-    // 2. Build the FT.SEARCH query string
+
     const escapedUserId = userId.replace(/[^\w]/g, "\\$&");
     const escapedLanguage = language.replace(/[^\w]/g, "\\$&");
     const escapedDifficulty = difficulty.replace(/[^\w]/g, "\\$&");
@@ -43,10 +42,7 @@ export class MatchRequestService {
       .join("|");
 
     const query = `@difficulty:{${escapedDifficulty}} @language:{${escapedLanguage}} @topic:{${escapedTopics}} @status:{waiting} -@userId:{${escapedUserId}}`;
-    // const query = `@difficulty:{${difficulty}} @language:{${language}} @topic:{${topicFilter}} @status:{"waiting"} -@userId:{${userId}}`;
 
-    // 3. Execute the search command
-    // Use Redis OM's ft.search API
     const result = await this.client.ft.search(MATCH_REQUEST_IDX, query, {
       SORTBY: { BY: "time", DIRECTION: "ASC" },
       LIMIT: { from: 0, size: 1 },
@@ -68,7 +64,6 @@ export class MatchRequestService {
   }
 
   /**
-   * Store a match request
    * @param {string} userId - User ID
    * @param {"waiting" | "matched"} status
    */
@@ -137,6 +132,7 @@ export class MatchRequestService {
   }
 
   /**
+   * AI Enhanced function
    * Atomically transition two users from one status to another
    * @param {string} userId1
    * @param {string} userId2

@@ -1,23 +1,40 @@
-import { useParams, useLocation } from "react-router-dom";
-import { useMemo, useState } from "react";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
+import { useMemo, useState, useEffect } from "react";
+import {useAuth0} from "@auth0/auth0-react";
 import CollabEditor from "./CollabEditor";
-import QuestionPanel from "./QuestionPanel"; 
+import QuestionPanel from "./QuestionPanel";
 import ChatPanel from "./ChatPanel";
 import { runCode } from "./ExecutionClient";
+import { submitAttempt, terminateSession } from "./SubmissionClient";
 import "./collab.css";
 
 export default function CollabPage() {
+    const navigate = useNavigate();
     const location = useLocation();
     const { sessionId } = useParams();
     const questionId = new URLSearchParams(location.search).get('questionId');
+    const matchedLanguage = new URLSearchParams(location.search).get('language');
+    const { getAccessTokenSilently } = useAuth0();
     const [theme, setTheme] = useState("vs-dark");
-    const [lang, setLang] = useState("javascript");
-    const [peers, setPeers] = useState([]); // awareness list
+    const [lang, setLang] = useState(null);
+    const [peers, setPeers] = useState([]);
     const [output, setOutput] = useState({ stdout: "", stderr: "", compile_output: "", status: null });
     const [running, setRunning] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
     const userId = useMemo(() => "user-" + Math.floor(Math.random() * 100000), []);
 
+    useEffect(() => {
+        if (matchedLanguage) {
+            setLang(matchedLanguage);
+        } else {
+            setLang("JavaScript"); // Fallback if no language in URL
+        }
+    }, [matchedLanguage]);
+
     if (!sessionId) return <div style={{ padding: 16 }}>Missing sessionId in URL</div>;
+
+    // Don't render until language is set
+    if (!lang) return <div style={{ padding: 16 }}>Loading...</div>;
 
     async function onRun() {
         const ed = window.__monaco_editor__;
@@ -38,9 +55,49 @@ export default function CollabPage() {
         }
     }
 
+    async function onSubmit() {
+        const ed = window.__monaco_editor__;
+        const code = ed ? ed.getValue() : "";
+
+        if (!code.trim()) {
+            alert("Please write some code before submitting!");
+            return;
+        }
+
+        const confirmSubmit = window.confirm(
+            "Are you sure you want to submit? This will end the collaboration session and save your code."
+        );
+
+        if (!confirmSubmit) return;
+
+        setSubmitting(true);
+
+        try {
+            // submit the attempt to history service
+            await submitAttempt({
+                userId: userId,
+                questionId: questionId,
+                submissionCode: code
+            });
+
+            // terminate the session
+            await terminateSession(sessionId, getAccessTokenSilently);
+
+            alert("Code submitted successfully!");
+
+            navigate('/');
+
+        } catch (error) {
+            console.error("Submission error:", error);
+            alert(`Failed to submit: ${error.message}`);
+        } finally {
+            setSubmitting(false);
+        }
+    }
+
     return (
-        <div className="collab-page-layout" data-theme={theme}> 
-            {/* 1. Header */}
+        <div className="collab-page-layout" data-theme={theme}>
+            {/* Header */}
             <header className="collab-header">
                 <h2>Session: {sessionId}</h2>
                 <div className="avatars">
@@ -52,21 +109,12 @@ export default function CollabPage() {
                 </div>
             </header>
 
-            {/* 2. Toolbar for language/theme selection and Run */}
+            {/* Toolbar */}
             <div className="toolbar">
-                <select value={lang} onChange={(e) => setLang(e.target.value)}>
-                    <option value="javascript">JavaScript</option>
-                    <option value="typescript">TypeScript</option>
-                    <option value="python">Python</option>
-                    <option value="cpp">C++</option>
-                    <option value="java">Java</option>
-                </select>
-
                 <select value={theme} onChange={(e) => setTheme(e.target.value)}>
                     <option value="vs-dark">Dark</option>
-                    <option value="light">Light</option>
+                    <option value="vs">Light</option>
                 </select>
-
 
                 <button onClick={()=>{
                     const ed = window.__monaco_editor__;
@@ -76,21 +124,33 @@ export default function CollabPage() {
                 <button onClick={onRun} disabled={running}>
                     {running ? "Running..." : "Run"}
                 </button>
+
+                <button
+                    onClick={onSubmit}
+                    disabled={submitting}
+                    className="submit-button"
+                    style={{
+                        marginLeft: 'auto',
+                        background: '#28a745',
+                        color: 'white',
+                        fontWeight: 'bold'
+                    }}
+                >
+                    {submitting ? "Submitting..." : "Submit"}
+                </button>
             </div>
 
-            {/* 3. Main content */}
+            {/* Main content */}
             <main className="collab-main-content">
-                {/* Left panel: Question + Chat */}
                 <div className="left-panel-column">
                     <div className="question-panel-area">
-                        <QuestionPanel questionId={questionId} /> 
+                        <QuestionPanel questionId={questionId} />
                     </div>
                     <div className="chat-panel-area">
-                        <ChatPanel sessionId={sessionId} /> 
+                        <ChatPanel sessionId={sessionId} />
                     </div>
                 </div>
 
-                {/* Right panel: Collaborative editor */}
                 <div className="right-panel-column">
                     <CollabEditor
                         sessionId={sessionId}
@@ -102,16 +162,15 @@ export default function CollabPage() {
                 </div>
             </main>
 
-            {/* 4. Footer / status bar */}
             <footer className="statusbar">
                 <span className="status-item">User: {userId}</span>
-                <span className="status-item">Lang: {lang}</span>
+                <span className="status-item">Lang: {matchedLanguage || lang}</span>
                 <span className="status-item">Theme: {theme}</span>
                 <span id="cursor-pos" className="status-item"></span>
             </footer>
 
-            {/* 5. Output panel (execution results) */}
             <div className="output-panel">
+                {/* Output panel code remains the same */}
                 <div className="output-header">
                     <span>Execution result</span>
                     <span className="status-pill">

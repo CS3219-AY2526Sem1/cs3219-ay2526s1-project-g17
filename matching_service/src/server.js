@@ -27,6 +27,7 @@ const io = new Server(server, {
 
 export const redisRepository = await initializeRedis();
 
+// AI Generated Block =================
 console.log("=== Environment Configuration ===");
 console.log("NODE_ENV:", process.env.NODE_ENV || "not set");
 console.log("ENV:", process.env.ENV || "not set");
@@ -39,6 +40,7 @@ console.log(
 );
 console.log("ACCEPTANCE_TIMEOUT:", process.env.ACCEPTANCE_TIMEOUT || "not set");
 console.log("=====================================");
+//======================================
 
 try {
   // await redisRepository.flushAll();
@@ -66,6 +68,7 @@ export const matchingService = new MatchingService(
   matchedDetailsService,
   collaborationService
 );
+await matchingService.initializeSessionStreams();
 
 process.on("SIGINT", () => {
   server.close(async () => {
@@ -73,6 +76,7 @@ process.on("SIGINT", () => {
   });
 });
 
+// AI changed from ws to socket.io
 io.on("connection", (socket) => {
   const userId = Array.isArray(socket.handshake.query.userId)
     ? socket.handshake.query.userId[0]

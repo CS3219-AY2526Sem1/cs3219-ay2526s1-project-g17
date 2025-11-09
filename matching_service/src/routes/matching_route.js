@@ -1,8 +1,7 @@
 import express from "express";
 import { collaborationService, matchedDetailsService } from "../server.js";
-import axios from "axios";
-import { COLLABORATION_URL } from "../constants.js";
 import { verifyAccessToken } from "../middleware/basic_access_control.js";
+import { fetchExistingSession } from "../utility/utility.js";
 
 const router = express.Router();
 
@@ -21,44 +20,27 @@ router.delete("/endSession", async (req, res) => {
   }
 });
 
-/**
- * @param {string} sessionId
- */
-async function fetchSession(sessionId) {
-  try {
-    const url = `${COLLABORATION_URL}/sessions/${sessionId}`;
-    console.log(`GET ${url}`);
-    const res = await axios.get(url);
-    const data = res.data;
-    console.log("Session retrieved", data);
-    return data;
-  } catch (error) {
-    console.error("Failed to fetch session", error);
-    return null;
-  }
-}
-
 router.get("/initiateMatch", verifyAccessToken, async (req, res) => {
   const { userId } = req.query;
   try {
     const matchedDetails = await matchedDetailsService.getMatchedDetails(
       userId.toString()
     );
+    console.log("Matched details", matchedDetails);
     if (matchedDetails) {
       const collaborationSession =
         await collaborationService.getCollaborationSession(
           userId.toString(),
           matchedDetails.partner
         );
-      //TODO: Call collaboration service to check if there such session
-      const session = await fetchSession(collaborationSession.session);
 
       if (collaborationSession) {
-        console.log(
-          `Has existing session on matching service: ${collaborationSession.session}`
+        const session = await fetchExistingSession(
+          collaborationSession.sessionId
         );
-        if (session) {
-          console.log(`${collaborationSession.session} is still active`);
+        console.log("Session from collaboration service", session)
+        if (session && session.isActive) {
+          console.log(`${collaborationSession.sessionId} is still active`);
           res
             .status(200)
             .json({ code: "has-existing", session: collaborationSession });
@@ -67,6 +49,7 @@ router.get("/initiateMatch", verifyAccessToken, async (req, res) => {
             userId.toString(),
             matchedDetails.partner
           );
+          res.status(200).json({ code: "no-existing" });
         }
       } else {
         res.status(200).json({ code: "no-existing" });
@@ -75,7 +58,7 @@ router.get("/initiateMatch", verifyAccessToken, async (req, res) => {
       res.status(200).json({ code: "no-existing" });
     }
   } catch (error) {
-    console.error("Session close error", error);
+    console.error("Initiate match error", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 });

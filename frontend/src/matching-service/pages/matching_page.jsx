@@ -9,7 +9,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 import LoadingSpinner from "../../components/Loading/LoadingSpinner";
 import { MATCH_CANCELLED, MATCH_FOUND, MATCH_TIMEOUT, ACK } from "../constants";
 import { useNavigate } from "react-router";
-import { formSectionUrl, getRandomQuestion } from "../util";
+import { formSectionUrl } from "../util";
 
 export default function MatchingPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -27,12 +27,11 @@ export default function MatchingPage() {
       console.log("Match found:", message);
       setIsMatching(false);
       const session = message.session;
-      const sessionId = session.session;
-      const criteria = session.criteria;
+      const sessionId = session.sessionId;
+      const questionId = session.questionId;
+      const language = session.criteria.language;
 
-      // get question from question service
-      const questionId = await getRandomQuestion(criteria);
-      navigate(formSectionUrl(sessionId, questionId), {
+      navigate(formSectionUrl(sessionId, questionId, language), {
         state: {
           session: session,
           question: questionId,
@@ -95,7 +94,7 @@ export default function MatchingPage() {
     // Start the matching process
     setIsMatching(true);
 
-    // Close the dialog (this is already handled in the dialog component)
+    // Close the dialog
     setIsDialogOpen(false);
   };
 

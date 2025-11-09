@@ -3,6 +3,8 @@ import { configDotenv } from "dotenv";
 import { REDIS_URL } from "../server_config.js";
 import { createRedisClient, RedisRepository } from "./redis_repository.js";
 
+// AI generated file
+
 export async function initializeRedis() {
   configDotenv();
 

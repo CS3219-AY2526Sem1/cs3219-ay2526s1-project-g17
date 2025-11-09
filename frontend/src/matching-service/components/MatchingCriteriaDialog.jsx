@@ -9,7 +9,7 @@ import axios from "axios";
 import { useAuth0 } from "@auth0/auth0-react";
 import { MATCHING_SERVICE_URL, QUEUE_TIMEOUT } from "../constants";
 import { useNavigate } from "react-router";
-import { formSectionUrl, getRandomQuestion } from "../util";
+import { formSectionUrl } from "../util";
 
 /**
  * @typedef {import("../types").MatchRequest} MatchRequest
@@ -43,6 +43,19 @@ const MatchingCriteriaDialog = ({ isOpen, onClose, onSubmit }) => {
     "Rust",
   ];
   const difficulties = ["Beginner", "Intermediate", "Advanced"];
+
+  const normalizeLanguageId = (displayName) => {
+    const languageMap = {
+      'JavaScript': 'javascript',
+      'TypeScript': 'typescript',
+      'Python': 'python',
+      'Java': 'java',
+      'C++': 'cpp',
+      'Go': 'go',
+      'Rust': 'rust'
+    };
+    return languageMap[displayName] || displayName.toLowerCase();
+  };
 
   // Load topics when dialog opens
   useEffect(() => {
@@ -145,11 +158,10 @@ const MatchingCriteriaDialog = ({ isOpen, onClose, onSubmit }) => {
           {
             /** @type {import("../types").MatchExists} */
             data;
-            const sessionId = data.session.session;
-            const criteria = data.session.criteria;
-            // get question from question service
-            const questionId = await getRandomQuestion(criteria);
-            navigate(formSectionUrl(sessionId, questionId), {
+            const sessionId = data.session.sessionId;
+            const questionId = data.session.questionId;
+            const language = data.session.criteria.language;
+            navigate(formSectionUrl(sessionId, questionId, language), {
               state: {
                 session: data.session,
                 question: questionId,
@@ -165,7 +177,7 @@ const MatchingCriteriaDialog = ({ isOpen, onClose, onSubmit }) => {
               type: "match-request",
               criterias: selectedTopics.map((topic) => ({
                 difficulty,
-                language,
+                language: normalizeLanguageId(language),
                 topic,
               })),
             };

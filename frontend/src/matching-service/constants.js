@@ -5,16 +5,7 @@ export const MATCH_TIMEOUT = "match-timeout";
 export const MATCH_CANCELLED = "match-cancel";
 export const ACK = "ack";
 export const ENV = import.meta.env.VITE_ENV;
-// export const MATCHING_SERVICE_URL =
-//   ENV === "PROD"
-//     ? "https://matching-service-226307456137.asia-southeast1.run.app"
-//     : "http://localhost:3001";
-// export const QUESTION_SERVICE_URL =
-//   ENV === "PROD"
-//     ? "https://question-service-226307456137.asia-southeast1.run.app"
-//     : "http://localhost:5001";
 export const MATCHING_SERVICE_URL =
-  "https://matching-service-226307456137.asia-southeast1.run.app";
-
+  import.meta.env.VITE_MATCHING_SERVICE_BASE || "http://localhost:3001";
 export const QUESTION_SERVICE_URL =
-  "https://question-service-226307456137.asia-southeast1.run.app";
+  import.meta.env.VITE_QUESTION_SERVICE_BASE || "http://localhost:5001/api/questions";
