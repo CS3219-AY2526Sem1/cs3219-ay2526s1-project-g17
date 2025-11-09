@@ -9,7 +9,7 @@ import { submitAttempt, terminateSession } from "./SubmissionClient";
 import "./collab.css";
 
 export default function CollabPage() {
-    const { user } = useAuth0();
+    const { user, isLoading } = useAuth0();
     const navigate = useNavigate();
     const location = useLocation();
     const { sessionId } = useParams();
@@ -24,17 +24,19 @@ export default function CollabPage() {
     const [submitting, setSubmitting] = useState(false);
     const userId = user?.sub;
 
+
+    // Wait for user and language
     useEffect(() => {
         if (matchedLanguage) {
-            setLang(matchedLanguage);
+        setLang(matchedLanguage);
         } else {
-            setLang("JavaScript"); // Fallback if no language in URL
+        setLang("JavaScript"); // fallback
         }
     }, [matchedLanguage]);
 
+    if (isLoading) return <div style={{ padding: 16 }}>Loading user info...</div>;
+    if (!user) return <div style={{ padding: 16 }}>User not authenticated</div>;
     if (!sessionId) return <div style={{ padding: 16 }}>Missing sessionId in URL</div>;
-
-    // Don't render until language is set
     if (!lang) return <div style={{ padding: 16 }}>Loading...</div>;
 
     async function onRun() {
