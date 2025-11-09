@@ -44,6 +44,19 @@ const MatchingCriteriaDialog = ({ isOpen, onClose, onSubmit }) => {
   ];
   const difficulties = ["Beginner", "Intermediate", "Advanced"];
 
+  const normalizeLanguageId = (displayName) => {
+    const languageMap = {
+      'JavaScript': 'javascript',
+      'TypeScript': 'typescript',
+      'Python': 'python',
+      'Java': 'java',
+      'C++': 'cpp',
+      'Go': 'go',
+      'Rust': 'rust'
+    };
+    return languageMap[displayName] || displayName.toLowerCase();
+  };
+
   // Load topics when dialog opens
   useEffect(() => {
     if (isOpen) {
@@ -164,7 +177,7 @@ const MatchingCriteriaDialog = ({ isOpen, onClose, onSubmit }) => {
               type: "match-request",
               criterias: selectedTopics.map((topic) => ({
                 difficulty,
-                language,
+                language: normalizeLanguageId(language),
                 topic,
               })),
             };
