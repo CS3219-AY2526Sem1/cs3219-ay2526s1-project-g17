@@ -29,8 +29,9 @@ export default function MatchingPage() {
       const session = message.session;
       const sessionId = session.sessionId;
       const questionId = session.questionId;
+      const language = session.criteria.language;
 
-      navigate(formSectionUrl(sessionId, questionId), {
+      navigate(formSectionUrl(sessionId, questionId, language), {
         state: {
           session: session,
           question: questionId,
