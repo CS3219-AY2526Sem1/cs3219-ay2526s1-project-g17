@@ -1,5 +1,5 @@
 import { useParams, useLocation, useNavigate } from "react-router-dom";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import {useAuth0} from "@auth0/auth0-react";
 import CollabEditor from "./CollabEditor";
 import QuestionPanel from "./QuestionPanel";
@@ -22,6 +22,12 @@ export default function CollabPage() {
     const [running, setRunning] = useState(false);
     const [submitting, setSubmitting] = useState(false);
     const userId = useMemo(() => "user-" + Math.floor(Math.random() * 100000), []);
+
+    useEffect(() => {
+        if (matchedLanguage) {
+            setLang(matchedLanguage);
+        }
+    }, [matchedLanguage]);
 
     if (!sessionId) return <div style={{ padding: 16 }}>Missing sessionId in URL</div>;
 
@@ -100,14 +106,6 @@ export default function CollabPage() {
 
             {/* Toolbar */}
             <div className="toolbar">
-                <select value={lang} onChange={(e) => setLang(e.target.value)}>
-                    <option value="javascript">JavaScript</option>
-                    <option value="typescript">TypeScript</option>
-                    <option value="python">Python</option>
-                    <option value="cpp">C++</option>
-                    <option value="java">Java</option>
-                </select>
-
                 <select value={theme} onChange={(e) => setTheme(e.target.value)}>
                     <option value="vs-dark">Dark</option>
                     <option value="vs">Light</option>
@@ -161,7 +159,7 @@ export default function CollabPage() {
 
             <footer className="statusbar">
                 <span className="status-item">User: {userId}</span>
-                <span className="status-item">Lang: {lang}</span>
+                <span className="status-item">Lang: {matchedLanguage || lang}</span>
                 <span className="status-item">Theme: {theme}</span>
                 <span id="cursor-pos" className="status-item"></span>
             </footer>
