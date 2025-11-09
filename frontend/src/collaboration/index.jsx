@@ -16,7 +16,7 @@ export default function CollabPage() {
     const matchedLanguage = new URLSearchParams(location.search).get('language');
     const { getAccessTokenSilently } = useAuth0();
     const [theme, setTheme] = useState("vs-dark");
-    const [lang, setLang] = useState(matchedLanguage || "javascript");
+    const [lang, setLang] = useState(null);
     const [peers, setPeers] = useState([]);
     const [output, setOutput] = useState({ stdout: "", stderr: "", compile_output: "", status: null });
     const [running, setRunning] = useState(false);
@@ -26,10 +26,15 @@ export default function CollabPage() {
     useEffect(() => {
         if (matchedLanguage) {
             setLang(matchedLanguage);
+        } else {
+            setLang("JavaScript"); // Fallback if no language in URL
         }
     }, [matchedLanguage]);
 
     if (!sessionId) return <div style={{ padding: 16 }}>Missing sessionId in URL</div>;
+
+    // Don't render until language is set
+    if (!lang) return <div style={{ padding: 16 }}>Loading...</div>;
 
     async function onRun() {
         const ed = window.__monaco_editor__;
