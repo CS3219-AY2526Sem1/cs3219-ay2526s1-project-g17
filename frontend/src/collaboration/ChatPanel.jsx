@@ -22,7 +22,7 @@ export default function ChatPanel({ sessionId, userId }) {
     const SOCKET_IO_BASE = import.meta.env.VITE_SOCKET_IO_BASE || "http://127.0.0.1:3002";
     const socket = io(SOCKET_IO_BASE, { reconnection: true });
     socketRef.current = socket;
-
+    window.__collab_socket__ = socket;
 
     socket.on("connect", () => {
         console.log("Connected to Socket.IO server");
@@ -54,6 +54,47 @@ export default function ChatPanel({ sessionId, userId }) {
       console.log('New message received:', msg);
       setMessages(prev => [...prev, msg]);
     });
+
+      //  Handle submission notifications
+      socket.on("alreadySubmitted", () => {
+          console.log('⚠️ You have already submitted. Editor is read-only.');
+          const editor = window.__monaco_editor__;
+          if (editor) {
+              editor.updateOptions({ readOnly: true });
+          }
+
+          const submitBtn = document.querySelector('.submit-button');
+          if (submitBtn) {
+              submitBtn.textContent = 'Already Submitted';
+              submitBtn.disabled = true;
+              submitBtn.style.background = '#6c757d';
+          }
+
+          alert('You have already submitted. Your editor is read-only. Click "Leave Session" to exit.');
+      });
+
+      socket.on("partnerSubmitted", ({ userId: submittedUserId }) => {
+          if (submittedUserId === userId) {
+              return;
+          }
+
+          // Partner submitted - show notification
+          setTimeout(() => {
+              const choice = window.confirm(
+                  `Your partner has submitted their solution!\n\n` +
+                  `What would you like to do?\n\n` +
+                  `Click OK to SUBMIT your code now\n` +
+                  `Click Cancel to CONTINUE WORKING`
+              );
+
+              if (choice) {
+                  const submitBtn = document.querySelector('.submit-button');
+                  if (submitBtn && !submitBtn.disabled) {
+                      submitBtn.click();
+                  }
+              }
+          }, 500);
+      });
 
     return () => {
       socket.disconnect();

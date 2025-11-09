@@ -12,6 +12,7 @@ const sessionSchema = new mongoose.Schema({
   users: [String],
   questionId: String,
   activeUsers: [String],
+  submittedUsers: [String],
   chatHistory: [messageSchema],
   isActive: Boolean,
   createdAt: Date,
