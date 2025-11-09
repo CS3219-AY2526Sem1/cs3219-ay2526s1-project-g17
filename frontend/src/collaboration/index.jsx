@@ -9,6 +9,7 @@ import { submitAttempt, terminateSession } from "./SubmissionClient";
 import "./collab.css";
 
 export default function CollabPage() {
+    const { user } = useAuth0();
     const navigate = useNavigate();
     const location = useLocation();
     const { sessionId } = useParams();
@@ -21,7 +22,7 @@ export default function CollabPage() {
     const [output, setOutput] = useState({ stdout: "", stderr: "", compile_output: "", status: null });
     const [running, setRunning] = useState(false);
     const [submitting, setSubmitting] = useState(false);
-    const userId = useMemo(() => "user-" + Math.floor(Math.random() * 100000), []);
+    const userId = user?.sub;
 
     useEffect(() => {
         if (matchedLanguage) {
@@ -147,7 +148,7 @@ export default function CollabPage() {
                         <QuestionPanel questionId={questionId} />
                     </div>
                     <div className="chat-panel-area">
-                        <ChatPanel sessionId={sessionId} />
+                        <ChatPanel sessionId={sessionId} userId={userId} />
                     </div>
                 </div>
 

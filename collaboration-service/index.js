@@ -180,10 +180,6 @@ let history = []; // Declared in the outer scope, as fixed before
         return;
     }
 
-
-    // Just emit locally for immediate response (optional)
-    socket.emit('receiveMessage', payload);
-
     // Check for AI trigger words
     if (message.includes('@gemini ')) {
       try {
