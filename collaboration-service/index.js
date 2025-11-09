@@ -66,6 +66,11 @@ io.on('connection', (socket) => {
         session.activeUsers.push(userId);
         await session.save();
       }
+
+      // Send submission status
+      if (session.submittedUsers && session.submittedUsers.includes(userId)) {
+        socket.emit('alreadySubmitted', { userId });
+      }
       
       // 💥 LOAD AND SEND CHAT HISTORY 💥
       if (session && session.chatHistory) {
@@ -224,6 +229,32 @@ let history = []; // Declared in the outer scope, as fixed before
       } catch (error) {
         console.error('Error generating AI response:', error);
       }
+    }
+  });
+
+  socket.on('userSubmitted', async ({ sessionId, userId }) => {
+    try {
+      const session = await Session.findOne({ sessionId });
+      if (!session) return;
+
+      if (!session.submittedUsers) {
+        session.submittedUsers = [];
+      }
+
+      if (!session.submittedUsers.includes(userId)) {
+        session.submittedUsers.push(userId);
+        await session.save();
+      }
+
+      // Notify users in the session
+      io.to(sessionId).emit('partnerSubmitted', {
+        userId,
+        submittedUsers: session.submittedUsers
+      });
+
+      console.log(`User ${userId} submitted in session ${sessionId}`);
+    } catch (err) {
+      console.error('Error handling user submission:', err);
     }
   });
 

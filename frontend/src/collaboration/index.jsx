@@ -67,8 +67,14 @@ export default function CollabPage() {
             return;
         }
 
+        if (ed.getOptions().get(monaco.editor.EditorOption.readOnly)) {
+            alert("You have already submitted!");
+            return;
+        }
+
         const confirmSubmit = window.confirm(
-            "Are you sure you want to submit? This will end the collaboration session and save your code."
+            "Are you sure you want to submit?\n\n" +
+            "Your editor will be frozen, but your partner can continue working."
         );
 
         if (!confirmSubmit) return;
@@ -83,10 +89,13 @@ export default function CollabPage() {
                 submissionCode: code
             });
 
-            // terminate the session
-            await terminateSession(sessionId, getAccessTokenSilently);
+            const socket = window.__collab_socket__;
+            if (socket && socket.connected) {
+                socket.emit('userSubmitted', { sessionId, userId });
+            }
 
-            alert("Code submitted successfully!");
+            // freeze user's editor
+            ed.updateOptions({ readOnly: true });
 
             navigate('/');
 
@@ -140,6 +149,22 @@ export default function CollabPage() {
                     }}
                 >
                     {submitting ? "Submitting..." : "Submit"}
+                </button>
+
+                <button
+                    onClick={() => {
+                        const confirm = window.confirm("Are you sure you want to leave this session?");
+                        if (confirm) {
+                            navigate('/');
+                        }
+                    }}
+                    style={{
+                        background: '#6c757d',
+                        color: 'white',
+                        fontWeight: 'bold'
+                    }}
+                >
+                    Leave Session
                 </button>
             </div>
 
