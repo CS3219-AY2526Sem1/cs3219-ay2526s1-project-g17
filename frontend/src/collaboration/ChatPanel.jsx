@@ -16,6 +16,8 @@ export default function ChatPanel({ sessionId, userId }) {
 
   // Connect to Socket.IO
   useEffect(() => {
+    if (!userId) return;
+
     // Connect to Socket.IO (for session management)
     const SOCKET_IO_BASE = import.meta.env.VITE_SOCKET_IO_BASE || "http://127.0.0.1:3002";
     const socket = io(SOCKET_IO_BASE, { reconnection: true });
@@ -65,7 +67,7 @@ const handleSubmit = (e) => {
   const socket = socketRef.current; // Get the persistent socket instance
 
   if (socket && socket.connected) {
-      socket.emit('sendMessage', { sessionId, message: input });
+      socket.emit('sendMessage', { sessionId, userId, message: input });
   } else {
       console.error("Socket is not connected. Message not sent.");
   }
