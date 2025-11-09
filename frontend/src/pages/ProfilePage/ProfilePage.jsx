@@ -120,16 +120,7 @@ export default function ProfilePage() {
               recent work.
             </p>
 
-            <dl className="profile-hero__meta">
-              <div>
-                <dt>Member since</dt>
-                <dd>
-                  {user.created_at
-                    ? new Date(user.created_at).toLocaleDateString()
-                    : "—"}
-                </dd>
-              </div>
-            </dl>
+            
           </div>
         </section>
         
