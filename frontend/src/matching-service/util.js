@@ -1,3 +1,3 @@
-export function formSectionUrl(sessionId, questionId) {
-    return `/collaboration/${sessionId}?questionId=${questionId}`
+export function formSectionUrl(sessionId, questionId, language) {
+    return `/collaboration/${sessionId}?questionId=${questionId}&language=${language}`;
 }

@@ -12,6 +12,25 @@ export default function CollabEditor({
     theme = "vs-dark",
     onAwareness = () => {},
 }) {
+    const MONACO_LANGUAGE_MAP = {
+        'javascript': 'javascript',
+        'JavaScript': 'javascript',
+        'typescript': 'typescript',
+        'TypeScript': 'typescript',
+        'python': 'python',
+        'Python': 'python',
+        'java': 'java',
+        'Java': 'java',
+        'c++': 'cpp',
+        'C++': 'cpp',
+        'cpp': 'cpp',
+        'go': 'go',
+        'Go': 'go',
+        'rust': 'rust',
+        'Rust': 'rust'
+    };
+    const monacoLanguage = MONACO_LANGUAGE_MAP[language] || 'javascript';
+
     const ydocRef = useRef(null);
     const providerRef = useRef(null);
     const bindingRef = useRef(null);
@@ -117,7 +136,7 @@ export default function CollabEditor({
             height="100%"
             width="100%"
             theme={theme}
-            defaultLanguage={language}
+            defaultLanguage={monacoLanguage}
             defaultValue={`// Welcome to PeerPrep collaboration\n// Session: ${sessionId}\n`}
             options={{
                 minimap: { enabled: true },

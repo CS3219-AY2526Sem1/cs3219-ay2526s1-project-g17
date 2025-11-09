@@ -147,7 +147,8 @@ const MatchingCriteriaDialog = ({ isOpen, onClose, onSubmit }) => {
             data;
             const sessionId = data.session.sessionId;
             const questionId = data.session.questionId;
-            navigate(formSectionUrl(sessionId, questionId), {
+            const language = data.session.criteria.language;
+            navigate(formSectionUrl(sessionId, questionId, language), {
               state: {
                 session: data.session,
                 question: questionId,

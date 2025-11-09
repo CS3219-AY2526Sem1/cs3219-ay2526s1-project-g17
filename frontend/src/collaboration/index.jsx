@@ -13,9 +13,10 @@ export default function CollabPage() {
     const location = useLocation();
     const { sessionId } = useParams();
     const questionId = new URLSearchParams(location.search).get('questionId');
+    const matchedLanguage = new URLSearchParams(location.search).get('language');
     const { getAccessTokenSilently } = useAuth0();
     const [theme, setTheme] = useState("vs-dark");
-    const [lang, setLang] = useState("javascript");
+    const [lang, setLang] = useState(matchedLanguage || "javascript");
     const [peers, setPeers] = useState([]);
     const [output, setOutput] = useState({ stdout: "", stderr: "", compile_output: "", status: null });
     const [running, setRunning] = useState(false);
