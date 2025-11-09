@@ -125,7 +125,7 @@ export default function ProfilePage() {
                 <dt>Member since</dt>
                 <dd>
                   {user.updated_at
-                    ? new Date(user.updated_at).toLocaleDateString()
+                    ? new Date(user.created_at).toLocaleDateString()
                     : "—"}
                 </dd>
               </div>
