@@ -21,6 +21,10 @@ This design ensures:
 - ✅ **Scalable separation** of sync vs. app logic
 
 ---
+## Architecture Diagram
+
+![Architecture Daigram](collaboration-service%20architecture%20diagram.png)
+---
 
 ## Sequence Diagram: Peer Interaction Flow
 
