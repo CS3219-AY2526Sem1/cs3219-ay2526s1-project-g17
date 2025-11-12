@@ -99,4 +99,11 @@ Set up environment variables for each service. Refer to the respective `README.m
 For a fast, complete setup, use Docker Compose to spin up all services and databases:
 
 ```bash
-docker-compose up --build
+docker compose up --build -d
+```
+
+To stop running all containers:
+
+```bash
+docker compose down
+```
