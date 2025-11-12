@@ -6,7 +6,6 @@ import { Server as SocketIOServer } from 'socket.io';
 import { MongodbPersistence } from 'y-mongodb';
 import app from './server.js';
 import Session from './model/session-model.js';
-import { LeveldbPersistence } from 'y-leveldb';
 import { GoogleGenAI } from "@google/genai";
 
 
@@ -22,13 +21,6 @@ const SESSION_GRACE_PERIOD = 30_000; // 30 seconds grace before ending session
 
 
 const server = http.createServer(app);
-
-// const ydoc = new Y.Doc()
-// ydoc.getArray('arr').insert(0, [1, 2, 3])
-// ydoc.getArray('arr').toArray() // => [1, 2, 3]
-
-// // store document updates retrieved from other clients
-// ldbPersistence.storeUpdate('test-session', Y.encodeStateAsUpdate(ydoc));
 
 // ====== 1. Socket.IO for session & presence logic ======
 const io = new SocketIOServer(server, {
@@ -50,9 +42,6 @@ io.on('connection', (socket) => {
     socket.data.sessionId = sessionId;
     socket.data.userId = userId;
     
-    // const ydoc = await getSessionYDoc(sessionId);
-    // socket.emit('initialDoc', Y.encodeStateAsUpdate(ydoc));
-
     const session = await Session.findOne({ sessionId });
       // Only allow if user is in the authorized list
       if (!session.users.includes(userId)){
@@ -282,7 +271,7 @@ socket.on('disconnect', async () => {
   await session.save();
 
   console.log(`User ${userId} disconnected from session ${sessionId}`);
-  console.log(`👥 Active users for ${sessionId}:`, session.activeUsers);
+  console.log(`Active users for ${sessionId}:`, session.activeUsers);
 
   // If session still has active users, do nothing
   if (session.activeUsers.length > 0) return;
@@ -330,7 +319,7 @@ socket.on('disconnect', async () => {
         io.in(sessionId).socketsLeave(sessionId);
         
         endSession(checkSession.users[0], checkSession.users[1]);
-        console.log(`🕒 Session ${sessionId} terminated after grace period.`);
+        console.log(`Session ${sessionId} terminated after grace period.`);
 
       }
     } catch (err) {
