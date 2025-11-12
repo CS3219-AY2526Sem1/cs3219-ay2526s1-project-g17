@@ -2,6 +2,13 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import LoadingSpinner from "../../../components/Loading/LoadingSpinner.jsx";
 
+// AI Assistance Disclosure:
+// Tool: ChatGPT (model: GPT‑5 Thinking), date: 30-10-2025
+// Scope: Wrote for me a useEffect with an asynchronous function to load the questions
+// Author review: Simplified the function / trimmed some lines, changed API calls to work with deployment, and changed dependency array
+// and then erified correctness on local and cloud deployment
+
+
 const QUESTION_SERVICE_BASE =
   import.meta.env.VITE_QUESTION_SERVICE_BASE ||
   "http://localhost:5001/api/questions";

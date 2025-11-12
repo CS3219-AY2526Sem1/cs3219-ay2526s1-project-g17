@@ -224,6 +224,21 @@ Appended my own test cases using the same format that was provided by Copilot on
 
 # History Service
 
+##### Date/Time:
+2025-10-30 (30 Oct)
+##### Tool:
+ChatGPT (GPT-5 Thinking)
+##### Prompt/Command:
+Asked ChatGPT to write unit tests for the routes in the history controller, and another separate test to make sure that the auth0 environment variables are being read properly since this was coming up as an error sometimes.
+##### Output Summary:
+It wrote the unit tests
+##### Action Taken:
+- [ ] Accepted as-is
+- [x] Modified
+- [ ] Rejected
+##### Author Notes:
+For many of the tests, had to modify the details of the test itself, for example by changing the body of the request to match what the actual request body looks like and had to append code to some tests to include checks for the correct error code and message. 
+
 # Execution Service
 ##### Date/Time:
 2025-10
@@ -317,3 +332,51 @@ editor.onDidChangeCursorPosition((e) => {
 - [ ] Rejected
 ##### Author Notes:
 Coded the first few lines. Was just missing the last line for it to work.
+
+
+##### Date/Time:
+2025-10-30 (30 Oct)
+##### Tool:
+ChatGPT (GPT-5 Thinking)
+##### Prompt/Command:
+Asked chatGPT to implement a memoised function / react hook to fetch the history in attempt to try to speed up the frontend profile page
+##### Output Summary:
+Gave me a useMemo and useCallback hook which I had to modify to call the correct backend service, and had to fix the dependency array to make it actually work and fix the trycatch error block to catch the correct error.
+##### Action Taken:
+- [ ] Accepted as-is
+- [x] Modified
+- [ ] Rejected
+##### Author Notes:
+Was initially not functioning properly and so the trycatch error block had to be manually added and corrected, and the dependency array and the actual API calls had to be modified for it to work properly. 
+
+##### Date/Time:
+2025-10-30 (30 Oct)
+##### Tool:
+ChatGPT (GPT-5 Thinking)
+##### Prompt/Command:
+Asked ChatGPT to write s useEffect hook to load the questions, given the props that I had selected to pass to the component. 
+##### Output Summary:
+Gave me a useEffect with an asynchronous function to load the questions
+##### Action Taken:
+- [ ] Accepted as-is
+- [x] Modified
+- [ ] Rejected
+##### Author Notes:
+The initial was a little bit more complicated then necessary so cut down some lines of code, and changed some of the API calls to work with the deployment and then changed the dependency array to match the changes. Verified correctness later by testing the frontend manually with different situations on both local and cloud deployment
+---
+
+##### Date/Time:
+2025-11
+##### Tool:
+Chatgpt
+##### Prompt/Command:
+Asked ai to write documentations
+##### Output Summary:
+Documentations
+##### Action Taken:
+- [ ] Accepted as-is
+- [x] Modified
+- [ ] Rejected
+##### Author Notes:
+Asked the chatgpt to come up with the documentation based on the codes and the chart we came up with. ChatGPT's answers are modified to correct its mistakes. Any outdated answer are discarded.
+---
