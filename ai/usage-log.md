@@ -35,6 +35,23 @@ The skeleton is not useful. Have to make changes to fix my project's needs. For 
 # Matching service
 
 ##### Date/Time:
+2025-11-07
+##### Tool:
+GitHub Copilot claude sonnet 4
+##### Prompt/Command:
+Asked copilot to generate the api and readme documentation.
+##### Output Summary:
+Created a draft the of documentation.
+##### Action Taken:
+- [ ] Accepted as-is
+- [x] Modified
+- [ ] Rejected
+##### Author Notes:
+Have modified and removed siginificant portion of the content which are unnecessary. Added some diagram and links into the documentation.
+
+---
+
+##### Date/Time:
 2025-09-01 to 2025-11-05
 ##### Tool:
 GitHub Copilot claude sonnet 4
