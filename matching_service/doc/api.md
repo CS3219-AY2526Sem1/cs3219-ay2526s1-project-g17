@@ -1,4 +1,5 @@
 # Matching Service API Documentation
+> **Note**: This documentation was partially generated with AI.
 
 ## Overview
 

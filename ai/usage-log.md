@@ -35,6 +35,23 @@ The skeleton is not useful. Have to make changes to fix my project's needs. For 
 # Matching service
 
 ##### Date/Time:
+2025-11-07
+##### Tool:
+GitHub Copilot claude sonnet 4
+##### Prompt/Command:
+Asked copilot to generate the api and readme documentation.
+##### Output Summary:
+Created a draft the of documentation.
+##### Action Taken:
+- [ ] Accepted as-is
+- [x] Modified
+- [ ] Rejected
+##### Author Notes:
+Have modified and removed siginificant portion of the content which are unnecessary. Added some diagram and links into the documentation.
+
+---
+
+##### Date/Time:
 2025-09-01 to 2025-11-05
 ##### Tool:
 GitHub Copilot claude sonnet 4
@@ -223,6 +240,37 @@ It wrote the unit tests
 For many of the tests, had to modify the details of the test itself, for example by changing the body of the request to match what the actual request body looks like and had to append code to some tests to include checks for the correct error code and message. 
 
 # Execution Service
+##### Date/Time:
+2025-10
+##### Tool:
+Claude Sonnet 4
+##### Prompt/Command:
+Prompted it to create a template of testcases for execution service
+##### Output Summary:
+Created connectivity tests, submission tests, error response tests
+##### Action Taken:
+- [ ] Accepted as-is
+- [x] Modified
+- [ ] Rejected
+##### Author Notes:
+Edited and changed the variables I wanted to test. Also, added API fallback logic tests.
+
+---
+
+##### Date/Time:
+2025-10
+##### Tool:
+Claude Sonnet 4
+##### Prompt/Command:
+Pasted my then functions for code validation. And asked it to improve it.
+##### Output Summary:
+In ./middleware/validation.js
+##### Action Taken:
+- [x] Accepted as-is
+- [ ] Modified
+- [ ] Rejected
+##### Author Notes:
+Functions - validate and validateFields. The rest are self-coded.
 
 # Frontend
 ##### Date/Time:
@@ -241,32 +289,46 @@ Created a working UI for matching criteria selection dialog and timer. But the c
 Only the css and design is kept as it is.
 The some UI logic and communication with the backend servers have to be manually added.
 
-##### Date/Time:
-2025-10-30 (30 Oct)
-##### Tool:
-ChatGPT (GPT-5 Thinking)
-##### Prompt/Command:
-Asked chatGPT to implement a memoised function / react hook to fetch the history in attempt to try to speed up the frontend profile page
-##### Output Summary:
-Gave me a useMemo and useCallback hook which I had to modify to call the correct backend service, and had to fix the dependency array to make it actually work and fix the trycatch error block to catch the correct error.
-##### Action Taken:
-- [ ] Accepted as-is
-- [x] Modified
-- [ ] Rejected
-##### Author Notes:
-Was initially not functioning properly and so the trycatch error block had to be manually corrected, and the dependency array and the actual API calls had to be modified for it to work properly. 
+---
 
 ##### Date/Time:
-2025-10-30 (30 Oct)
+2025-09 to 2025-10
 ##### Tool:
-ChatGPT (GPT-5 Thinking)
+Claude Sonnet 4
 ##### Prompt/Command:
-Asked ChatGPT to write s useEffect hook to load the questions, given the props that I had selected to pass to the component. 
+Prompted it to create code output boxes.
 ##### Output Summary:
-Gave me a useEffect with an asynchronous function to load the questions
+Created a dull UI of it.
 ##### Action Taken:
 - [ ] Accepted as-is
 - [x] Modified
 - [ ] Rejected
 ##### Author Notes:
-The initial was a little bit more complicated then necessary so cut down some lines of code, and changed some of the API calls to work with the deployment and then changed the dependency array to match the changes. Verified correctness later by testing the frontend manually with different situations on both local and cloud deployment
+Only the CSS and design is kept as it is. Logic, font, colours are changed to match other elements.
+
+---
+
+##### Date/Time:
+2025-10
+##### Tool:
+Claude Sonnet 4
+##### Prompt/Command:
+Asked how I should track cursor position. 
+
+editor.onDidChangeCursorPosition((e) => {
+    const pos = e.position;
+    const el = document.getElementById("cursor-pos");
+});
+##### Output Summary:
+// Cursor position tracking
+editor.onDidChangeCursorPosition((e) => {
+    const pos = e.position;
+    const el = document.getElementById("cursor-pos");
+    if (el) el.textContent = `Ln ${pos.lineNumber}, Col ${pos.column}`; // missing this line
+});
+##### Action Taken:
+- [x] Accepted as-is
+- [ ] Modified
+- [ ] Rejected
+##### Author Notes:
+Coded the first few lines. Was just missing the last line for it to work.

@@ -2,6 +2,9 @@
 
 This microservice provides real-time collaborative coding sessions for matched users on PeerPrep.
 
+## Architecture
+- For detailed architecture information, see [Architecture Documentation](collaboration-service.md).
+
 ## Features
 - Create, join, and terminate collaborative sessions
 - Real-time code editing (via Socket.io)
