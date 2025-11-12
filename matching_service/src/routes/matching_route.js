@@ -40,10 +40,15 @@ router.get("/initiateMatch", verifyAccessToken, async (req, res) => {
         );
         console.log("Session from collaboration service", session)
         if (session && session.isActive) {
-          console.log(`${collaborationSession.sessionId} is still active`);
-          res
-            .status(200)
-            .json({ code: "has-existing", session: collaborationSession });
+          if (session.submittedUsers && session.submittedUsers.includes(userId.toString())) {
+            console.log(`User ${userId} already submitted to session ${collaborationSession.sessionId}. Preventing rejoin.`);
+            res.status(200).json({ code: "no-existing" });
+          } else {
+            console.log(`${collaborationSession.sessionId} is still active`);
+            res
+                .status(200)
+                .json({ code: "has-existing", session: collaborationSession });
+          }
         } else {
           await collaborationService.deleteCollaborationSession(
             userId.toString(),
