@@ -1,6 +1,7 @@
 # Execution Service
 
-This microservice is responsible for executing user-submitted code within Peerprep platform.
+The Execution Service is a microservice responsible for executing code submissions in multiple programming languages. 
+It provides a secure, isolated environment for running user code, supporting both self-hosted Judge0 and RapidAPI fallback.
 
 ## Quick Start
 ### 1. Install dependencies:
@@ -31,7 +32,8 @@ You should see:
 Copy `.env.example` to `.env` and fill in your Judge0 URLs:
 
 ### Required Configuration
-* `SELF_JUDGE0_URL`: Your self-hosted Judge0 instance URL (e.g., http://localhost:2358)
+* `SELF_JUDGE0_URL`: Your self-hosted Judge0 instance URL (e.g., http://localhost:2358).
+  Refer to https://ce.judge0.com/ for more information on how to self-host it. Otherwise, you can use the API version.
 
 ### Optional Configuration
 **RapidAPI Fallback:**
