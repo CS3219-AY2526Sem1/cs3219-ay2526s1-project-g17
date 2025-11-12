@@ -1,11 +1,15 @@
 [
   {
     "title": "Reverse a String",
-    "question": "Write a function that reverses a string. The input string is given as an array of characters s. You must do this by modifying the input array in-place with O(1) extra memory.",
+    "question": "Write a function that reverses a string. The input string s is given as an array of characters. You must do this by modifying the input array in-place with O(1) extra memory.",
     "difficulty": "Beginner",
     "topics": [
       "Strings",
       "Algorithms"
+    ],
+    "testCases": [
+      "Input: s = [\"h\",\"e\",\"l\",\"l\",\"o\"], Output: [\"o\",\"l\",\"l\",\"e\",\"h\"]",
+      "Input: s = [\"H\",\"a\",\"n\",\"n\",\"a\",\"h\"], Output: [\"h\",\"a\",\"n\",\"n\",\"a\",\"H\"]"
     ]
   },
   {
@@ -15,6 +19,11 @@
     "topics": [
       "Data Structures",
       "Algorithms"
+    ],
+    "testCases": [
+      "Input: head = [3,2,0,-4], pos = 1, Output: true",
+      "Input: head = [1,2], pos = -1, Output: false",
+      "Input: head = [1], pos = 0, Output: true"
     ]
   },
   {
@@ -23,6 +32,11 @@
     "difficulty": "Beginner",
     "topics": [
       "Algorithms"
+    ],
+    "testCases": [
+      "Input: s = \"III\", Output: 3",
+      "Input: s = \"LVIII\", Output: 58",
+      "Input: s = \"MCMXCIV\", Output: 1994"
     ]
   },
   {
@@ -32,15 +46,24 @@
     "topics": [
       "Bit Manipulation",
       "Algorithms"
+    ],
+    "testCases": [
+      "Input: a = \"11\", b = \"1\", Output: \"100\"",
+      "Input: a = \"1010\", b = \"1011\", Output: \"10101\""
     ]
   },
   {
     "title": "Fibonacci Number",
-    "question": "The Fibonacci numbers, commonly denoted F(n) form a sequence, called the Fibonacci sequence, such that each number is the sum of the two preceding ones, starting from 0 and 1. That is, F(0) = 0, F(1) = 1, F(n) = F(n - 1) + F(n - 2), for n > 1. Given n, calculate F(n).",
+    "question": "The Fibonacci numbers, commonly denoted F(n) form a sequence, called the Fibonacci sequence, such that each number is the sum of the two preceding ones, starting from 0 and 1. That is, F(0) = 0, F(1) = 1, F(n) = F(n - 1) + F(n - 2), for n > 1. Given any n, calculate F(n).",
     "difficulty": "Beginner",
     "topics": [
       "Recursion",
       "Algorithms"
+    ],
+    "testCases": [
+      "Input: n = 2, Output: 1",
+      "Input: n = 3, Output: 2",
+      "Input: n = 4, Output: 3"
     ]
   },
   {
@@ -52,20 +75,16 @@
     ]
   },
   {
-    "title": "Combine Two Tables",
-    "question": "Given table Person and table Address, write a solution to report the first name, last name, city, and state of each person in the Person table. If the address of a person is not present in the Address table, report null instead.",
-    "difficulty": "Beginner",
-    "topics": [
-      "Databases"
-    ]
-  },
-  {
     "title": "Repeated DNA Sequences",
-    "question": "Given a string s that represents a DNA sequence, return all the 10-letter-long sequences (substrings) that occur more than once in a DNA molecule. You may return the answer in any order.",
+    "question": "Given a string that represents a DNA sequence, return all the 10-letter-long sequences (substrings) that occur more than once in a DNA molecule. You may return the answer in any order.",
     "difficulty": "Intermediate",
     "topics": [
       "Algorithms",
       "Bit Manipulation"
+    ],
+    "testCases": [
+      "Input: s = \"AAAAACCCCCAAAAACCCCCCAAAAAGGGTTT\", Output: [\"AAAAACCCCC\", \"CCCCCAAAAA\"]",
+      "Input: s = \"AAAAAAAAAAAAA\", Output: [\"AAAAAAAAAA\"]"
     ]
   },
   {
@@ -75,6 +94,10 @@
     "topics": [
       "Data Structures",
       "Algorithms"
+    ],
+    "testCases": [
+      "Input: numCourses = 2, prerequisites = [1,0], Output: true",
+      "Input: numCourses = 2, prerequisites = [0,1], Output: false"
     ]
   },
   {
@@ -83,6 +106,9 @@
     "difficulty": "Intermediate",
     "topics": [
       "Data Structures"
+    ],
+    "testCases": [
+      "Input: [\"LRUCache\", \"put\", \"put\", \"get\", \"put\", \"get\", \"put\", \"get\", \"get\", \"get\"], [[2], [1, 1], [2, 2], [1], [3, 3], [2], [4, 4], [1], [3], [4]], Output: [null, null, null, 1, null, -1, null, -1, 3, 4]"
     ]
   },
   {
@@ -92,6 +118,10 @@
     "topics": [
       "Strings",
       "Algorithms"
+    ],
+    "testCases": [
+      "Input: text1 = \"abcde\", text2 = \"ace\", Output: 3",
+      "Input: text1 = \"abc\", text2 = \"def\", Output: 0"
     ]
   },
   {
@@ -101,6 +131,10 @@
     "topics": [
       "Arrays",
       "Algorithms"
+    ],
+    "testCases": [
+      "Input: matrix = [[1,2,3],[4,5,6],[7,8,9]], Output: [[7,4,1],[8,5,2],[9,6,3]]",
+      "Input: matrix = [[5,1,9,11],[2,4,8,10],[13,3,6,7],[15,14,12,16]], Output: [[15,13,2,5],[14,3,4,1],[12,6,8,9],[16,7,10,11]]"
     ]
   },
   {
@@ -109,6 +143,11 @@
     "difficulty": "Intermediate",
     "topics": [
       "Brainteaser"
+    ],
+    "testCases": [
+      "Input: n = 1, Output: 1.00",
+      "Input: n = 2, Output: 0.50",
+      "Input: n = 5, Output: 0.50"
     ]
   },
   {
@@ -127,6 +166,11 @@
     "topics": [
       "Arrays",
       "Algorithms"
+    ],
+    "testCases": [
+      "Input: nums = [1,3,-1,-3,5,3,6,7], k = 3, Output: [3,3,5,5,6,7]",
+      "Input: nums = [1], k = 1, Output: [1]",
+      "Input: nums = [1,-1], k = 1, Output: [1,-1]"
     ]
   },
   {
@@ -153,6 +197,12 @@
     "topics": [
       "Strings",
       "Algorithms"
+    ],
+    "testCases": [
+      "Input: s = \"aa\", p = \"*\", Output: true",
+      "Input: s = \"adceb\", p = \"*a*b\", Output: true",
+      "Input: s = \"acdcb\", p = \"a*c?b\", Output: false",
+      "Input: s = \"aa\", p = \"a\", Output: false"
     ]
   },
   {
@@ -161,14 +211,6 @@
     "difficulty": "Advanced",
     "topics": [
       "Brainteaser"
-    ]
-  },
-  {
-    "title": "Trips and Users",
-    "question": "Write a solution to find the cancellation rate of requests with unbanned users (both client and driver must not be banned) each day between \"2013-10-01\" and \"2013-10-03\". Round Cancellation Rate to two decimal points.",
-    "difficulty": "Advanced",
-    "topics": [
-      "Databases"
     ]
   },
   {
@@ -219,20 +261,6 @@
     "solution": "This problem can be solved recursively. The base case is when the root is null. Otherwise, swap the left and right children of the current node. Then, recursively call the invert function on the new left child (the original right child) and the new right child (the original left child). Return the root."
   },
   {
-    "title": "Employees Earning More Than Their Managers",
-    "question": "Write a solution to find the employees who earn more than their managers. The `Employee` table has columns `id`, `name`, `salary`, and `managerId`.",
-    "difficulty": "Beginner",
-    "topics": [
-      "Databases"
-    ],
-    "testCases": [
-      "Input: Employee table = {id: 1, name: 'Joe', salary: 70000, managerId: 3}, {id: 2, name: 'Henry', salary: 80000, managerId: 4}, {id: 3, name: 'Sam', salary: 60000, managerId: NULL}, {id: 4, name: 'Max', salary: 90000, managerId: NULL}. Output: 'Joe'"
-    ],
-    "constraints": "The `id` column is the primary key for this table. Each row of this table indicates the ID of an employee, their name, salary, and the ID of their manager.",
-    "hints": "You need to join the table with itself to compare an employee's salary with their manager's salary.",
-    "solution": "SELECT e1.name AS Employee FROM Employee e1 JOIN Employee e2 ON e1.managerId = e2.id WHERE e1.salary > e2.salary;"
-  },
-  {
     "title": "Water Bottles",
     "question": "There are `numBottles` water bottles that are initially full of water. You can exchange `numExchange` empty water bottles from the market with one full water bottle. The operation of drinking a full water bottle turns it into an empty bottle. Given the two integers `numBottles` and `numExchange`, return the maximum number of water bottles you can drink.",
     "difficulty": "Beginner",
@@ -278,20 +306,6 @@
     "constraints": "1 <= nums.length <= 6\n-10 <= nums[i] <= 10\nAll the integers of nums are unique.",
     "hints": "Use a backtracking approach. In the recursive function, iterate through the numbers. If a number hasn't been used yet, add it to the current permutation and make a recursive call. Remember to backtrack by removing the number afterward.",
     "solution": "A backtracking algorithm is suitable here. Define a recursive function `backtrack(current_permutation)`. The base case is when the length of `current_permutation` equals the length of `nums`, at which point you add a copy of it to the results. In the recursive step, loop through `nums`. If the current number is not already in `current_permutation`, add it, recurse with `backtrack(new_permutation)`, and then remove the number to backtrack for other possibilities."
-  },
-  {
-    "title": "Department Top Three Salaries",
-    "question": "A company's executives are interested in seeing who earns the most money in each of the company's departments. A high earner in a department is an employee who has a salary in the top three unique salaries for that department. Write a solution to find the employees who are high earners in each of their departments. The tables are `Employee` (`id`, `name`, `salary`, `departmentId`) and `Department` (`id`, `name`).",
-    "difficulty": "Advanced",
-    "topics": [
-      "Databases"
-    ],
-    "testCases": [
-      "See the problem link for detailed table examples."
-    ],
-    "constraints": "The `id` columns are primary keys. `Employee.departmentId` is a foreign key to `Department.id`.",
-    "hints": "You can use a window function like `DENSE_RANK()` to rank salaries within each department.",
-    "solution": "SELECT d.name AS Department, e.name AS Employee, e.salary AS Salary FROM Employee e JOIN Department d ON e.departmentId = d.id WHERE ( SELECT COUNT(DISTINCT e2.salary) FROM Employee e2 WHERE e2.salary > e.salary AND e2.departmentId = e.departmentId ) < 3;"
   },
   {
     "title": "Trapping Rain Water",
@@ -431,20 +445,6 @@
     "constraints": "1 <= n <= 45",
     "hints": "This problem is a classic dynamic programming problem. The number of ways to reach step n is the sum of ways to reach step n-1 and step n-2. This is the Fibonacci sequence.",
     "solution": "The number of ways to reach step `n`, `ways(n)`, is `ways(n-1) + ways(n-2)`. This is the same recurrence relation as the Fibonacci sequence. The base cases are `ways(1) = 1` and `ways(2) = 2`. You can solve this using dynamic programming with an array to store the results for each step from 1 to `n`, avoiding recomputation."
-  },
-  {
-    "title": "Delete Duplicate Emails",
-    "question": "Write a solution to delete all duplicate email entries in a table named Person, keeping only unique emails based on its smallest id. The table has columns id and email.",
-    "difficulty": "Beginner",
-    "topics": [
-      "Databases"
-    ],
-    "testCases": [
-      "Input: Person table = {{id: 1, email: 'john@example.com'}, {id: 2, email: 'bob@example.com'}, {id: 3, email: 'john@example.com'}}. Output: The table should be modified to {{id: 1, email: 'john@example.com'}, {id: 2, email: 'bob@example.com'}}."
-    ],
-    "constraints": "The id column is the primary key for this table.",
-    "hints": "Use a self-join to find rows that have the same email but a larger id.",
-    "solution": "DELETE p1 FROM Person p1, Person p2 WHERE p1.email = p2.email AND p1.id > p2.id;"
   },
   {
     "title": "Contains Duplicate",
@@ -617,48 +617,6 @@
     "solution": "Use a backtracking function `backtrack(start_number, current_combination)`. The base case is when `len(current_combination) == k`, at which point you add a copy to the results. In the recursive step, loop from `start_number` to `n`. In each iteration, add the current number `i` to the combination, make a recursive call `backtrack(i + 1, current_combination)`, and then remove `i` to backtrack."
   },
   {
-    "title": "Department Highest Salary",
-    "question": "Write a solution to find employees who have the highest salary in each of their departments. The tables are Employee (id, name, salary, departmentId) and Department (id, name).",
-    "difficulty": "Intermediate",
-    "topics": [
-      "Databases"
-    ],
-    "testCases": [
-      "See problem link for detailed examples."
-    ],
-    "constraints": "id columns are primary keys.",
-    "hints": "Find the maximum salary for each department first, then find the employees who match that department and salary.",
-    "solution": "SELECT d.name AS Department, e.name AS Employee, e.salary AS Salary FROM Employee e JOIN Department d ON e.departmentId = d.id WHERE (e.departmentId, e.salary) IN (SELECT departmentId, MAX(salary) FROM Employee GROUP BY departmentId);"
-  },
-  {
-    "title": "Consecutive Numbers",
-    "question": "Write a solution to find all numbers that appear at least three times consecutively in the Logs table. The table has columns id and num.",
-    "difficulty": "Intermediate",
-    "topics": [
-      "Databases"
-    ],
-    "testCases": [
-      "See problem link for detailed examples."
-    ],
-    "constraints": "id is the primary key.",
-    "hints": "You can use self-joins or window functions like LAG() or LEAD() to compare a row with its neighbors.",
-    "solution": "SELECT DISTINCT l1.num AS ConsecutiveNums FROM Logs l1 JOIN Logs l2 ON l1.id = l2.id - 1 JOIN Logs l3 ON l1.id = l3.id - 2 WHERE l1.num = l2.num AND l2.num = l3.num;"
-  },
-  {
-    "title": "Exchange Seats",
-    "question": "Write a solution to swap the seat id of every two consecutive students. If the number of students is odd, the id of the last student is not swapped. The table is Seat (id, student).",
-    "difficulty": "Intermediate",
-    "topics": [
-      "Databases"
-    ],
-    "testCases": [
-      "See problem link for detailed examples."
-    ],
-    "constraints": "id is the primary key.",
-    "hints": "Use a CASE statement to handle the logic for swapping. Consider the even and odd ids, and also the case of the last student if the total count is odd.",
-    "solution": "SELECT CASE WHEN MOD(id, 2) != 0 AND id = (SELECT COUNT(*) FROM Seat) THEN id WHEN MOD(id, 2) != 0 THEN id + 1 ELSE id - 1 END AS id, student FROM Seat ORDER BY id;"
-  },
-  {
     "title": "Bulb Switcher",
     "question": "There are n bulbs that are initially off. You first turn on all the bulbs. Then, you turn off every second bulb. On the third round, you toggle every third bulb (turning on if it's off or turning off if it's on). For the ith round, you toggle every ith bulb. For the nth round, you only toggle the last bulb. Return the number of bulbs that are on after n rounds.",
     "difficulty": "Intermediate",
@@ -682,8 +640,8 @@
       "Brainteaser"
     ],
     "testCases": [
-      "Input: hour = 12, minutes = 30, Output: 165",
-      "Input: hour = 3, minutes = 30, Output: 75"
+      "Input: hour = 12, minutes = 30, Output: 180",
+      "Input: hour = 3, minutes = 30, Output: 45"
     ],
     "constraints": "1 <= hour <= 12. 0 <= minutes <= 59.",
     "hints": "Calculate the position of the hour hand and the minute hand in degrees from the 12 o'clock position. The minute hand moves 6 degrees per minute. The hour hand moves 0.5 degrees per minute.",
@@ -795,7 +753,7 @@
   },
   {
     "title": "Counting Bits",
-    "question": "Given an integer n, return an array ans of length n + 1 such that for each i (0 <= i <= n), ans[i] is the number of 1's in the binary representation of i.",
+    "question": "Given an integer n, return an array (ans) of length n + 1 such that for each i (0 <= i <= n), ans[i] is the number of 1's in the binary representation of i.",
     "difficulty": "Advanced",
     "topics": [
       "Bit Manipulation",
@@ -856,20 +814,6 @@
     "solution": "Use a backtracking algorithm. Define a recursive function `solve(row)` that tries to place a queen in the given `row`. Iterate through each column `col` in that row. For each column, check if placing a queen at `(row, col)` is safe (i.e., not attacked by any previously placed queens). To check for safety, you need to verify that no other queen is in the same column, or on the two diagonals. Use helper arrays or sets to keep track of occupied columns and diagonals. If the placement is safe, make the recursive call `solve(row + 1)`. The base case is when `row == n`, which means a valid solution has been found; increment a global counter. Remember to backtrack by removing the queen's state before returning."
   },
   {
-    "title": "Human Traffic of Stadium",
-    "question": "Write a solution to find the IDs of stadium visits with 3 or more consecutive visits with 100 or more people. The table is Stadium (id, visit_date, people).",
-    "difficulty": "Advanced",
-    "topics": [
-      "Databases"
-    ],
-    "testCases": [
-      "See problem link for detailed examples."
-    ],
-    "constraints": "id is the primary key.",
-    "hints": "Use window functions like LAG() and LEAD() to access previous and next rows to check for consecutive visits.",
-    "solution": "First, filter the stadium table for visits with 100 or more people. Then, use window functions to find consecutive runs. A common trick is to use `id - ROW_NUMBER() OVER (ORDER BY id)` to create a grouping `id` for consecutive rows. Then, group by this calculated `id` and select the groups having a count of 3 or more. Finally, select all original `id`s that belong to these valid groups."
-  },
-  {
     "title": "Median of Two Sorted Arrays",
     "question": "Given two sorted arrays nums1 and nums2 of size m and n respectively, return the median of the two sorted arrays. The overall run time complexity should be O(log (m+n)).",
     "difficulty": "Advanced",
@@ -878,8 +822,8 @@
       "Algorithms"
     ],
     "testCases": [
-      "Input: nums1 = [1,3], nums2 = [2], Output: 2.0",
-      "Input: nums1 = [1,2], nums2 = [3,4], Output: 2.5"
+      "Input: nums1 = [1,3], nums2 = [2], Output: 2",
+      "Input: nums1 = [1], nums2 = [3,4], Output: 3"
     ],
     "constraints": "nums1.length == m. nums2.length == n. 0 <= m, n <= 1000. 1 <= m + n <= 2000.",
     "hints": "This problem can be solved by finding a partition in both arrays such that all elements on the left side of the partitions are less than or equal to all elements on the right side. This can be achieved with binary search.",
@@ -947,7 +891,7 @@
   },
   {
     "title": "Min Cost Climbing Stairs",
-    "question": "You are given an integer array `cost` where `cost[i]` is the cost of the `i`th step on a staircase. Once you pay the cost, you can either climb one or two steps. You can either start from the step with index 0, or the step with index 1. Return the minimum cost to reach the top of the floor.",
+    "question": "You are given an integer array `cost` where `cost[i]` is the cost of the `i`th step on a staircase. Once you pay the cost, you can either climb one or two steps. You can either start from the step with index 0, or the step with index 1. The top of the floor is considered to be one step beyond the last index of the array. Return the minimum cost to reach the top of the floor.",
     "difficulty": "Beginner",
     "topics": [
       "Dynamic Programming",
