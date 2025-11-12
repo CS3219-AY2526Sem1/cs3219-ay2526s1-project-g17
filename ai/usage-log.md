@@ -240,6 +240,8 @@ Created connectivity tests, submission tests, error response tests
 ##### Author Notes:
 Edited and changed the variables I wanted to test. Also, added API fallback logic tests.
 
+---
+
 ##### Date/Time:
 2025-10
 ##### Tool:
@@ -272,6 +274,8 @@ Created a working UI for matching criteria selection dialog and timer. But the c
 Only the css and design is kept as it is.
 The some UI logic and communication with the backend servers have to be manually added.
 
+---
+
 ##### Date/Time:
 2025-09 to 2025-10
 ##### Tool:
@@ -286,3 +290,30 @@ Created a dull UI of it.
 - [ ] Rejected
 ##### Author Notes:
 Only the CSS and design is kept as it is. Logic, font, colours are changed to match other elements.
+
+---
+
+##### Date/Time:
+2025-10
+##### Tool:
+Claude Sonnet 4
+##### Prompt/Command:
+Asked how I should track cursor position. 
+
+editor.onDidChangeCursorPosition((e) => {
+    const pos = e.position;
+    const el = document.getElementById("cursor-pos");
+});
+##### Output Summary:
+// Cursor position tracking
+editor.onDidChangeCursorPosition((e) => {
+    const pos = e.position;
+    const el = document.getElementById("cursor-pos");
+    if (el) el.textContent = `Ln ${pos.lineNumber}, Col ${pos.column}`; // missing this line
+});
+##### Action Taken:
+- [x] Accepted as-is
+- [ ] Modified
+- [ ] Rejected
+##### Author Notes:
+Coded the first few lines. Was just missing the last line for it to work.
