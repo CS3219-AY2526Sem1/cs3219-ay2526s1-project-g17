@@ -9,8 +9,32 @@ This repository hosts the full-stack application for a real-time, collaborative 
 The platform is structured around five core backend microservices, supported by a dedicated frontend, an identity provider, and persistent data stores.
 
 
-
-[Image of high-level system architecture]
+```mermaid
+flowchart TB
+    %% ==== MAIN COMPONENTS ====
+    FE[Frontend]
+    AUTH0[Auth0 Identity Provider]
+    BACKEND[[Backend Microservices]]
+    EXTERNAL[[External APIs (Gemini, Judge0)]]
+    DB[(Databases)]
+    %% ==== FLOWS ====
+    FE -- "Login / Auth" --> AUTH0
+    FE -- "Requests with Auth Token" --> BACKEND
+    BACKEND -- "Verify Token" --> AUTH0
+    BACKEND -- "Store & Retrieve Data" --> DB
+    BACKEND -. "AI & Code Execution" .-> EXTERNAL
+    %% ==== STYLES ====
+    classDef client fill:#B5EAEA,stroke:#333,stroke-width:1px;
+    classDef auth fill:#FFBCBC,stroke:#333,stroke-width:1px;
+    classDef backend fill:#FFF3B0,stroke:#333,stroke-width:1px;
+    classDef external fill:#D3F8E2,stroke:#333,stroke-width:1px;
+    classDef db fill:#A0E7E5,stroke:#333,stroke-width:1px;
+    class FE client
+    class AUTH0 auth
+    class BACKEND backend
+    class EXTERNAL external
+    class DB db
+```
 
 
 ### Key Components
