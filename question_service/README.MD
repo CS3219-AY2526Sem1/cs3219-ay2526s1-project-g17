@@ -1,132 +1,77 @@
-# Question Service API Guide
+# Question Service
 
-## Endpoints
+The Question Service is a RESTful API microservice for managing coding questions in the PeerPrep application. It provides endpoints for creating, reading, updating, and deleting questions, as well as retrieving questions by difficulty and topic, and fetching random questions for matched users.
 
-### Get All Questions
+**Key Features:**
+- CRUD operations for coding questions
+- Topic-based filtering and queries
+- Random question selection by difficulty and topic
+- Auth0 JWT authentication for admin operations
+- MongoDB for flexible document storage
 
-- **HTTP Method:** `GET`
-- **Endpoint:** `http://localhost:5001/api/questions`
-- **Description:** Retrieves all questions from the database.
+**Technology Stack:**
+- Runtime: Node.js 22
+- Framework: Express 5.1.0
+- Database: MongoDB Atlas
+- Authentication: Auth0
+- Containerization: Docker
 
-| Response Code | Explanation                                 |
-|--------------|---------------------------------------------|
-| 200 (OK)     | Success, all questions returned              |
-| 500          | Internal server error                        |
+## Documentation
 
----
+For comprehensive information about the Question Service, refer to the following documentation:
 
-### Get Question by ID
+- **[API Documentation](doc/api-documentation.md)** - Complete API reference with endpoints, request/response formats, and examples
+- **[Design Documentation](doc/design-documentation.md)** - Architecture decisions, database design, and technology rationale
+- **[Runbook](doc/runbook.md)** - Deployment procedures, configuration, monitoring, and troubleshooting guide
 
-- **HTTP Method:** `GET`
-- **Endpoint:** `http://localhost:5001/api/questions/{questionId}`
-- **Parameters:**
-	- Required: `questionId` path parameter
-	- Example: `http://localhost:5001/api/questions/60c72b2f9b1d4c3a2e5f8b4c`
+## Quick Start
 
-| Response Code | Explanation                                 |
-|--------------|---------------------------------------------|
-| 200 (OK)     | Success, question data returned              |
-| 404          | Question not found                           |
-| 500          | Internal server error                        |
+```bash
+# Install dependencies
+npm install
 
----
+# Set up environment variables in .env
+MONGO_URI=your_mongodb_uri
+PORT=5001
+AUTH0_DOMAIN=your_auth0_domain
+AUTH0_AUDIENCE=your_auth0_audience
 
-### Create Question
+# Start development server
+npm run dev
 
-- **HTTP Method:** `POST`
-- **Endpoint:** `http://localhost:5001/api/questions`
-- **Headers:**
-	- Required: `Authorization: Bearer <JWT_ACCESS_TOKEN>` (admin only)
-- **Body:**
-	- Required: `title`, `question`, `difficulty`, `topics`, `link`
-	- Optional: `testCases`, `constraints`, `hints`, `solution`
+# Run tests
+npm test
+```
 
-| Response Code | Explanation                                 |
-|--------------|---------------------------------------------|
-| 201 (Created)| Question created successfully                |
-| 400          | Missing required fields                      |
-| 401/403      | Unauthorized or insufficient permissions     |
-| 500          | Internal server error                        |
+## API Endpoints
 
----
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/api/questions` | Get all questions | No |
+| GET | `/api/questions/:id` | Get question by ID | No |
+| GET | `/api/questions/topics` | Get all unique topics | No |
+| GET | `/api/questions/topicsByDifficulty` | Get topics grouped by difficulty | No |
+| GET | `/api/questions/randomQuestion` | Get random question ID by difficulty and topic | No |
+| POST | `/api/questions` | Create a new question | Admin |
+| POST | `/api/questions/insertMany` | Bulk insert questions | Admin |
+| PUT | `/api/questions/:id` | Update a question | Admin |
+| DELETE | `/api/questions/:id` | Delete a question | Admin |
 
-### Edit Question
+## Environment Variables
 
-- **HTTP Method:** `PUT`
-- **Endpoint:** `http://localhost:5001/api/questions/{questionId}`
-- **Headers:**
-	- Required: `Authorization: Bearer <JWT_ACCESS_TOKEN>` (admin only)
-- **Body:**
-	- At least one of the question fields to update
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `MONGO_URI` | Yes | MongoDB connection string |
+| `PORT` | No | Server port (default: 5001) |
+| `AUTH0_DOMAIN` | Yes | Auth0 tenant domain |
+| `AUTH0_AUDIENCE` | Yes | Auth0 API identifier |
 
-| Response Code | Explanation                                 |
-|--------------|---------------------------------------------|
-| 200 (OK)     | Success, question updated                    |
-| 404          | Question not found                           |
-| 401/403      | Unauthorized or insufficient permissions     |
-| 500          | Internal server error                        |
+## Docker
 
----
+```bash
+# Build image
+docker build -t question-service .
 
-### Delete Question
-
-- **HTTP Method:** `DELETE`
-- **Endpoint:** `http://localhost:5001/api/questions/{questionId}`
-- **Headers:**
-	- Required: `Authorization: Bearer <JWT_ACCESS_TOKEN>` (admin only)
-
-| Response Code | Explanation                                 |
-|--------------|---------------------------------------------|
-| 200 (OK)     | Success, question deleted                    |
-| 404          | Question not found                           |
-| 401/403      | Unauthorized or insufficient permissions     |
-| 500          | Internal server error                        |
-
----
-
-### Get Random Question ID by Difficulty and Topics
-
-- **HTTP Method:** `GET`
-- **Endpoint:** `http://localhost:5001/api/questions/randomQuestion`
-- **Query Parameters:**
-	- `difficulty` (string)
-	- `topics` (comma-separated string, e.g. `array,recursion`)
-- **Description:** Returns the ID of a random question matching the criteria.
-
-| Response Code | Explanation                                 |
-|--------------|---------------------------------------------|
-| 200 (OK)     | Success, question ID returned                |
-| 404          | No matching question found                   |
-| 500          | Internal server error                        |
-
----
-
-### Get All Topics
-
-- **HTTP Method:** `GET`
-- **Endpoint:** `http://localhost:5001/api/questions/topics`
-- **Description:** Returns a list of all unique topics.
-
-| Response Code | Explanation                                 |
-|--------------|---------------------------------------------|
-| 200 (OK)     | Success, topics returned                     |
-| 500          | Internal server error                        |
-
----
-
-### Get Topics by Difficulty
-
-- **HTTP Method:** `GET`
-- **Endpoint:** `http://localhost:5001/api/questions/topicsByDifficulty`
-- **Description:** Returns a mapping of difficulty levels to their unique topics.
-
-| Response Code | Explanation                                 |
-|--------------|---------------------------------------------|
-| 200 (OK)     | Success, topics by difficulty returned       |
-| 500          | Internal server error                        |
-
----
-
-**Note:**
-- All endpoints return JSON responses.
-- Admin-only endpoints require a valid JWT with admin privileges.
+# Run container
+docker run -p 5001:5001 --env-file .env question-service
+```

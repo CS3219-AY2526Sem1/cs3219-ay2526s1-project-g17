@@ -89,18 +89,6 @@ Database (MongoDB Atlas)
 }
 ```
 
-**Design Decisions:**
-
-- **title:** Unique identifier for human readability
-- **question:** Full problem description in markdown or plain text
-- **difficulty:** Enum constraint ensures data consistency across three levels
-- **topics:** Array allows multiple categorizations for flexible filtering
-- **testCases:** Array of strings for flexibility in format (can store input/output pairs as text)
-- **constraints:** Single string field for problem constraints
-- **hints:** Single string field, can contain multiple hints separated by delimiters
-- **solution:** Text-based solution approach or code snippets
-- **timestamps:** Automatic tracking of creation and modification times
-
 ### Indexing Strategy
 
 **Compound Index:**
@@ -113,21 +101,6 @@ questionSchema.index({ difficulty: 1, topics: 1 });
 - Supports queries that filter by both difficulty and topics simultaneously
 - Uses ascending order (1) for both fields
 
-**Query Performance:**
-- Without index: O(n) full collection scan
-- With index: O(log n) + O(k) where k is number of matching documents
-- Random selection from matched subset is efficient
-
-**Index Trade-offs:**
-- **Benefit:** Faster query performance for filtered random question selection
-- **Cost:** Additional storage overhead (minimal for compound index)
-- **Write Performance:** Slight decrease in insert/update speed (acceptable for read-heavy workload)
-
-**Why Not Index Other Fields:**
-- **title:** Not frequently queried alone
-- **createdAt/updatedAt:** Not used in filtering operations
-- **topics alone:** Always queried with difficulty, compound index covers this case
-
 ## API Design
 
 ### RESTful Principles
@@ -137,42 +110,6 @@ The API follows REST conventions:
 - **HTTP Methods:** GET (read), POST (create), PUT (update), DELETE (remove)
 - **Stateless:** Each request contains all necessary information
 - **JSON Format:** All requests and responses use JSON
-
-### Query Optimization
-
-**getAllTopics Aggregation Pipeline:**
-```javascript
-[
-  { $unwind: "$topics" },                          // Flatten topics arrays
-  { $group: { _id: "$topics" } },                  // Get unique topics
-  { $sort: { _id: 1 } },                           // Sort alphabetically
-  { $group: { _id: null, allTopics: { $push: "$_id" } } }  // Collect into array
-]
-```
-
-**Why Aggregation Over Find:**
-- `find()` returns full documents, then client-side processing extracts topics
-- Aggregation processes data on database server, reducing network transfer
-- Pipeline stages leverage indexes and optimize query execution plan
-- Result is a single array of unique, sorted topics
-
-**getRandomQuestionIdByDifficultyAndTopic Aggregation:**
-```javascript
-Question.aggregate()
-  .match({ difficulty: difficulty, topics: { $in: topicsList } })
-  .sample(1)
-```
-
-**Design Choice:**
-- `$match` filters documents using the compound index
-- `$sample` performs random selection on matched subset (not entire collection)
-- Returns only `_id` field to minimize response payload
-- More efficient than client-side random selection after fetch
-
-**getListOfTopicsByDifficulty Implementation:**
-- Uses `find()` to retrieve all questions (simple query)
-- Client-side grouping and deduplication (acceptable for small datasets)
-- Could be optimized with aggregation if dataset grows large
 
 ## Authentication and Authorization
 
@@ -224,22 +161,6 @@ All errors return JSON with `message` field:
   "message": "Error description"
 }
 ```
-
-**Controller-Level Error Handling:**
-```javascript
-try {
-  // Business logic
-} catch (error) {
-  console.error("Error in <controller>", error);
-  res.status(500).json({ message: "Internal server error" });
-}
-```
-
-**Advantages:**
-- Prevents sensitive error details from leaking to clients
-- Provides consistent error format for frontend parsing
-- Logs detailed errors server-side for debugging
-- Separates client-facing messages from internal errors
 
 ### Error Categories
 
@@ -337,7 +258,3 @@ The Question Service is one microservice in the PeerPrep application:
 | Orchestration | Docker Compose | Local multi-service development, simple configuration |
 | CI/CD | GitHub Actions | Native GitHub integration, free for public repos |
 | Cloud Platform | Google Cloud Run | Serverless, auto-scaling, pay-per-request |
-
-## Conclusion
-
-The Question Service is designed for simplicity, scalability, and maintainability. It leverages modern technologies and best practices to provide a reliable API for managing coding questions within the PeerPrep ecosystem. The architecture supports future growth through horizontal scaling, caching strategies, and modular design.
