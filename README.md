@@ -15,7 +15,7 @@ flowchart TB
     FE[Frontend]
     AUTH0[Auth0 Identity Provider]
     BACKEND[[Backend Microservices]]
-    EXTERNAL[[External APIs (Gemini, Judge0)]]
+    EXTERNAL[[External APIs]]
     DB[(Databases)]
     %% ==== FLOWS ====
     FE -- "Login / Auth" --> AUTH0
