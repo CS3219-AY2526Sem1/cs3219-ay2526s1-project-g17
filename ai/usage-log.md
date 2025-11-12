@@ -208,3 +208,20 @@ Appended my own test cases using the same format that was provided by Copilot on
 # History Service
 
 # Execution Service
+
+# Frontend
+##### Date/Time:
+2025-08 to 2025-09?
+##### Tool:
+Github copilot claude sonnet 3.5/4
+##### Prompt/Command:
+Asked chat to create a UI for matching service's dialog pop up and timer.
+##### Output Summary:
+Created a working UI for matching criteria selection dialog and timer. But the communication with the backend is not working.
+##### Action Taken:
+- [ ] Accepted as-is
+- [x] Modified
+- [ ] Rejected
+##### Author Notes:
+Only the css and design is kept as it is.
+The some UI logic and communication with the backend servers have to be manually added.
