@@ -208,6 +208,35 @@ Appended my own test cases using the same format that was provided by Copilot on
 # History Service
 
 # Execution Service
+##### Date/Time:
+2025-10
+##### Tool:
+Claude Sonnet 4
+##### Prompt/Command:
+Prompted it to create a template of testcases for execution service
+##### Output Summary:
+Created connectivity tests, submission tests, error response tests
+##### Action Taken:
+- [ ] Accepted as-is
+- [x] Modified
+- [ ] Rejected
+##### Author Notes:
+Edited and changed the variables I wanted to test. Also, added API fallback logic tests.
+
+##### Date/Time:
+2025-10
+##### Tool:
+Claude Sonnet 4
+##### Prompt/Command:
+Pasted my then functions for code validation. And asked it to improve it.
+##### Output Summary:
+In ./middleware/validation.js
+##### Action Taken:
+- [x] Accepted as-is
+- [ ] Modified
+- [ ] Rejected
+##### Author Notes:
+Functions - validate and validateFields. The rest are self-coded.
 
 # Frontend
 ##### Date/Time:
@@ -225,3 +254,18 @@ Created a working UI for matching criteria selection dialog and timer. But the c
 ##### Author Notes:
 Only the css and design is kept as it is.
 The some UI logic and communication with the backend servers have to be manually added.
+
+##### Date/Time:
+2025-09 to 2025-10
+##### Tool:
+Claude Sonnet 4
+##### Prompt/Command:
+Prompted it to create code output boxes.
+##### Output Summary:
+Created a dull UI of it.
+##### Action Taken:
+- [ ] Accepted as-is
+- [x] Modified
+- [ ] Rejected
+##### Author Notes:
+Only the CSS and design is kept as it is. Logic, font, colours are changed to match other elements.
