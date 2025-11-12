@@ -363,3 +363,20 @@ Gave me a useEffect with an asynchronous function to load the questions
 - [ ] Rejected
 ##### Author Notes:
 The initial was a little bit more complicated then necessary so cut down some lines of code, and changed some of the API calls to work with the deployment and then changed the dependency array to match the changes. Verified correctness later by testing the frontend manually with different situations on both local and cloud deployment
+---
+
+##### Date/Time:
+2025-11
+##### Tool:
+Chatgpt
+##### Prompt/Command:
+Asked ai to write documentations
+##### Output Summary:
+Documentations
+##### Action Taken:
+- [ ] Accepted as-is
+- [x] Modified
+- [ ] Rejected
+##### Author Notes:
+Asked the chatgpt to come up with the documentation based on the codes and the chart we came up with. ChatGPT's answers are modified to correct its mistakes. Any outdated answer are discarded.
+---
