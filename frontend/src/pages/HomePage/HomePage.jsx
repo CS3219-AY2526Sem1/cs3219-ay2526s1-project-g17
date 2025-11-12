@@ -64,7 +64,6 @@ export default function HomePage() {
               <div className="hero__actions">
                 {/* Gentle nudge to log in */}
                 <LoginButton className="btn btn--primary" />
-                <a href="#learn-more" className="btn btn--ghost">Learn more</a>
               </div>
             </section>
 
