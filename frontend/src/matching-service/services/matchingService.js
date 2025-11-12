@@ -1,3 +1,4 @@
+/* AI Generated File */
 /** @typedef {import("../types").MatchRequest} MatchRequest */
 /** @typedef {import("../types").MessageToServer} MessageToServer */
 /** @typedef {import("../types").Notification} Notification */

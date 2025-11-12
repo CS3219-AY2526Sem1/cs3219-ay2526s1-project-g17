@@ -1,3 +1,4 @@
+/* AI Generated File */
 import React, { useState, useEffect, useRef } from "react";
 import "./MatchingTimer.css";
 import { QUEUE_TIMEOUT } from "../constants";
