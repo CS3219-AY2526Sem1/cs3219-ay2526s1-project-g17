@@ -2,6 +2,12 @@ import { describe, expect, it, afterEach, jest } from "@jest/globals";
 import { getUsersHistory, createAttempt, updateAttempt } from "../src/controller/historyController.js";
 import { QuestionAttempt } from "../src/models/Attempt.js";
 
+// AI Assistance Disclosure:
+// Tool: ChatGPT (model: GPT‑5 Thinking), date: 30-10-2025
+// Scope: Generated unit test cases that I specified to test the history controller
+// Author review: I added in the correct env variables and values, validated for correctness, edited the style.
+
+
 const buildMockRes = () => {
   const res = {};
   res.status = jest.fn().mockReturnValue(res);

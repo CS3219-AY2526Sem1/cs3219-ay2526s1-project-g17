@@ -254,7 +254,7 @@ Gave me a useMemo and useCallback hook which I had to modify to call the correct
 - [x] Modified
 - [ ] Rejected
 ##### Author Notes:
-Was initially not functioning properly and so the trycatch error block had to be manually added and corrected, and the dependency array and the actual API calls had to be modified for it to work properly. 
+Was initially not functioning properly and so the trycatch error block had to be manually corrected, and the dependency array and the actual API calls had to be modified for it to work properly. 
 
 ##### Date/Time:
 2025-10-30 (30 Oct)
