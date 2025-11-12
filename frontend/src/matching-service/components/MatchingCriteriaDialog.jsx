@@ -162,6 +162,7 @@ const MatchingCriteriaDialog = ({ isOpen, onClose, onSubmit }) => {
             const sessionId = data.session.sessionId;
             const questionId = data.session.questionId;
             const language = data.session.criteria.language;
+            alert(`Please submit the previous session before finding a new match`);
             navigate(formSectionUrl(sessionId, questionId, language), {
               state: {
                 session: data.session,
