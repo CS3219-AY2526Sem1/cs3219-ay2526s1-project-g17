@@ -7,6 +7,12 @@ import './ProfilePage.css'
 import axios from "axios";
 import HistoryPanel from "./components/HistoryPanel.jsx";
 
+// AI Assistance Disclosure:
+// Tool: ChatGPT (model: GPT‑5 Thinking), date: 30-10-2025
+// Scope: Write a function / hook to memoise the function call from fetchAttempts to try speed up the page
+// Author review: Was initially not functioning properly and so the trycatch error block had to be 
+// manually corrected, and the dependency array and the actual API calls had to be modified for it to work properly. 
+
 const PAGE_SIZE = 5;
 const HISTORY_SERVICE_BASE =
   import.meta.env.VITE_HISTORY_SERVICE_BASE || "http://localhost:3004/history";

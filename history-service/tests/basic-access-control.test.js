@@ -1,5 +1,11 @@
 import { describe, expect, it, beforeEach, afterEach, jest } from "@jest/globals";
 
+// AI Assistance Disclosure:
+// Tool: ChatGPT (model: GPT‑5 Thinking), date: 30-10-2025
+// Scope: Generated unit test cases that I specified to test the environment variables are read properly
+// Author review: Validated correctness by changing the body of the ai-generated request to match what the 
+// actual request body looks like and had to append code to some tests to include checks for the correct error code and message.
+
 describe("verifyAccessToken middleware", () => {
   const originalAudience = process.env.AUTH0_AUDIENCE;
   const originalDomain = process.env.AUTH0_DOMAIN;
