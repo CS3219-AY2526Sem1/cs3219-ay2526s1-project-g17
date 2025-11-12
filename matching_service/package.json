@@ -1,0 +1,38 @@
+{
+  "name": "peerprep",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --no-watch",
+    "test-env": "node test-env.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^24.7.1",
+    "@types/ws": "^8.18.1",
+    "jest": "^30.2.0",
+    "nodemon": "^3.1.10",
+    "socket.io-client": "^4.8.1",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "axios": "^1.12.2",
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.2",
+    "express": "^5.1.0",
+    "express-oauth2-jwt-bearer": "^1.7.1",
+    "jsonwebtoken": "^9.0.2",
+    "mongodb": "^6.20.0",
+    "mongoose": "^8.18.2",
+    "redis": "^5.8.3",
+    "socket.io": "^4.8.1",
+    "ws": "^8.18.3"
+  }
+}

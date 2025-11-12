@@ -1,0 +1,126 @@
+/* AI Generated File */
+/* Root wrapper inherits global background; just handle nav offset + centering */
+.matching.with-nav-offset {
+  padding-top: var(--nav-height);
+  min-height: calc(100vh - var(--nav-height));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Inner container */
+.matching__container {
+  width: 100%;
+  max-width: 1200px;
+  padding: 32px 20px;
+}
+
+/* Two-column hero: copy the feel from HomePage */
+.matching__hero {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 32px;
+  align-items: center;
+}
+
+/* Content column */
+.matching__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  text-align: center;
+}
+
+.matching__title {
+  font-size: clamp(28px, 4vw, 44px);
+  line-height: 1.15;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.matching__subtitle {
+  color: var(--muted);
+  font-size: clamp(16px, 2.2vw, 18px);
+  line-height: 1.6;
+  max-width: 56ch;
+}
+
+/* Primary actions */
+.matching__actions {
+  display: flex;
+  justify-content: center;  /* center horizontally */
+  align-items: center;
+  gap: 12px;
+  margin-top: 24px;         /* add a little breathing room below the text */
+}
+
+
+/* Result card (reuses dark panel aesthetic) */
+.matching__card {
+  background: var(--panel);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+}
+
+.matching__cardTitle {
+  margin: 0 0 8px;
+  font-size: 1.25rem;
+}
+
+/* Artwork / decorative block (image can replace this) */
+.matching__art {
+  display: grid;
+  place-items: center;
+}
+
+.matching__artBox {
+  width: 100%;
+  max-width: 520px;
+  height: 320px;
+  border-radius: 16px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02)),
+    radial-gradient(400px 200px at 20% 0%, rgba(110,168,254,0.35), transparent 60%),
+    radial-gradient(500px 300px at 100% 100%, rgba(99,102,241,0.25), transparent 60%),
+    #0f172a;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.35), inset 0 0 0 1px rgba(255,255,255,0.06);
+  position: relative;
+  overflow: hidden;
+}
+
+/* A subtle animated shimmer line */
+.matching__artBox::after {
+  content: "";
+  position: absolute;
+  inset: -40% -40% auto -40%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
+  transform: rotate(12deg);
+  animation: sweep 4s linear infinite;
+}
+
+@keyframes sweep {
+  0%   { transform: translateX(-40%) rotate(12deg); opacity: 0; }
+  15%  { opacity: 1; }
+  85%  { opacity: 1; }
+  100% { transform: translateX(140%) rotate(12deg); opacity: 0; }
+}
+
+/* Responsive: stack columns and center text */
+@media (max-width: 900px) {
+  .matching__hero {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    text-align: center;
+  }
+  .matching__actions {
+    justify-content: center;
+  }
+  .matching__artBox {
+    max-width: 460px;
+    height: 260px;
+  }
+}
